@@ -2,6 +2,7 @@ import deepEqual from "deep-is";
 import getHash from "./getHash";
 import uuid from "./uuid";
 import inflate from "./inflate";
+import keysPressed from "./keysPressed";
 
 function storage() {
   const ns = "rewrite";
@@ -15,4 +16,11 @@ function storage() {
   };
 }
 
-export default { getHash, uuid, deepEqual, storage, inflate };
+export default {
+  getHash, //
+  uuid,
+  deepEqual,
+  storage,
+  inflate,
+  keysPressed
+};
