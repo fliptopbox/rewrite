@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "keywords": [],
-  "main": "src/version2.js",
+  "main": "src/index.js",
   "dependencies": {
     "marked": "0.5.1",
     "node-sass": "4.11.0",
