@@ -1,14 +1,14 @@
-import React, { Component } from "react";
+import React from "react";
 import ReactDOM from "react-dom";
 import { createStore, combineReducers } from "redux";
 
 // helper functions and modules
 import u from "./utilities/";
 import initialState from "./modules/initialState";
-import fontFamily from "./modules/fontFamily";
 
 // React components
 import Editor from "./modules/Editor";
+import Article from "./modules/Article";
 import allReducers from "./modules/allReducers";
 
 import "./styles.scss";
@@ -17,128 +17,37 @@ window.RE = window.RE || {};
 
 const localState = u.storage();
 const state = localState.read() || initialState;
-localState.write(state);
+// localState.write(state);
 
 const store = createStore(combineReducers(allReducers), state);
 
-function tagNode(e) {
-  // give a node an id if it doesn't have one
+// const tiggerDict = {
+//   ALTenter: e => {
+//     const el = window.getSelection().focusNode.parentNode;
+//     const { id } = el;
 
-  const div = window.getSelection().focusNode.parentNode;
+//     el.classList.add("locked");
 
-  if (!/^div$/i.test(div.nodeName)) return;
-  div.id = div.id || u.uuid();
-}
+//     const text = u.inflate(el.innerText);
 
-const tiggerDict = {
-  ALTenter: e => {
-    const el = window.getSelection().focusNode.parentNode;
-    const { id } = el;
+//     store.dispatch({ type: "CONTENT-LOCK", id: id });
+//     store.dispatch({ type: "EDITOR-LOAD", id: id, text: text });
 
-    el.classList.add("locked");
+//     return false;
+//   }
+// };
 
-    const text = u.inflate(el.innerText);
-
-    store.dispatch({ type: "CONTENT-LOCK", id: id });
-    store.dispatch({ type: "EDITOR-LOAD", id: id, text: text });
-
-    return false;
-  }
-};
-
-function keyTriggers(e) {
-  let { altKey, shiftKey, ctrlKey, code, key } = e;
-
-  altKey = (altKey && "ALT") || "";
-  shiftKey = (shiftKey && "SHIFT") || "";
-  ctrlKey = (ctrlKey && "CTRL") || "";
-  key = key.trim() || code;
-
-  const down = `${ctrlKey}${shiftKey}${altKey}${key.toLowerCase()}`;
-  return tiggerDict[down] && tiggerDict[down](e);
-}
-
-function readonly(e) {
-  const div = window.getSelection().focusNode.parentNode;
-  const arrow = /^arrow/i.test(e.code);
-  const { content } = store.getState();
-  return arrow ? false : content[div.id];
-}
-
-window.RE.fontFamily = fontFamily;
-
-class Article extends Component {
-  constructor() {
-    super();
-    this.state = {
-      defaultMsg: [{ key: 0, value: "Type your words here ...." }],
-      collection: []
-    };
-    window.RE.article = this;
-  }
-
-  textToCollection(text) {
-    const paras = text.split("\n");
-    return paras.map((value, n) => ({
-      key: n,
-      text: value,
-      id: value && value.trim() ? u.uuid() : undefined
-    }));
-  }
-
-  load(text, replace) {
-    // if (this.state.plainText && !replace) {
-    //   console.error("Text already exists. Use replace=true to bypass");
-    //   return;
-    // }
-    const array = this.textToCollection(text);
-    this.setState({ collection: array });
-  }
-
-  render() {
-    const { defaultMsg, collection } = this.state;
-    const array = collection.length === 0 ? defaultMsg : collection;
-
-    const html = array.map(row => {
-      const { id, key, text } = row;
-      return (
-        <div id={id} key={key}>
-          {text || <br />}
-        </div>
-      );
-    });
-
-    return (
-      <div className="content">
-        <article contentEditable="true">{html}</article>
-      </div>
-    );
-  }
-}
-
-const Content = () => {
+const App = () => {
   return (
     <div className="pg">
-      <Article />
+      <Article store={store} />
       <Editor store={store} />
     </div>
   );
 };
 
-const App = () => <Content />;
-
 const root = document.getElementById("root");
 ReactDOM.render(<App />, root);
-
-document.querySelector("article").onkeydown = e => {
-  if (readonly(e)) {
-    e.preventDefault();
-    return false;
-  }
-
-  tagNode(e);
-  return keyTriggers(e);
-};
 
 function updateIO(value = null) {
   const el = document.getElementById("io");

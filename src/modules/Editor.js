@@ -1,6 +1,7 @@
 import React from "react";
 import Resizer from "./Resizer";
 import SampleLinks from "./SampleLinks";
+import FontSettings from "./FontSettings";
 import getCandidate from "../modules/extractCandidateText";
 
 let store;
@@ -9,6 +10,7 @@ const Footer = () => {
   return (
     <span className="buttons">
       <SampleLinks />
+      <FontSettings />
     </span>
   );
 };
