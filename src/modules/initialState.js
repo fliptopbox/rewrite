@@ -2,12 +2,15 @@
 // const variants = {}; // a dictionary of raw text refs
 export default {
   settings: {
-    fontFamily: "serif",
-    fontSize: 20,
+    fontFamily: 0,
+    fontSize: 0,
     panelWidth: 70
   },
   editor: {
     current: null // DOM id
   },
-  content: {}
+  content: {
+    defaultMsg: [{ key: 0, text: "Type your message here ..." }],
+    collection: []
+  }
 };
