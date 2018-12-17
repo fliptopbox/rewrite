@@ -36,9 +36,7 @@ const handleKeyUp = e => {
     //   text: candidate
     // });
 
-    // if (id) {
     document.getElementById(id).innerText = candidate;
-    // }
   }, delay);
 };
 
