@@ -17,7 +17,7 @@ const settings = (state = {}, action) => {
 };
 
 const content = (state = [], actions) => {
-  const { type, id } = actions;
+  const { type, id, value } = actions;
 
   if (type === "CONTENT-LOAD") {
   }
@@ -27,7 +27,8 @@ const content = (state = [], actions) => {
   if (type === "CONTENT-UNLOCK") {
     delete state[id];
   }
-  if (type === "CONTENT-CHANGE") {
+  if (type === "CONTENT-SAVE") {
+    state.collection = [...value];
   }
 
   return { ...state };
@@ -37,6 +38,11 @@ const editor = (state = {}, actions) => {
   const { type, id = null, text = null } = actions;
 
   switch (type) {
+    case "EDITOR-PARENT":
+      state.current = id;
+      state.value = text;
+      break;
+
     case "EDITOR-LOAD":
       state[id] = text || state[id];
       state.current = id;
