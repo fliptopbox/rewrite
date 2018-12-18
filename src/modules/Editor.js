@@ -10,13 +10,14 @@ const Footer = () => {
   return (
     <span className="buttons">
       <SampleLinks />
-      <FontSettings />
+      <FontSettings store={store} />
     </span>
   );
 };
 
 let timer;
 const delay = 555;
+let $parent;
 
 const handleKeyUp = e => {
   const text = e.target.value;
@@ -26,6 +27,8 @@ const handleKeyUp = e => {
     const state = store.getState();
     const id = state.editor.current;
     const candidate = getCandidate(text);
+    const el = document.getElementById(id);
+    if (!el) return;
 
     store.dispatch({
       type: "EDITOR-LOAD",
@@ -38,8 +41,13 @@ const handleKeyUp = e => {
     //   text: candidate
     // });
 
-    document.getElementById(id).innerText = candidate;
+    el.innerText = candidate;
+    el.dataset.versions = text;
   }, delay);
+};
+
+const handleFocus = e => {
+  $parent = $parent || document.getElementById(e.target.id);
 };
 
 const Editor = props => {
@@ -50,7 +58,7 @@ const Editor = props => {
       <Resizer />
       <Footer />
       <div className="inner">
-        <textarea id="io" onKeyUp={handleKeyUp} />
+        <textarea id="io" onKeyUp={handleKeyUp} onFocus={handleFocus} />
       </div>
     </div>
   );
