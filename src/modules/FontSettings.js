@@ -5,10 +5,11 @@ let store;
 let fface = 0;
 let fsize = 1;
 
+const sizes = [18, 24, 26, 32];
+const modifiers = ["serif", "sans-serif", "monospace"];
+
 function setFontFamily(modifier = 0, size = 1, noSave) {
   const body = document.querySelector("body");
-  const modifiers = ["serif", "sanserif", "monospace"];
-  const sizes = [14, 18, 24, 26];
   modifiers.forEach(value => body.removeAttribute(value, ""));
 
   modifier = Math.min(modifier, modifiers.length - 1);
@@ -29,37 +30,25 @@ function setFontFamily(modifier = 0, size = 1, noSave) {
   u.storage().write(store.getState());
 }
 
-const FontSizes = () => {
+const link = (text, index, args, trim) => {
+  const trimmed = trim && text.replace(trim, "");
   return (
-    <ul>
-      <a href="#0" onClick={() => setFontFamily(fface, 0)}>
-        14
-      </a>
-      <a href="#1" onClick={() => setFontFamily(fface, 1)}>
-        18
-      </a>
-      <a href="#2" onClick={() => setFontFamily(fface, 2)}>
-        24
-      </a>
-      <a href="#3" onClick={() => setFontFamily(fface, 3)}>
-        26
-      </a>
-    </ul>
+    <a
+      href="{index}"
+      key={index}
+      onClick={() => setFontFamily.apply(this, args)}
+    >
+      {trim ? trimmed || text : text}
+    </a>
   );
 };
+
+const FontSizes = () => {
+  return sizes.map((value, n) => link(value, n, [fface, n]));
+};
 const FontFaces = () => {
-  return (
-    <ul>
-      <a href="#0" onClick={() => setFontFamily(0)}>
-        Serif
-      </a>
-      <a href="#1" onClick={() => setFontFamily(1)}>
-        Sans
-      </a>
-      <a href="#2" onClick={() => setFontFamily(2)}>
-        Mono
-      </a>
-    </ul>
+  return modifiers.map((value, n) =>
+    link(value, n, [n, fsize], /(-serif|space)$/i)
   );
 };
 
