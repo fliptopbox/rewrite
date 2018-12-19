@@ -55,7 +55,7 @@ const Editor = props => {
 
   return (
     <div className="editor">
-      <Resizer />
+      <Resizer store={store} />
       <Footer />
       <div className="inner">
         <textarea id="io" onKeyUp={handleKeyUp} onFocus={handleFocus} />
