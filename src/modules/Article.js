@@ -176,12 +176,11 @@ class Article extends Component {
   };
 
   render() {
-    const { defaultMsg, collection } = this.state;
-    const array = collection.length > 1 ? collection : defaultMsg;
+    const { collection } = this.state;
 
-    const html = array.map((row, n) => {
-      const { id, text, locked, versions } = row;
-      const classname = locked ? "locked" : undefined;
+    const html = collection.map((row, n) => {
+      const { id, text, versions } = row;
+      const classname = versions ? "locked" : "";
       return (
         <div id={id} key={n} className={classname} data-versions={versions}>
           {text || <br />}

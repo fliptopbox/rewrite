@@ -10,13 +10,7 @@ export default {
     current: null // DOM id
   },
   content: {
-    defaultMsg: [{ key: 0, text: "Type your message here ..." }],
     collection: [
-      {
-        id: "",
-        text: null,
-        versions: ""
-      },
       {
         id: "c6764948a4313003",
         text: "# Re:writing",
