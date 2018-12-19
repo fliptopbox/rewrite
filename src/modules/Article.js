@@ -179,8 +179,8 @@ class Article extends Component {
     const { collection } = this.state;
 
     const html = collection.map((row, n) => {
-      const { id, text, versions } = row;
-      const classname = versions ? "locked" : "";
+      const { id, text, versions, className = null } = row;
+      const classname = [versions ? "locked" : "", className].join(" ");
       return (
         <div id={id} key={n} className={classname} data-versions={versions}>
           {text || <br />}

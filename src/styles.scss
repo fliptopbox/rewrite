@@ -65,6 +65,13 @@ article {
     padding: 0.05em 0.4em;
   }
 
+  .heading {
+    font-size: 2em;
+    margin-top: 3em;
+    letter-spacing: -1px;
+    font-variant-ligatures: common-ligatures;
+  }
+
   .locked {
     position: relative;
     background: $locked;
@@ -72,9 +79,9 @@ article {
     &::before {
       content: " ";
       background-image: url($lock);
-      background-size: 90%;
+      background-size: 12px;
       background-repeat: no-repeat;
-      background-position: 100% 10%;
+      background-position: 100% 10px;
       position: absolute;
       //background-color: $gutter;
       width: $width;
