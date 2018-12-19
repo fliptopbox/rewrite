@@ -3,6 +3,7 @@ import Resizer from "./Resizer";
 import SampleLinks from "./SampleLinks";
 import FontSettings from "./FontSettings";
 import getCandidate from "../modules/extractCandidateText";
+import u from "../utilities";
 
 let store;
 
@@ -10,7 +11,7 @@ const Footer = () => {
   return (
     <span className="buttons">
       <SampleLinks />
-      <FontSettings store={store} />
+      <FontSettings store={store} />{" "}
     </span>
   );
 };
@@ -36,13 +37,11 @@ const handleKeyUp = e => {
       text: text
     });
 
-    // store.dispatch({
-    //   type: "CONTENT-CHANGE",
-    //   text: candidate
-    // });
-
     el.innerText = candidate;
     el.dataset.versions = text;
+
+    // u.storage().write(state);
+    window.RE.article.save();
   }, delay);
 };
 
@@ -55,11 +54,10 @@ const Editor = props => {
 
   return (
     <div className="editor">
-      <Resizer store={store} />
-      <Footer />
+      <Resizer store={store} /> <Footer />
       <div className="inner">
-        <textarea id="io" onKeyUp={handleKeyUp} onFocus={handleFocus} />
-      </div>
+        <textarea id="io" onKeyUp={handleKeyUp} onFocus={handleFocus} />{" "}
+      </div>{" "}
     </div>
   );
 };

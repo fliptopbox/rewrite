@@ -31,11 +31,15 @@ class Article extends Component {
 
   load(text) {
     const array = this.textToCollection(text);
-    this.setState({ collection: array });
+    this.setState({
+      collection: array
+    });
   }
 
   clear() {
-    this.setState({ collection: [] });
+    this.setState({
+      collection: []
+    });
   }
 
   save() {
@@ -54,18 +58,30 @@ class Article extends Component {
 
         let versions = (dataset && dataset.versions) || "";
 
-        return { id, text, locked, versions };
+        return {
+          id,
+          text,
+          locked,
+          versions
+        };
       });
 
       console.log(6, "SAVE COLLECTION", collection);
-      store.dispatch({ type: "CONTENT-SAVE", value: collection });
+      store.dispatch({
+        type: "CONTENT-SAVE",
+        value: collection
+      });
 
       u.storage().write(store.getState());
     }, delay);
   }
 
   updateEditor = (id, value) => {
-    store.dispatch({ type: "EDITOR-PARENT", id, text: value });
+    store.dispatch({
+      type: "EDITOR-PARENT",
+      id,
+      text: value
+    });
     $editor = $editor || document.getElementById("io");
     $editor.value = String(value) || "";
     $editor.dataset.parent = id;
@@ -80,7 +96,12 @@ class Article extends Component {
     const text = innerText.trim();
     const locked = versions ? true : false;
 
-    return { id, text, versions, locked };
+    return {
+      id,
+      text,
+      versions,
+      locked
+    };
   };
 
   handlePaste = e => {
@@ -183,7 +204,8 @@ class Article extends Component {
       const classname = [versions ? "locked" : "", className].join(" ");
       return (
         <div id={id} key={n} className={classname} data-versions={versions}>
-          {text || <br />}
+          {" "}
+          {text || <br />}{" "}
         </div>
       );
     });
@@ -197,8 +219,8 @@ class Article extends Component {
           onClick={this.handleClick}
           onDoubleClick={this.handleDblClick}
         >
-          {html}
-        </article>
+          {html}{" "}
+        </article>{" "}
       </section>
     );
   }
