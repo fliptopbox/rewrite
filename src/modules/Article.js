@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import u from "../utilities/";
 
 let store;
-let $editor;
+// let $editor;
 
 class Article extends Component {
   constructor(props) {
@@ -13,24 +13,13 @@ class Article extends Component {
     const { content } = store.getState();
     this.state = Object.assign({}, content);
     this.timer = null; // timeout container
-    $editor = document.getElementById("id");
 
-    window.RE.article = this;
-  }
-
-  textToCollection(text) {
-    const paras = text.split("\n");
-
-    return paras.map((value, n) => ({
-      key: n,
-      id: value && value.trim() ? u.uuid() : "",
-      text: value,
-      locked: ""
-    }));
+    // $editor = document.getElementById("id");
+    // window.RE.article = this;
   }
 
   load(text) {
-    const array = this.textToCollection(text);
+    const array = u.textToCollection(text);
     this.setState({
       collection: array
     });
@@ -51,110 +40,82 @@ class Article extends Component {
       // convert them into a Collection
 
       const children = document.querySelector("article").childNodes;
-      const collection = [...children].map(el => {
-        const { innerText, id, className, dataset } = el;
-        const locked = /locked/gi.test(className) || undefined;
-        const text = `${innerText}`.trim() || null;
+      const collection = u.nodesToCollection(children);
 
-        let versions = (dataset && dataset.versions) || "";
-
-        return {
-          id,
-          text,
-          locked,
-          versions
-        };
-      });
-
-      console.log(6, "SAVE COLLECTION", collection);
       store.dispatch({
         type: "CONTENT-SAVE",
         value: collection
       });
-
-      u.storage().write(store.getState());
     }, delay);
   }
 
-  updateEditor = (id, value) => {
+  updateEditor = (id, text) => {
     store.dispatch({
       type: "EDITOR-PARENT",
       id,
-      text: value
+      text
     });
-    $editor = $editor || document.getElementById("io");
-    $editor.value = String(value) || "";
-    $editor.dataset.parent = id;
-    $editor.focus();
+    // $editor = $editor || document.getElementById("io");
+    // $editor.value = String(value) || "";
+    // $editor.dataset.parent = id;
+    // $editor.focus();
   };
 
   eventToObject = e => {
-    // Reminder .... the dataset.version
-    // is a doubled parsed string
     const { id, dataset, innerText } = e.target;
-    const versions = dataset.versions || "";
+    const versions = dataset.versions || undefined;
     const text = innerText.trim();
     const locked = versions ? true : false;
 
-    return {
-      id,
-      text,
-      versions,
-      locked
-    };
+    return Object.assign(
+      {},
+      {
+        id,
+        text,
+        versions,
+        locked
+      }
+    );
   };
 
   handlePaste = e => {
-    console.log("PASTE");
-
     const selection = window.getSelection();
     const parent = selection.focusNode.parentNode;
 
-    console.log(parent.nodeName);
-
-    // let paste = (e.clipboardData || window.clipboardData).getData("text");
-    // this is select all + paste
-    // just re-render the whole thing
-    // e.preventDefault();
-    // e.stopPropagation();
-    // console.log(paste);
-    // this.load(`\n${paste}`);
-    // switch (parent.nodeName) {
-    //   case "SECTION":
-    //   case "ARTICLE":
-    //     break;
-    //   case "DIV":
-    //     break;
-    //   default:
-    //     break;
-    // }
+    console.log("clipboard paste", parent.nodeName);
   };
 
   handleKeyDown = e => {
-    const key = e.key;
     const el = window.getSelection().focusNode.parentNode;
-    const { id = null, nodeName = null } = el;
+    const { id = null, nodeName = null, dataset = null } = el;
     const keyspressed = u.keysPressed(e);
 
-    console.log(keyspressed, nodeName);
+    console.log(keyspressed, nodeName, /^enter/i.test(keyspressed));
 
     const isDiv = /^div$/i.test(nodeName);
     if (!isDiv) return;
 
-    const isArrow = /^arrow/i.test(key);
-    const isReadOnly = el.classList.contains("locked");
-    console.log(1, "readonly", isArrow, isReadOnly);
+    const isArrow = /^arrow/i.test(keyspressed);
+    const isEnter = /^enter/i.test(keyspressed);
+    const isReadOnly = dataset && dataset.versions ? true : false;
+
     if (!isArrow && isReadOnly) {
+      console.log("is NOT an arrow key and read only");
       e.preventDefault();
       return false;
     }
 
-    console.log(2, "assign UUID");
-    if (!id) el.id = u.uuid();
+    if (isEnter) {
+      console.log("is enter, remove id and className");
+      el.removeAttribute("id", "");
+      el.className = "";
+    }
 
-    console.log(3, "handleKeyTriggers");
+    if (isReadOnly && !id) {
+      console.log("is readonly without an ID");
+      el.id = u.uuid();
+    }
 
-    console.log(4, "update local strorage");
     this.save();
   };
 
@@ -171,41 +132,48 @@ class Article extends Component {
 
   handleDblClick = e => {
     const { id, text, locked } = this.eventToObject(e);
+    let multiline = "";
+    let method = "remove";
 
-    console.log("double click");
+    console.log("double click", e.shiftKey);
     // This is a toggle action:
-    // if the row has versions (aka locked)
+
+    // if the row has version data (ie. locked)
     // then present warning and delete versions
-    if (locked && window.confirm("Are you sure?")) {
-      e.target.dataset.versions = "";
-      e.target.classList.remove("locked");
-      this.updateEditor(id, null);
-      this.save();
-      return;
+    // NOTE: a shift + double click bypasses the warning.
+
+    const confirmed = locked && (e.shiftKey || window.confirm("Are you sure?"));
+
+    if (locked && !confirmed) return;
+
+    // if the row has no version data (ie. not locked)
+    // then create a dataset and dispatch a notification
+
+    if (!locked) {
+      multiline = u.inflate(text);
+      method = "add";
     }
 
-    // if the row is has no version (aka not locked)
-    // then create a dataset and pass it to the Editor
-    if (!locked) {
-      const multiline = u.inflate(text);
-      e.target.dataset.versions = multiline;
-      e.target.classList.add("locked");
-      this.updateEditor(id, multiline);
-      this.save();
-      return;
-    }
+    e.target.dataset.versions = multiline;
+    e.target.classList[method]("locked");
+    this.updateEditor(id, multiline);
+    this.save();
+    return;
   };
 
   render() {
     const { collection } = this.state;
 
     const html = collection.map((row, n) => {
-      const { id, text, versions, className = null } = row;
-      const classname = [versions ? "locked" : "", className].join(" ");
+      if (!row) return null;
+
+      let { id, text, versions, className = null } = row;
+      className = [versions ? "locked" : "", className].join(" ").trim();
+      id = (versions && u.uuid()) || "";
+
       return (
-        <div id={id} key={n} className={classname} data-versions={versions}>
-          {" "}
-          {text || <br />}{" "}
+        <div id={id} key={n} className={className} data-versions={versions}>
+          {text || <br />}
         </div>
       );
     });

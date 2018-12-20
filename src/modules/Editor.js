@@ -1,24 +1,19 @@
-import React from "react";
+import React, { Component } from "react";
+
+import getCandidate from "./extractCandidateText";
 import Resizer from "./Resizer";
-import SampleLinks from "./SampleLinks";
-import FontSettings from "./FontSettings";
-import getCandidate from "../modules/extractCandidateText";
-import u from "../utilities";
+import Footer from "./Footer";
+
+const delay = 555;
 
 let store;
-
-const Footer = () => {
-  return (
-    <span className="buttons">
-      <SampleLinks />
-      <FontSettings store={store} />{" "}
-    </span>
-  );
-};
-
 let timer;
-const delay = 555;
 let $parent;
+
+const setWordCount = () => {
+  $parent.classList.add("selected");
+  $parent.setAttribute("data-word-count", 133);
+};
 
 const handleKeyUp = e => {
   const text = e.target.value;
@@ -29,6 +24,7 @@ const handleKeyUp = e => {
     const id = state.editor.current;
     const candidate = getCandidate(text);
     const el = document.getElementById(id);
+    // const el = $parent;
     if (!el) return;
 
     store.dispatch({
@@ -39,6 +35,9 @@ const handleKeyUp = e => {
 
     el.innerText = candidate;
     el.dataset.versions = text;
+    el.setAttribute("data-word-count", candidate.split(" ").length);
+
+    // setWordCount();
 
     // u.storage().write(state);
     window.RE.article.save();
@@ -46,20 +45,36 @@ const handleKeyUp = e => {
 };
 
 const handleFocus = e => {
-  $parent = $parent || document.getElementById(e.target.id);
+  $parent = document.getElementById(e.target.id);
+  setWordCount();
 };
 
-const Editor = props => {
-  store = store || props.store;
-
-  return (
-    <div className="editor">
-      <Resizer store={store} /> <Footer />
-      <div className="inner">
-        <textarea id="io" onKeyUp={handleKeyUp} onFocus={handleFocus} />{" "}
-      </div>{" "}
-    </div>
-  );
+const handleBlur = e => {
+  console.log("blur", $parent);
+  document.querySelector(".selected").classList.remove("selected");
 };
 
+class Editor extends Component {
+  constructor(props) {
+    super();
+    store = props.store;
+  }
+
+  render() {
+    return (
+      <div className="editor">
+        <Resizer store={store} />
+        <Footer store={store} />
+        <div className="inner">
+          <textarea
+            id="io"
+            onKeyUp={handleKeyUp}
+            onFocus={handleFocus}
+            onBlur={handleBlur}
+          />
+        </div>
+      </div>
+    );
+  }
+}
 export default Editor;

@@ -3,6 +3,8 @@ import getHash from "./getHash";
 import uuid from "./uuid";
 import inflate from "./inflate";
 import keysPressed from "./keysPressed";
+import textToCollection from './textToCollection';
+import nodesToCollection from './nodesToCollection';
 
 let timer;
 let count;
@@ -12,8 +14,8 @@ function time() {
   return new Date().toString().replace(/.* (\d+:\d+:\d+) .*/g, "$1");
 }
 
-function storage(sufix) {
-  const ns = ['rewrite', sufix].join("-")
+function storage(sufix = null) {
+  const ns = ['rewrite', sufix].filter(val => val).join("-");
 
   return {
     read: () => {
@@ -43,5 +45,7 @@ export default {
   storage,
   inflate,
   keysPressed,
+  textToCollection,
+  nodesToCollection,
   time
 };

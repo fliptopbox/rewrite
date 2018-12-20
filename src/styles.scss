@@ -48,9 +48,11 @@ body {
     margin: 0 5px;
   }
 }
+
 section {
   font-size: 1em;
 }
+
 article {
   & {
     //background: #efefef;
@@ -59,6 +61,7 @@ article {
     margin: 0 auto;
     width: 70%;
   }
+
   div {
     display: block;
     border: 1px solid transparent;
@@ -76,6 +79,7 @@ article {
     position: relative;
     background: $locked;
     font-style: italic;
+
     &::before {
       content: " ";
       background-image: url($lock);
@@ -91,10 +95,33 @@ article {
       padding: 0em;
       margin: 0 0 0 -2px;
     }
+
+    &::after {
+      display: none;
+      content: "";
+      background: #ddd;
+      color: white;
+      padding: 0px 10px;
+      margin: 0 0 0 4px;
+      border-radius: 20px;
+      text-align: center;
+      font-size: 0.6em;
+      font-style: normal;
+      font-family: sans-serif;
+      font-weight: bolder;
+    }
+
+    &.selected {
+      &::after {
+        display: inline-block;
+        content: attr(data-word-count);
+      }
+    }
   }
 }
 
 $padding: 10%;
+
 textarea {
   height: 90%;
   display: block;
@@ -120,6 +147,7 @@ textarea {
   padding: 0;
   color: white;
   resize: horizontal;
+
   .inner {
     position: absolute;
     bottom: 0;
