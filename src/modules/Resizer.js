@@ -34,19 +34,15 @@ const Resizer = props => {
   store = props.store;
   const width = store.getState().settings.panelWidth;
   setTimeout(() => setWidth(width || 70, true), 0);
-  return ( <
-    span id = "resizer"
-    className = "resizer"
-    onMouseDown = {
-      () => (dragging = true)
-    }
-    onDoubleClick = {
-      () => setWidth(50, true)
-    } >
-    {
-      "|||"
-    } <
-    /span>
+  return (
+    <span
+      id="resizer"
+      className="resizer"
+      onMouseDown={() => (dragging = true)}
+      onDoubleClick={() => setWidth(50, true)}
+    >
+      {"⁝"}
+    </span>
   );
 };
 

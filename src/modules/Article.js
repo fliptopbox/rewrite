@@ -1,8 +1,9 @@
 import React, { Component } from "react";
+
+import stateMonitor from "./stateMonitor";
 import u from "../utilities/";
 
 let store;
-// let $editor;
 
 class Article extends Component {
   constructor(props) {
@@ -12,53 +13,30 @@ class Article extends Component {
 
     const { content } = store.getState();
     this.state = Object.assign({}, content);
-    this.timer = null; // timeout container
 
-    // $editor = document.getElementById("id");
-    // window.RE.article = this;
+    const watch = stateMonitor(store.getState, "content.string");
+    const announce = current => {
+      if (store.getState().content.string) {
+        store.dispatch({ type: "CONTENT-CLEAR", value: null });
+        this.load(current);
+      }
+    };
+    store.subscribe(() => watch(announce));
   }
 
-  load(text) {
-    const array = u.textToCollection(text);
-    this.setState({
-      collection: array
-    });
-  }
+  load = text => this.setState({ collection: u.textToCollection(text) });
 
-  clear() {
-    this.setState({
-      collection: []
-    });
-  }
-
-  save() {
-    // Prevent rapid saving.
-    const delay = 1000;
-    this.timer && clearTimeout(this.timer);
-    this.timer = setTimeout(() => {
-      // grab the children Elements and
-      // convert them into a Collection
-
-      const children = document.querySelector("article").childNodes;
-      const collection = u.nodesToCollection(children);
-
-      store.dispatch({
-        type: "CONTENT-SAVE",
-        value: collection
-      });
-    }, delay);
-  }
+  save = () => store.dispatch({ type: "CONTENT-TIMESTAMP" });
 
   updateEditor = (id, text) => {
-    store.dispatch({
-      type: "EDITOR-PARENT",
-      id,
-      text
-    });
-    // $editor = $editor || document.getElementById("io");
-    // $editor.value = String(value) || "";
-    // $editor.dataset.parent = id;
-    // $editor.focus();
+    let type = "EDITOR-BIND";
+
+    if (!text) {
+      type = "EDITOR-RESET";
+      text = null;
+    }
+
+    store.dispatch({ type, id, text });
   };
 
   eventToObject = e => {
@@ -123,19 +101,18 @@ class Article extends Component {
     // If the row has versions then it is locked.
     // Add the className and refresh the Editor
     // The Editor needs a DOM reference and a value.
-    const { id, locked, versions } = this.eventToObject(e);
-    if (!locked) return;
+    const { id, versions } = this.eventToObject(e);
+    if (!id || !versions) return;
 
-    console.log("single click", locked);
-    this.updateEditor(id, versions);
+    store.dispatch({ type: "EDITOR-BIND", id, text: versions });
   };
 
   handleDblClick = e => {
-    const { id, text, locked } = this.eventToObject(e);
+    let { id, text, locked } = this.eventToObject(e);
     let multiline = "";
     let method = "remove";
+    let type = "EDITOR-RESET";
 
-    console.log("double click", e.shiftKey);
     // This is a toggle action:
 
     // if the row has version data (ie. locked)
@@ -151,13 +128,18 @@ class Article extends Component {
 
     if (!locked) {
       multiline = u.inflate(text);
+      id = u.uuid();
+      type = "EDITOR-BIND";
       method = "add";
+      e.target.id = id;
     }
 
     e.target.dataset.versions = multiline;
     e.target.classList[method]("locked");
-    this.updateEditor(id, multiline);
-    this.save();
+    e.target.classList[method]("selected");
+
+    store.dispatch({ type, id, text: multiline });
+
     return;
   };
 
@@ -173,7 +155,8 @@ class Article extends Component {
 
       return (
         <div id={id} key={n} className={className} data-versions={versions}>
-          {text || <br />}
+          {" "}
+          {text || <br />}{" "}
         </div>
       );
     });

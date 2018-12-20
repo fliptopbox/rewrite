@@ -5,6 +5,7 @@ import { createStore, combineReducers } from "redux";
 // helper functions and modules
 import u from "./utilities/";
 import initialState from "./modules/initialState";
+import stateMonitor from "./modules/stateMonitor";
 
 // React components
 import Editor from "./modules/Editor";
@@ -12,7 +13,6 @@ import Article from "./modules/Article";
 import allReducers from "./modules/allReducers";
 
 import "./styles.scss";
-import stateMonitor from "./modules/stateMonitor";
 
 window.RE = window.RE || {};
 
@@ -33,10 +33,16 @@ const App = () => {
 const root = document.getElementById("root");
 ReactDOM.render(<App />, root);
 
-const watchArticle = stateMonitor(store.getState, "content.collection");
+const watchArticle = stateMonitor(store.getState, "content.timestamp");
 const announceArticle = current => {
   console.log("state watch article", current);
+
+  const children = document.querySelector("article").childNodes;
+  const collection = u.nodesToCollection(children);
+  store.dispatch({
+    type: "CONTENT-SAVE",
+    value: collection
+  });
   u.storage().write(store.getState());
 };
-
 store.subscribe(() => watchArticle(announceArticle));

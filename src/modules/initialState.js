@@ -10,21 +10,25 @@ export default {
     current: null // DOM id
   },
   content: {
-    collection: [{
+    timestamp: null,
+    string: null,
+    collection: [
+      {
         text: "Re:writing",
-        className: "heading",
+        className: "heading"
       },
       {
-        text: null,
+        text: null
       },
       {
-        text: "_Writing is rewriting_",
+        text: "_Writing is rewriting_"
       },
       {
-        text: null,
+        text: null
       },
       {
-        text: "Tempor dolore exercitation est in id esse ullamco mollit labore. Ad anim consequat esse commodo. Veniam amet aute velit laboris aute ea deserunt. Occaecat cillum ad anim voluptate pariatur dolor aute adipisicing.",
+        text:
+          "Tempor dolore exercitation est in id esse ullamco mollit labore. Ad anim consequat esse commodo. Veniam amet aute velit laboris aute ea deserunt. Occaecat cillum ad anim voluptate pariatur dolor aute adipisicing.",
         locked: true,
         versions: [
           "Tempor dolore exercitation est in id esse ullamco mollit labore.",
@@ -39,7 +43,7 @@ export default {
           "",
           "Occaecat cillum ad anim voluptate pariatur dolor aute adipisicing."
         ].join("\n")
-      },
+      }
     ]
   }
 };

@@ -1,8 +1,13 @@
 import React from "react";
 import samples from "../samples/";
 
+let store;
+
 const getSampleText = id => {
-  window.RE.article.load(samples[id]);
+  const text = samples[id];
+  if (!text) return;
+
+  store.dispatch({ type: "CONTENT-LOAD", id, value: text });
 };
 
 const Link = ({ id, text }) => (
@@ -16,7 +21,8 @@ const sampleList = Object.keys({ ...samples }).map((id, n) => ({
   text: `[${n}]`
 }));
 
-const SampleLinks = () => {
+const SampleLinks = props => {
+  store = props.store;
   return (
     <span className="button">
       <strong>Samples: </strong>

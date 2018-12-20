@@ -51,15 +51,18 @@ body {
 
 section {
   font-size: 1em;
+  position: relative;
 }
 
 article {
   & {
-    //background: #efefef;
-    padding: 2em;
-    padding: 2em;
-    margin: 0 auto;
-    width: 70%;
+    border: 1px solid #efefef;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 5% 15% 10%;
   }
 
   div {

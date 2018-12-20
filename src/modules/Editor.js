@@ -1,76 +1,83 @@
 import React, { Component } from "react";
 
+import u from "../utilities/";
+import stateMonitor from "./stateMonitor";
 import getCandidate from "./extractCandidateText";
 import Resizer from "./Resizer";
 import Footer from "./Footer";
 
-const delay = 555;
-
 let store;
-let timer;
-let $parent;
 
-const setWordCount = () => {
-  $parent.classList.add("selected");
-  $parent.setAttribute("data-word-count", 133);
-};
-
-const handleKeyUp = e => {
-  const text = e.target.value;
-
-  timer && clearTimeout(timer);
-  timer = setTimeout(() => {
-    const state = store.getState();
-    const id = state.editor.current;
-    const candidate = getCandidate(text);
-    const el = document.getElementById(id);
-    // const el = $parent;
-    if (!el) return;
-
-    store.dispatch({
-      type: "EDITOR-LOAD",
-      id: id,
-      text: text
-    });
-
-    el.innerText = candidate;
-    el.dataset.versions = text;
-    el.setAttribute("data-word-count", candidate.split(" ").length);
-
-    // setWordCount();
-
-    // u.storage().write(state);
-    window.RE.article.save();
-  }, delay);
-};
-
-const handleFocus = e => {
-  $parent = document.getElementById(e.target.id);
-  setWordCount();
-};
-
-const handleBlur = e => {
-  console.log("blur", $parent);
-  document.querySelector(".selected").classList.remove("selected");
-};
+// const handleBlur = e => {
+//   console.log("blur", $parent);
+//   document.querySelector(".selected").classList.remove("selected");
+// };
 
 class Editor extends Component {
   constructor(props) {
     super();
     store = props.store;
+    this.parent = null;
+    this.state = {
+      current: null,
+      value: null
+    };
+
+    const watchEditor = stateMonitor(store.getState, "editor.current");
+    const announceEditor = current => {
+      const obj = Object.assign({}, store.getState().editor);
+      this.setState(obj);
+      this.select(current);
+    };
+    store.subscribe(() => watchEditor(announceEditor));
   }
 
+  select = current => {
+    const prev = document.querySelectorAll(".selected");
+    [...prev].forEach(el => el.classList.remove("selected"));
+
+    this.parent = document.getElementById(current);
+    if (!current || !this.parent) {
+      console.log("EDITOR RESET");
+      this.setState({ current: null, value: null });
+      return;
+    }
+
+    const value = this.parent.innerText;
+    this.parent.setAttribute("data-word-count", value.split(" ").length);
+    this.parent.classList.add("selected");
+  };
+
+  handleChange = e => {
+    const { value } = e.target;
+    const candidate = getCandidate(value);
+    const words = candidate.split(" ").length;
+
+    this.setState({ value });
+
+    this.parent = this.parent || document.getElementById(this.state.current);
+    this.parent.innerText = candidate;
+    this.parent.dataset.versions = value;
+    this.parent.setAttribute("data-word-count", words);
+  };
+
+  handleBlur = () => {
+    store.dispatch({ type: "CONTENT-TIMESTAMP" });
+  };
+
   render() {
+    let { current, value = "" } = this.state;
     return (
       <div className="editor">
         <Resizer store={store} />
         <Footer store={store} />
         <div className="inner">
+          <span className="current">{current}</span>
           <textarea
             id="io"
-            onKeyUp={handleKeyUp}
-            onFocus={handleFocus}
-            onBlur={handleBlur}
+            onChange={this.handleChange}
+            onBlur={this.handleBlur}
+            value={value || ""}
           />
         </div>
       </div>

@@ -17,18 +17,18 @@ const settings = (state = {}, action) => {
 };
 
 const content = (state = [], actions) => {
-  const { type, id, value } = actions;
-
+  const { type, value } = actions;
+  if (type === "CONTENT-CLEAR") {
+    state.string = null;
+  }
   if (type === "CONTENT-LOAD") {
-  }
-  if (type === "CONTENT-LOCK") {
-    state[id] = true;
-  }
-  if (type === "CONTENT-UNLOCK") {
-    delete state[id];
+    state.string = String(value);
   }
   if (type === "CONTENT-SAVE") {
     state.collection = [...value];
+  }
+  if (type === "CONTENT-TIMESTAMP") {
+    state.timestamp = new Date().valueOf();
   }
 
   return { ...state };
@@ -38,19 +38,14 @@ const editor = (state = {}, actions) => {
   const { type, id = null, text = null } = actions;
 
   switch (type) {
-    case "EDITOR-PARENT":
+    case "EDITOR-BIND":
       state.current = id;
       state.value = text;
       break;
 
-    case "EDITOR-LOAD":
-      state[id] = text || state[id];
-      state.current = id;
-      break;
-
-    case "EDITOR-DELETE":
-      delete state[id];
+    case "EDITOR-RESET":
       state.current = null;
+      state.value = "";
       break;
 
     default:

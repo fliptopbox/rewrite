@@ -5,7 +5,7 @@ import FontSettings from "./FontSettings";
 const Footer = ({ store }) => {
   return (
     <span className="buttons">
-      <SampleLinks />
+      <SampleLinks store={store} />
       <FontSettings store={store} />{" "}
     </span>
   );
