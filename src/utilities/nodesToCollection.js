@@ -1,17 +1,21 @@
-function nodesToCollection(nodes) {
-    return [...nodes].map(el => {
-        const {
-            innerText,
-            dataset
-        } = el;
-        const text = (innerText && innerText.trim()) || "";
-        const versions = (dataset && dataset.versions) || undefined;
+import extractCandidateText from "../modules/extractCandidateText";
 
-        return Object.assign({}, {
-            text,
-            versions
-        });
-    });
+function nodesToCollection(nodes) {
+  return [...nodes].map(el => {
+    const { innerText, dataset } = el;
+    let text = (innerText && innerText.trim()) || null;
+    let versions = (dataset && dataset.versions) || undefined;
+
+    text = versions ? extractCandidateText(versions) : text || "";
+
+    return Object.assign(
+      {},
+      {
+        text,
+        versions
+      }
+    );
+  });
 }
 
 export default nodesToCollection;
