@@ -2,18 +2,21 @@ const settings = (state = {}, action) => {
   const { type, value } = action;
 
   if (type === "font-family") {
-    return { ...state, fontFamily: value };
+    // return { ...state, fontFamily: value };
+    state.fontFamily = Number(value);
   }
 
   if (type === "font-size") {
-    return { ...state, fontSize: Number(value) };
+    state.fontSize = Number(value);
+    // return { ...state, fontSize: Number(value) };
   }
 
   if (type === "panel-width") {
-    return { ...state, panelWidth: Number(value) };
+    state.panelWidth = Number(value);
+    // return { ...state, panelWidth: Number(value) };
   }
 
-  return state;
+  return { ...state };
 };
 
 const content = (state = [], actions) => {

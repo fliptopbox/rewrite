@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 
-import u from "../utilities/";
 import stateMonitor from "./stateMonitor";
 import getCandidate from "./extractCandidateText";
 import Resizer from "./Resizer";

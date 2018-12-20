@@ -22,11 +22,10 @@ function setFontFamily(modifier = 0, size = 1, noSave) {
   fface = modifier;
   fsize = size;
 
-  if (noSave) return;
-
   store.dispatch({ type: "font-family", value: fface });
   store.dispatch({ type: "font-size", value: fsize });
 
+  if (noSave) return;
   u.storage().write(store.getState());
 }
 
@@ -36,7 +35,10 @@ const link = (text, index, args, trim) => {
     <a
       href="{index}"
       key={index}
-      onClick={() => setFontFamily.apply(this, args)}
+      onClick={e => {
+        e.preventDefault();
+        setFontFamily.apply(this, args);
+      }}
     >
       {trim ? trimmed || text : text}
     </a>
