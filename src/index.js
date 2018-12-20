@@ -36,6 +36,7 @@ ReactDOM.render(<App />, root);
 const watchArticle = stateMonitor(store.getState, "content.timestamp");
 const announceArticle = current => {
   console.log("state watch article", current);
+  if (!current) return;
 
   const children = document.querySelector("article").childNodes;
   const collection = u.nodesToCollection(children);

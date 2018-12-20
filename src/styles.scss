@@ -151,6 +151,15 @@ textarea {
   color: white;
   resize: horizontal;
 
+  .uuid {
+    font-family: sans-serif;
+    position: absolute;
+    right: 0;
+    color: #252525;
+    font-size: 14px;
+    margin: 10px;
+  }
+
   .inner {
     position: absolute;
     bottom: 0;

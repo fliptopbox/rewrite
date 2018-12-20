@@ -1,9 +1,14 @@
 import React, { Component } from "react";
+// import saveAs from "file-saver";
 
 import stateMonitor from "./stateMonitor";
 import u from "../utilities/";
 
 let store;
+
+const Menu = () => {
+  return <div className="menu">save | font | size | word count</div>;
+};
 
 class Article extends Component {
   constructor(props) {
@@ -163,6 +168,7 @@ class Article extends Component {
 
     return (
       <section className="content">
+        <Menu />
         <article
           contentEditable="true"
           onPaste={this.handlePaste}

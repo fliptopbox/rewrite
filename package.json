@@ -6,6 +6,7 @@
   "main": "src/index.js",
   "dependencies": {
     "deep-is": "^0.1.3",
+    "file-saver": "^2.0.0",
     "marked": "0.5.1",
     "node-sass": "4.11.0",
     "react": "16.5.2",

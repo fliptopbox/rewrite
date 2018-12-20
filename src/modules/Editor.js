@@ -71,7 +71,7 @@ class Editor extends Component {
         <Resizer store={store} />
         <Footer store={store} />
         <div className="inner">
-          <span className="current">{current}</span>
+          <span className="uuid">{current}</span>
           <textarea
             id="io"
             onChange={this.handleChange}
