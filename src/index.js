@@ -40,10 +40,9 @@ const announceArticle = current => {
 
   const children = document.querySelector("article").childNodes;
   const collection = u.nodesToCollection(children);
-  store.dispatch({
-    type: "CONTENT-SAVE",
-    value: collection
-  });
+
+  store.dispatch({ type: "CONTENT-SAVE", value: collection });
+
   u.storage().write(store.getState());
 };
 store.subscribe(() => watchArticle(announceArticle));

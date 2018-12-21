@@ -21,17 +21,29 @@ const settings = (state = {}, action) => {
 
 const content = (state = [], actions) => {
   const { type, value } = actions;
-  if (type === "CONTENT-CLEAR") {
-    state.string = null;
-  }
-  if (type === "CONTENT-LOAD") {
-    state.string = String(value);
-  }
-  if (type === "CONTENT-SAVE") {
-    state.collection = [...value];
-  }
-  if (type === "CONTENT-TIMESTAMP") {
-    state.timestamp = new Date().valueOf();
+  switch (type) {
+    case "CONTENT-WORD-COUNT":
+      state.wordCount = Number(value);
+      break;
+
+    case "CONTENT-CLEAR":
+      state.string = null;
+      break;
+
+    case "CONTENT-LOAD":
+      state.string = String(value);
+      break;
+
+    case "CONTENT-SAVE":
+      state.collection = [...value];
+      break;
+
+    case "CONTENT-TIMESTAMP":
+      state.timestamp = new Date().valueOf();
+      break;
+
+    default:
+      break;
   }
 
   return { ...state };

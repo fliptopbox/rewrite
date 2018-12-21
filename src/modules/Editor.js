@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 
 import stateMonitor from "./stateMonitor";
+import u from "../utilities";
 import getCandidate from "./extractCandidateText";
 import Resizer from "./Resizer";
 import Footer from "./Footer";
@@ -58,6 +59,8 @@ class Editor extends Component {
     this.parent.innerText = candidate;
     this.parent.dataset.versions = value;
     this.parent.setAttribute("data-word-count", words);
+
+    store.dispatch({ type: "CONTENT-WORD-COUNT", value: u.wordCount() });
   };
 
   handleBlur = () => {

@@ -2,9 +2,10 @@ import deepEqual from "deep-is";
 import getHash from "./getHash";
 import uuid from "./uuid";
 import inflate from "./inflate";
+import wordCount from "./wordCount";
 import keysPressed from "./keysPressed";
-import textToCollection from './textToCollection';
-import nodesToCollection from './nodesToCollection';
+import textToCollection from "./textToCollection";
+import nodesToCollection from "./nodesToCollection";
 
 let timer;
 let count;
@@ -15,7 +16,7 @@ function time() {
 }
 
 function storage(sufix = null) {
-  const ns = ['rewrite', sufix].filter(val => val).join("-");
+  const ns = ["rewrite", sufix].filter(val => val).join("-");
 
   return {
     read: () => {
@@ -27,10 +28,7 @@ function storage(sufix = null) {
       clearTimeout(timer);
       count = (count || 0) + 1;
       timer = setTimeout(() => {
-        console.log("localstroage SAVE",
-          count,
-          time()
-        );
+        console.log("localstroage SAVE", count, time());
         localStorage[ns] = JSON.stringify(obj);
         count = 0;
       }, delay);
@@ -45,6 +43,7 @@ export default {
   storage,
   inflate,
   keysPressed,
+  wordCount,
   textToCollection,
   nodesToCollection,
   time

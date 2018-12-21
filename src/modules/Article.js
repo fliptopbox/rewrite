@@ -1,13 +1,18 @@
 import React, { Component } from "react";
 // import saveAs from "file-saver";
 
+import WordCount from "./WordCount";
 import stateMonitor from "./stateMonitor";
 import u from "../utilities/";
 
 let store;
 
 const Menu = () => {
-  return <div className="menu">save | font | size | word count</div>;
+  return (
+    <div className="menu">
+      <WordCount store={store} />
+    </div>
+  );
 };
 
 class Article extends Component {
@@ -31,7 +36,10 @@ class Article extends Component {
 
   load = text => this.setState({ collection: u.textToCollection(text) });
 
-  save = () => store.dispatch({ type: "CONTENT-TIMESTAMP" });
+  save = () => {
+    store.dispatch({ type: "CONTENT-WORD-COUNT", value: u.wordCount() });
+    store.dispatch({ type: "CONTENT-TIMESTAMP" });
+  };
 
   updateEditor = (id, text) => {
     let type = "EDITOR-BIND";
@@ -168,7 +176,7 @@ class Article extends Component {
 
     return (
       <section className="content">
-        <Menu />
+        <Menu store={store} />
         <article
           contentEditable="true"
           onPaste={this.handlePaste}
