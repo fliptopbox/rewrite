@@ -5,11 +5,13 @@
   "keywords": [],
   "main": "src/index.js",
   "dependencies": {
+    "ContentEdit": "1.3.4",
     "deep-is": "^0.1.3",
     "file-saver": "^2.0.0",
     "marked": "0.5.1",
     "node-sass": "4.11.0",
     "react": "16.5.2",
+    "react-contenteditable": "3.2.3",
     "react-dom": "16.5.2",
     "react-scripts": "2.0.3",
     "redux": "4.0.1",

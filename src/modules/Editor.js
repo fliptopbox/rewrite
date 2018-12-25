@@ -25,9 +25,18 @@ class Editor extends Component {
 
     const watchEditor = stateMonitor(store.getState, "editor.current");
     const announceEditor = current => {
-      const obj = Object.assign({}, store.getState().editor);
-      this.setState(obj);
+      let obj = Object.assign({}, store.getState().editor);
+      let { value } = obj;
+      value = value
+        .split("\n")
+        .map(text => "<div>" + (text.trim() || "<br />") + "</div>")
+        .join("\n");
+      obj.value = value;
+      this.setState({ ...obj });
       this.select(current);
+      this.history = [];
+      this.ts = 0;
+      this.re_comments = /^([\/\>\?\=\!]\s*?)/;
     };
     store.subscribe(() => watchEditor(announceEditor));
   }
@@ -48,16 +57,55 @@ class Editor extends Component {
     this.parent.classList.add("selected");
   };
 
+  execTrigger = (ms, pattern, value) => {
+    // console.log(ms, pattern, value)
+    switch (pattern.toLowerCase()) {
+      case "shiftshift":
+        this.toggleComment();
+        // dispatch('updateparent');
+        break;
+    }
+  };
+
+  toggleComment = () => {
+    var line = document.getSelection().focusNode.parentNode;
+    var text = line.innerText;
+    var inactive = this.re_comments.test(text);
+    var prefix = inactive ? "" : "> ";
+    var toggle = prefix + text.replace(this.re_comments, "").trim();
+
+    line.innerText = toggle;
+    return toggle;
+  };
+
+  catchTriggers = e => {
+    var diff = e.timeStamp - this.ts;
+    var delay = diff < 200;
+    this.ts = e.timeStamp;
+    var value = e.target.innerText;
+
+    if (diff > 250 * 3) {
+      this.history = [];
+    }
+
+    this.history.push(e.key);
+    this.history = this.history.slice(-5);
+
+    this.execTrigger(delay, this.history.join(""), value);
+  };
+
   handleChange = e => {
-    const { value } = e.target;
-    const candidate = getCandidate(value);
+    this.catchTriggers(e);
+
+    const { value, innerText } = e.target;
+    const candidate = getCandidate(innerText);
     const words = candidate.split(" ").length;
 
-    this.setState({ value });
+    //this.setState({ value: innerText });
 
     this.parent = this.parent || document.getElementById(this.state.current);
     this.parent.innerText = candidate;
-    this.parent.dataset.versions = value;
+    this.parent.dataset.versions = innerText;
     this.parent.setAttribute("data-word-count", words);
 
     store.dispatch({ type: "CONTENT-WORD-COUNT", value: u.wordCount() });
@@ -75,11 +123,13 @@ class Editor extends Component {
         <Footer store={store} />
         <div className="inner">
           <span className="uuid">{current}</span>
-          <textarea
+          <div
             id="io"
-            onChange={this.handleChange}
+            className="textarea"
+            contentEditable
+            onKeyDown={this.handleChange}
             onBlur={this.handleBlur}
-            value={value || ""}
+            dangerouslySetInnerHTML={{ __html: value }}
           />
         </div>
       </div>

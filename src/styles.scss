@@ -107,6 +107,8 @@ article {
       border-radius: 20px;
       text-align: center;
       font-style: normal;
+      position: absolute;
+      right: -25px;
     }
 
     &.selected {
@@ -121,7 +123,7 @@ article {
 
 $padding: 10%;
 
-textarea {
+.textarea {
   height: 90%;
   display: block;
   width: 100% - ($padding * 2);
