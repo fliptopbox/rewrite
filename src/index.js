@@ -13,7 +13,6 @@ import Article from "./modules/Article";
 import allReducers from "./modules/allReducers";
 
 import "./styles.scss";
-
 window.RE = window.RE || {};
 
 const localState = u.storage();
