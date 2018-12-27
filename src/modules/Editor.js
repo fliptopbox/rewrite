@@ -13,6 +13,13 @@ let store;
 //   document.querySelector(".selected").classList.remove("selected");
 // };
 
+const plainTextToHtml = (string = "") => {
+  return string
+    .split("\n")
+    .map(text => ["<div>", text.trim() || "<br />", "</div>"].join(""))
+    .join("\n");
+};
+
 class Editor extends Component {
   constructor(props) {
     super();
@@ -27,16 +34,16 @@ class Editor extends Component {
     const announceEditor = current => {
       let obj = Object.assign({}, store.getState().editor);
       let { value } = obj;
-      value = value
-        .split("\n")
-        .map(text => "<div>" + (text.trim() || "<br />") + "</div>")
-        .join("\n");
+      value = plainTextToHtml(value);
       obj.value = value;
+
+      console.log(1, value);
+
       this.setState({ ...obj });
       this.select(current);
       this.history = [];
       this.ts = 0;
-      this.re_comments = /^([\/\>\?\=\!]\s*?)/;
+      this.re_comments = /^([/>?=!]\s*?)/;
     };
     store.subscribe(() => watchEditor(announceEditor));
   }
@@ -63,6 +70,8 @@ class Editor extends Component {
       case "shiftshift":
         this.toggleComment();
         // dispatch('updateparent');
+        break;
+      default:
         break;
     }
   };
@@ -97,12 +106,11 @@ class Editor extends Component {
   handleChange = e => {
     this.catchTriggers(e);
 
-    const { value, innerText } = e.target;
+    const { innerText } = e.target;
     const candidate = getCandidate(innerText);
     const words = candidate.split(" ").length;
 
-    //this.setState({ value: innerText });
-
+    // this.setState({ value: plainTextToHtml(innerText) });
     this.parent = this.parent || document.getElementById(this.state.current);
     this.parent.innerText = candidate;
     this.parent.dataset.versions = innerText;
