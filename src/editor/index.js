@@ -1,5 +1,6 @@
 import defaultConfig from "./config";
 import empty from "./empty";
+import terminate from "./terminate";
 import htmlToStringArray from "./htmlToStringArray";
 import arrayToHtml from "./arrayToHtml";
 
@@ -30,13 +31,10 @@ let cache = {
   versions: [null] // versions
 };
 
-const punctuation = [".", ":", "!", "?", `"`, ")"]
-  .map(s => String("\\" + s))
-  .join("|");
-
-const re_comment_prefix = new RegExp("^[>]s?", "g");
-const re_punctuation = new RegExp(`(${punctuation})$`, "g");
+// const re_comment_prefix = new RegExp("^[>]s?", "g");
+const re_punctuation = /(\.|\:|\!|\?|\"|\))$/g;
 const re_comments = /^([\/\>\?\=\!]\s*?)/;
+console.log(re_punctuation);
 
 const triggerDictionary = {
   cleanup: cleanupBlanks,
@@ -49,27 +47,17 @@ function getCandidateString(value) {
   // parse the DOM elements to simple Array
   value = value || htmlToStringArray(editor.children);
 
+  const { autoTerminate } = config;
   const is_array = value && value.constructor === Array;
   const array = is_array ? value : textToArray(value);
 
   return [...array]
-    .map(line => (re_comments.test(line) ? null : terminate(line)))
+    .map(line =>
+      re_comments.test(line) ? null : terminate(line, autoTerminate)
+    )
     .filter(s => s && s.length)
     .join(" ")
     .trim();
-}
-
-function terminate(text) {
-  // return a closed sentnece.
-  const { autoTerminate } = config;
-  text = text && text.trim();
-
-  if (!text) return;
-
-  var is_closed = re_punctuation.test(text);
-  var sufix = autoTerminate && !is_closed ? "." : "";
-
-  return `${text}${sufix}`;
 }
 
 function textToArray(text) {
@@ -80,6 +68,13 @@ function textToArray(text) {
 }
 
 // ["Lorem ipsum 1","Lorem ipsum 2","> Lorem ipsum 4","","Lorem ipsum 3"]
+function clearVersions() {
+  editor.innerHTML = "";
+  editor = null;
+  cache.candidate = null;
+  cache.versions = [null];
+  // issue onClose event
+}
 
 function load(value = null, options = {}) {
   if (!value) return;
@@ -207,6 +202,7 @@ function initialize(selector = null, options) {
   return {
     load,
     trigger,
+    clear: clearVersions,
     settings: () => config,
     onChange: addOnChange,
     candidate: getCandidateString,

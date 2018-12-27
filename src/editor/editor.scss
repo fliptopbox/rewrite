@@ -1,37 +1,39 @@
-
-
 $grey: #c1c1c1;
 $gutter: 15px;
-
+$min-width: 320px;
 
 .commentbox {
-  position: absolute;
-  margin: $gutter;
-  padding: $gutter;
-  min-width: 20%;
-  max-width: 30%;
-  right: 0;
-  background: #efefef;
+  & {
+    position: absolute;
+    margin: 5px 10px;
+    padding: $gutter;
+    min-width: $min-width;
+    max-width: 30%;
+    right: 0;
+    background: #fff;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+    border: 1px solid #ccc;
+    z-index: 9;
+  }
 
   h1 {
-      margin: 0;
-      padding: 0;
-      font-weight: normal;
-      font-size: 10px;
+    margin: 0;
+    padding: 0;
+    font-weight: normal;
+    font-size: 10px;
   }
 
   article {
     div {
-        position: relative;
-        padding: 5px 20px;
-        line-height: 1.2;
-        margin: 2px 0;
-        border-bottom: 1px solid #e0e0e0;
+      position: relative;
+      padding: 5px 15px;
+      line-height: 1.2;
+      margin: 2px 0;
+      border-bottom: 1px solid #f0f0f0;
 
-        &.comment {
+      &.comment {
         text-decoration: line-through;
-        }
-
+      }
     }
   }
 }
