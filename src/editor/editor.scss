@@ -1,0 +1,37 @@
+
+
+$grey: #c1c1c1;
+$gutter: 15px;
+
+
+.commentbox {
+  position: absolute;
+  margin: $gutter;
+  padding: $gutter;
+  min-width: 20%;
+  max-width: 30%;
+  right: 0;
+  background: #efefef;
+
+  h1 {
+      margin: 0;
+      padding: 0;
+      font-weight: normal;
+      font-size: 10px;
+  }
+
+  article {
+    div {
+        position: relative;
+        padding: 5px 20px;
+        line-height: 1.2;
+        margin: 2px 0;
+        border-bottom: 1px solid #e0e0e0;
+
+        &.comment {
+        text-decoration: line-through;
+        }
+
+    }
+  }
+}

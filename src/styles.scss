@@ -1,0 +1,14 @@
+body {
+  font-family: sans-serif;
+}
+
+.intLink { cursor: pointer; }
+img.intLink { border: 0; }
+#toolBar1 select { font-size:10px; }
+.textarea {
+  width: auto;
+  min-height: 150px;
+  border: 1px #000000 solid;
+  padding: 12px;
+  overflow: auto;
+}
