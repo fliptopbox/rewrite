@@ -1,6 +1,6 @@
 const comment = new RegExp("^[>]s?", "g");
 
-function arrayToHtml(array = []) {
+function arrayToHtml(array) {
   // returns DOM string
   // parse comment chars to className "comment"
 
