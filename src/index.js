@@ -1,11 +1,10 @@
-import sbd from "sbd";
 import { dispatch, subscribe } from "./functions";
-import initialize from "./editor";
+
 import u from "./utilities";
+import initialize from "./editor";
+import collectionToHtml from "./editor/collectionToHtml";
 
 import "./styles.scss";
-
-let $focusOn;
 
 const messages = {
   confirmDelete: `
@@ -19,29 +18,29 @@ const messages = {
 };
 
 const editor = initialize("#sentences", {
-  autoTerminate: true,
-  prefixToken: "// "
+  autoTerminate: false
 });
 
-editor.onChange((candidate, versions) =>
-  dispatch("updateparent", { candidate, versions })
-);
-
 // load some text into the DOM
+let $focusOn; // current node element
 const $doc = document.querySelector("#document");
+const sample = require("./editor/startup.json");
+const local = u.storage().read();
 
-$doc.innerHTML = `
-      <div>Lorem Ipsum 11 word. Lorem Ipsum 12 word. Lorem Ipsum 13 word.</div>
-      <div><br /></div>
-      <div>Lorem Ipsum 21 word. Lorem Ipsum 22 word. Lorem Ipsum 23 word.</div>
-      <div><br /></div>
-      <div><br /></div>
-      <div><br /></div>
-      <div>Lorem Ipsum 31 word. Lorem Ipsum 32 word. Lorem Ipsum 33 word.</div
-`;
+function save($els) {
+  // parse DOM to collection
+  // save to localstrorage
 
-subscribe("updateparent", e => {
-  console.log("UPDATE-PARENT:", e.detail, e);
+  const collection = [...$els].map(el => {
+    const { innerText = "", dataset } = el;
+    const versions = (dataset.versions && JSON.parse(dataset.versions)) || "";
+    return { text: innerText, versions: versions };
+  });
+
+  u.storage().write(collection);
+}
+
+function updateParent(e) {
   const { candidate, versions } = e.detail;
   document.querySelector("#article").innerHTML = candidate;
   document.querySelector("#versions").innerHTML = JSON.stringify(versions);
@@ -49,11 +48,21 @@ subscribe("updateparent", e => {
   if ($focusOn) {
     $focusOn.innerText = candidate;
     $focusOn.dataset.versions = JSON.stringify(versions);
+    save(document.querySelector("#document").children);
   }
-});
+}
 
-// document.getElementById("app").innerHTML = ``;
+// Initial DOM injection
+$doc.innerHTML = collectionToHtml(local || sample);
 
+// Passive events from Editor changes
+editor.onChange((candidate, versions) =>
+  dispatch("updateparent", { candidate, versions })
+);
+
+subscribe("updateparent", updateParent);
+
+// Acive DOM interaction Events
 document.querySelector("#document").ondblclick = e => {
   e.target.id = e.target.id || u.uuid();
   let { id, innerText, dataset } = e.target;
@@ -84,7 +93,23 @@ document.querySelector("#document").ondblclick = e => {
   const value = (versions && JSON.parse(versions)) || text || "";
 
   $focusOn = document.querySelector(`#${id}`);
-  $focusOn.classList.add("locked");
+  $focusOn.className = "locked selected";
 
   editor.load(value);
+};
+
+document.querySelector("#document").onclick = e => {
+  // de-select any existing nodes
+  const selected = document.querySelector(".selected");
+  selected && selected.classList.remove("selected");
+
+  // only load locked nodes
+  let { id, dataset } = e.target;
+  if (!id || !dataset.versions) return;
+
+  console.log(333, e.target);
+  $focusOn = document.querySelector(`#${id}`);
+  $focusOn.classList.add("selected");
+
+  editor.load(JSON.parse(dataset.versions));
 };

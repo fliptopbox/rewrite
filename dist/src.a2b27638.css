@@ -21,7 +21,9 @@
   padding: 5px 15px;
   line-height: 1.2;
   margin: 2px 0;
-  border-bottom: 1px solid #f0f0f0; }
+  background-color: #f0f0f0; }
+  .commentbox article div.selected {
+    background: #fdffe8; }
   .commentbox article div.comment {
     text-decoration: line-through; }
 body {

@@ -1,0 +1,18 @@
+[
+  {
+    "text": "kilroy",
+    "versions": ["kilroy", "", "> is here", "> might come here", "> was here."]
+  },
+  {
+    "versions": ["kilroy", "is here", "> might come here", "", "> was here."]
+  },
+  {
+    "text": "kilroy",
+    "versions": ["kilroy", "> is here", "", "> .... who's Kilroy"]
+  },
+  {},
+  {},
+  {
+    "text": "Word is the the last word."
+  }
+]

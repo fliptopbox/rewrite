@@ -104,7 +104,154 @@ parcelRequire = (function (modules, cache, entry, globalName) {
 
   // Override the current require with this new one
   return newRequire;
-})({"node_modules/sbd/lib/sanitize-html-browser.js":[function(require,module,exports) {
+})({"src/functions.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.dispatch = dispatch;
+exports.subscribe = subscribe;
+
+function dispatch(name) {
+  var message = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+  var elm = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : window;
+  var e = new CustomEvent(name, Object.assign({
+    bubbles: true
+  }, {
+    detail: message
+  }));
+  elm.dispatchEvent(e);
+}
+
+function subscribe(name, callback) {
+  var elm = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : window;
+  elm.addEventListener(name, callback);
+}
+},{}],"node_modules/deep-is/index.js":[function(require,module,exports) {
+var pSlice = Array.prototype.slice;
+var Object_keys = typeof Object.keys === 'function'
+    ? Object.keys
+    : function (obj) {
+        var keys = [];
+        for (var key in obj) keys.push(key);
+        return keys;
+    }
+;
+
+var deepEqual = module.exports = function (actual, expected) {
+  // enforce Object.is +0 !== -0
+  if (actual === 0 && expected === 0) {
+    return areZerosEqual(actual, expected);
+
+  // 7.1. All identical values are equivalent, as determined by ===.
+  } else if (actual === expected) {
+    return true;
+
+  } else if (actual instanceof Date && expected instanceof Date) {
+    return actual.getTime() === expected.getTime();
+
+  } else if (isNumberNaN(actual)) {
+    return isNumberNaN(expected);
+
+  // 7.3. Other pairs that do not both pass typeof value == 'object',
+  // equivalence is determined by ==.
+  } else if (typeof actual != 'object' && typeof expected != 'object') {
+    return actual == expected;
+
+  // 7.4. For all other Object pairs, including Array objects, equivalence is
+  // determined by having the same number of owned properties (as verified
+  // with Object.prototype.hasOwnProperty.call), the same set of keys
+  // (although not necessarily the same order), equivalent values for every
+  // corresponding key, and an identical 'prototype' property. Note: this
+  // accounts for both named and indexed properties on Arrays.
+  } else {
+    return objEquiv(actual, expected);
+  }
+};
+
+function isUndefinedOrNull(value) {
+  return value === null || value === undefined;
+}
+
+function isArguments(object) {
+  return Object.prototype.toString.call(object) == '[object Arguments]';
+}
+
+function isNumberNaN(value) {
+  // NaN === NaN -> false
+  return typeof value == 'number' && value !== value;
+}
+
+function areZerosEqual(zeroA, zeroB) {
+  // (1 / +0|0) -> Infinity, but (1 / -0) -> -Infinity and (Infinity !== -Infinity)
+  return (1 / zeroA) === (1 / zeroB);
+}
+
+function objEquiv(a, b) {
+  if (isUndefinedOrNull(a) || isUndefinedOrNull(b))
+    return false;
+
+  // an identical 'prototype' property.
+  if (a.prototype !== b.prototype) return false;
+  //~~~I've managed to break Object.keys through screwy arguments passing.
+  //   Converting to array solves the problem.
+  if (isArguments(a)) {
+    if (!isArguments(b)) {
+      return false;
+    }
+    a = pSlice.call(a);
+    b = pSlice.call(b);
+    return deepEqual(a, b);
+  }
+  try {
+    var ka = Object_keys(a),
+        kb = Object_keys(b),
+        key, i;
+  } catch (e) {//happens when one is a string literal and the other isn't
+    return false;
+  }
+  // having the same number of owned properties (keys incorporates
+  // hasOwnProperty)
+  if (ka.length != kb.length)
+    return false;
+  //the same set of keys (although not necessarily the same order),
+  ka.sort();
+  kb.sort();
+  //~~~cheap key test
+  for (i = ka.length - 1; i >= 0; i--) {
+    if (ka[i] != kb[i])
+      return false;
+  }
+  //equivalent values for every corresponding key, and
+  //~~~possibly expensive deep test
+  for (i = ka.length - 1; i >= 0; i--) {
+    key = ka[i];
+    if (!deepEqual(a[key], b[key])) return false;
+  }
+  return true;
+}
+
+},{}],"src/utilities/uuid.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+var serial = 0;
+
+var uuid = function uuid() {
+  serial++;
+  return (new Date().valueOf().toString(16) + // eg 127b795136 (11)
+  Math.floor(1000 + Math.random() * 1000).toString(13) + // eg aa7 (3)
+  (1000 + serial++ % 1000).toString(5) + // eg 13001 (5)
+  "").slice(-16);
+};
+
+var _default = uuid;
+exports.default = _default;
+},{}],"node_modules/sbd/lib/sanitize-html-browser.js":[function(require,module,exports) {
 
 module.exports = function sanitizeHtml(text, opts) {
   // Strip HTML from Text using browser HTML parser
@@ -574,31 +721,82 @@ exports.sentences = function(text, user_options) {
     });
 };
 
-},{"sanitize-html":"node_modules/sbd/lib/sanitize-html-browser.js","./stringHelper":"node_modules/sbd/lib/stringHelper.js","./Match":"node_modules/sbd/lib/Match.js"}],"src/functions.js":[function(require,module,exports) {
+},{"sanitize-html":"node_modules/sbd/lib/sanitize-html-browser.js","./stringHelper":"node_modules/sbd/lib/stringHelper.js","./Match":"node_modules/sbd/lib/Match.js"}],"src/utilities/inflate.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.dispatch = dispatch;
-exports.subscribe = subscribe;
+exports.default = void 0;
 
-function dispatch(name) {
-  var message = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
-  var elm = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : window;
-  var e = new CustomEvent(name, Object.assign({
-    bubbles: true
-  }, {
-    detail: message
-  }));
-  elm.dispatchEvent(e);
+var _sbd = _interopRequireDefault(require("sbd"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function inflate(text) {
+  // returns sentences broken into lines
+  var array = _sbd.default.sentences(text);
+
+  return array.join("\n\n");
 }
 
-function subscribe(name, callback) {
-  var elm = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : window;
-  elm.addEventListener(name, callback);
+var _default = inflate;
+exports.default = _default;
+},{"sbd":"node_modules/sbd/lib/tokenizer.js"}],"src/utilities/index.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _deepIs = _interopRequireDefault(require("deep-is"));
+
+var _uuid = _interopRequireDefault(require("./uuid"));
+
+var _inflate = _interopRequireDefault(require("./inflate"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var timer;
+var count = 0;
+var delay = 250;
+
+function time() {
+  return new Date().toString().replace(/.* (\d+:\d+:\d+) .*/g, "$1");
 }
-},{}],"src/editor/config.json":[function(require,module,exports) {
+
+function storage() {
+  var sufix = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+  var ns = ["rewrite", sufix].filter(function (val) {
+    return val;
+  }).join("-");
+  return {
+    read: function read() {
+      var data = localStorage[ns] || null;
+      return data && JSON.parse(data);
+    },
+    write: function write(obj) {
+      clearTimeout(timer);
+      count = (count || 0) + 1;
+      timer = setTimeout(function () {
+        console.log("localstroage SAVE", count, time());
+        localStorage[ns] = JSON.stringify(obj);
+        count = 0;
+      }, delay);
+    }
+  };
+}
+
+var _default = {
+  uuid: _uuid.default,
+  deepEqual: _deepIs.default,
+  inflate: _inflate.default,
+  storage: storage,
+  time: time
+};
+exports.default = _default;
+},{"deep-is":"node_modules/deep-is/index.js","./uuid":"src/utilities/uuid.js","./inflate":"src/utilities/inflate.js"}],"src/editor/config.json":[function(require,module,exports) {
 module.exports = {
   "resetDelay": 750,
   "doubleTap": 200,
@@ -623,27 +821,6 @@ function empty(s) {
 }
 
 var _default = empty;
-exports.default = _default;
-},{}],"src/editor/terminate.js":[function(require,module,exports) {
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = void 0;
-var re_punctuation = /(\.|\:|\!|\?|\"|\))$/g;
-
-function terminate(text) {
-  var autoTerminate = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
-  // return a closed sentnece.
-  text = text && text.trim();
-  if (!text) return;
-  var is_closed = re_punctuation.test(text);
-  var sufix = autoTerminate && !is_closed ? "." : "";
-  return "".concat(text).concat(sufix);
-}
-
-var _default = terminate;
 exports.default = _default;
 },{}],"src/editor/htmlToStringArray.js":[function(require,module,exports) {
 "use strict";
@@ -685,7 +862,86 @@ function htmlToStringArray(children) {
 
 var _default = htmlToStringArray;
 exports.default = _default;
-},{"./config":"src/editor/config.json"}],"src/editor/arrayToHtml.js":[function(require,module,exports) {
+},{"./config":"src/editor/config.json"}],"src/editor/textToArray.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+function textToArray() {
+  var text = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+  // returns simple text Array
+  // correcting for double line breaks
+  if (!text) return;
+  return text.replace(/\n\n/gm, "\n").split(/\n/g);
+}
+
+var _default = textToArray;
+exports.default = _default;
+},{}],"src/editor/terminate.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+var re_punctuation = /(\.|\:|\!|\?|\"|\))$/g;
+
+function terminate(text) {
+  var autoTerminate = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+  // return a closed sentnece.
+  text = text && text.trim();
+  if (!text) return;
+  var is_closed = re_punctuation.test(text);
+  var sufix = autoTerminate && !is_closed ? "." : "";
+  return "".concat(text).concat(sufix);
+}
+
+var _default = terminate;
+exports.default = _default;
+},{}],"src/editor/getCandidateString.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _terminate = _interopRequireDefault(require("./terminate"));
+
+var _textToArray = _interopRequireDefault(require("./textToArray"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _nonIterableSpread(); }
+
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance"); }
+
+function _iterableToArray(iter) { if (Symbol.iterator in Object(iter) || Object.prototype.toString.call(iter) === "[object Arguments]") return Array.from(iter); }
+
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } }
+
+var re_comments = /^([\/\>\?\=\!]\s*?)/;
+
+function getCandidateString(value) {
+  var autoTerminate = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+  // recieve String or Array
+  // returns string
+  // parse the DOM elements to simple Array
+  var is_array = value && value.constructor === Array;
+  var array = is_array ? value : (0, _textToArray.default)(value);
+  return _toConsumableArray(array).map(function (line) {
+    return re_comments.test(line) ? null : (0, _terminate.default)(line, autoTerminate);
+  }).filter(function (s) {
+    return s && s.length;
+  }).join(" ").trim();
+}
+
+var _default = getCandidateString;
+exports.default = _default;
+},{"./terminate":"src/editor/terminate.js","./textToArray":"src/editor/textToArray.js"}],"src/editor/arrayToHtml.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -703,8 +959,7 @@ function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
 
 var comment = new RegExp("^[>]s?", "g");
 
-function arrayToHtml() {
-  var array = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
+function arrayToHtml(array) {
   // returns DOM string
   // parse comment chars to className "comment"
   return _toConsumableArray(array).map(function (text) {
@@ -716,7 +971,7 @@ function arrayToHtml() {
 
 var _default = arrayToHtml;
 exports.default = _default;
-},{}],"node_modules/parcel-bundler/src/builtins/bundle-url.js":[function(require,module,exports) {
+},{}],"../../../.nvm/versions/node/v8.10.0/lib/node_modules/parcel-bundler/src/builtins/bundle-url.js":[function(require,module,exports) {
 var bundleURL = null;
 
 function getBundleURLCached() {
@@ -748,7 +1003,7 @@ function getBaseURL(url) {
 
 exports.getBundleURL = getBundleURLCached;
 exports.getBaseURL = getBaseURL;
-},{}],"node_modules/parcel-bundler/src/builtins/css-loader.js":[function(require,module,exports) {
+},{}],"../../../.nvm/versions/node/v8.10.0/lib/node_modules/parcel-bundler/src/builtins/css-loader.js":[function(require,module,exports) {
 var bundle = require('./bundle-url');
 
 function updateLink(link) {
@@ -783,12 +1038,12 @@ function reloadCSS() {
 }
 
 module.exports = reloadCSS;
-},{"./bundle-url":"node_modules/parcel-bundler/src/builtins/bundle-url.js"}],"src/editor/editor.scss":[function(require,module,exports) {
+},{"./bundle-url":"../../../.nvm/versions/node/v8.10.0/lib/node_modules/parcel-bundler/src/builtins/bundle-url.js"}],"src/editor/editor.scss":[function(require,module,exports) {
 var reloadCSS = require('_css_loader');
 
 module.hot.dispose(reloadCSS);
 module.hot.accept(reloadCSS);
-},{"_css_loader":"node_modules/parcel-bundler/src/builtins/css-loader.js"}],"src/editor/index.js":[function(require,module,exports) {
+},{"_css_loader":"../../../.nvm/versions/node/v8.10.0/lib/node_modules/parcel-bundler/src/builtins/css-loader.js"}],"src/editor/index.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -796,13 +1051,15 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = void 0;
 
-var _config4 = _interopRequireDefault(require("./config"));
+var _config3 = _interopRequireDefault(require("./config"));
 
 var _empty = _interopRequireDefault(require("./empty"));
 
-var _terminate = _interopRequireDefault(require("./terminate"));
-
 var _htmlToStringArray = _interopRequireDefault(require("./htmlToStringArray"));
+
+var _textToArray = _interopRequireDefault(require("./textToArray"));
+
+var _getCandidateString = _interopRequireDefault(require("./getCandidateString"));
 
 var _arrayToHtml = _interopRequireDefault(require("./arrayToHtml"));
 
@@ -840,7 +1097,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 */
 var editor;
 
-var config = _objectSpread({}, _config4.default);
+var config = _objectSpread({}, _config3.default);
 
 var cache = {
   candidate: null,
@@ -855,30 +1112,7 @@ console.log(re_punctuation);
 var triggerDictionary = {
   cleanup: cleanupBlanks,
   shiftshift: toggleComment
-};
-
-function getCandidateString(value) {
-  // recieve String or Array
-  // returns string
-  // parse the DOM elements to simple Array
-  value = value || (0, _htmlToStringArray.default)(editor.children);
-  var _config = config,
-      autoTerminate = _config.autoTerminate;
-  var is_array = value && value.constructor === Array;
-  var array = is_array ? value : textToArray(value);
-  return _toConsumableArray(array).map(function (line) {
-    return re_comments.test(line) ? null : (0, _terminate.default)(line, autoTerminate);
-  }).filter(function (s) {
-    return s && s.length;
-  }).join(" ").trim();
-}
-
-function textToArray(text) {
-  // returns simple text Array
-  // correcting for double line breaks
-  return text.replace(/\n\n/gm, "\n").split(/\n/g);
-} // ["Lorem ipsum 1","Lorem ipsum 2","> Lorem ipsum 4","","Lorem ipsum 3"]
-
+}; // ["Lorem ipsum 1","Lorem ipsum 2","> Lorem ipsum 4","","Lorem ipsum 3"]
 
 function clearVersions() {
   editor.innerHTML = "";
@@ -892,10 +1126,12 @@ function load() {
   var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
   if (!value) return;
   if (!editor) initialize();
-  var array = value.constructor === Array ? value : textToArray(value);
+  var array = value.constructor === Array ? value : (0, _textToArray.default)(value);
   var html = (0, _arrayToHtml.default)(array);
   config = Object.assign({}, config, options);
   editor.innerHTML = html;
+  editor.focus();
+  notifyChanges();
   return html;
 }
 
@@ -932,9 +1168,9 @@ function bindEvents() {
   var hist = [];
 
   editor.onkeyup = function (e) {
-    var _config2 = config,
-        doubleTap = _config2.doubleTap,
-        resetDelay = _config2.resetDelay;
+    var _config = config,
+        doubleTap = _config.doubleTap,
+        resetDelay = _config.resetDelay;
     var diff = e.timeStamp - ts;
     var delay = diff < doubleTap;
     ts = e.timeStamp;
@@ -957,13 +1193,17 @@ function notifyChanges() {
   // if the candidate is diffrent OR
   // if the version array is different
   // execute the change
+  var _editor = editor,
+      children = _editor.children;
+
   var _cache = _objectSpread({}, cache),
       candidate = _cache.candidate,
       versions = _cache.versions;
 
-  var _config3 = config,
-      onChange = _config3.onChange;
-  var nextCandidate = String(getCandidateString());
+  var _config2 = config,
+      onChange = _config2.onChange;
+  var string = (0, _htmlToStringArray.default)(children);
+  var nextCandidate = String((0, _getCandidateString.default)(string));
 
   var nextVersions = _toConsumableArray(getVersionArray()); // cheap checks first ...
 
@@ -1017,137 +1257,14 @@ function initialize() {
       return config;
     },
     onChange: addOnChange,
-    candidate: getCandidateString,
+    candidate: _getCandidateString.default,
     versions: _htmlToStringArray.default
   };
 }
 
 var _default = initialize;
 exports.default = _default;
-},{"./config":"src/editor/config.json","./empty":"src/editor/empty.js","./terminate":"src/editor/terminate.js","./htmlToStringArray":"src/editor/htmlToStringArray.js","./arrayToHtml":"src/editor/arrayToHtml.js","./editor.scss":"src/editor/editor.scss"}],"node_modules/deep-is/index.js":[function(require,module,exports) {
-var pSlice = Array.prototype.slice;
-var Object_keys = typeof Object.keys === 'function'
-    ? Object.keys
-    : function (obj) {
-        var keys = [];
-        for (var key in obj) keys.push(key);
-        return keys;
-    }
-;
-
-var deepEqual = module.exports = function (actual, expected) {
-  // enforce Object.is +0 !== -0
-  if (actual === 0 && expected === 0) {
-    return areZerosEqual(actual, expected);
-
-  // 7.1. All identical values are equivalent, as determined by ===.
-  } else if (actual === expected) {
-    return true;
-
-  } else if (actual instanceof Date && expected instanceof Date) {
-    return actual.getTime() === expected.getTime();
-
-  } else if (isNumberNaN(actual)) {
-    return isNumberNaN(expected);
-
-  // 7.3. Other pairs that do not both pass typeof value == 'object',
-  // equivalence is determined by ==.
-  } else if (typeof actual != 'object' && typeof expected != 'object') {
-    return actual == expected;
-
-  // 7.4. For all other Object pairs, including Array objects, equivalence is
-  // determined by having the same number of owned properties (as verified
-  // with Object.prototype.hasOwnProperty.call), the same set of keys
-  // (although not necessarily the same order), equivalent values for every
-  // corresponding key, and an identical 'prototype' property. Note: this
-  // accounts for both named and indexed properties on Arrays.
-  } else {
-    return objEquiv(actual, expected);
-  }
-};
-
-function isUndefinedOrNull(value) {
-  return value === null || value === undefined;
-}
-
-function isArguments(object) {
-  return Object.prototype.toString.call(object) == '[object Arguments]';
-}
-
-function isNumberNaN(value) {
-  // NaN === NaN -> false
-  return typeof value == 'number' && value !== value;
-}
-
-function areZerosEqual(zeroA, zeroB) {
-  // (1 / +0|0) -> Infinity, but (1 / -0) -> -Infinity and (Infinity !== -Infinity)
-  return (1 / zeroA) === (1 / zeroB);
-}
-
-function objEquiv(a, b) {
-  if (isUndefinedOrNull(a) || isUndefinedOrNull(b))
-    return false;
-
-  // an identical 'prototype' property.
-  if (a.prototype !== b.prototype) return false;
-  //~~~I've managed to break Object.keys through screwy arguments passing.
-  //   Converting to array solves the problem.
-  if (isArguments(a)) {
-    if (!isArguments(b)) {
-      return false;
-    }
-    a = pSlice.call(a);
-    b = pSlice.call(b);
-    return deepEqual(a, b);
-  }
-  try {
-    var ka = Object_keys(a),
-        kb = Object_keys(b),
-        key, i;
-  } catch (e) {//happens when one is a string literal and the other isn't
-    return false;
-  }
-  // having the same number of owned properties (keys incorporates
-  // hasOwnProperty)
-  if (ka.length != kb.length)
-    return false;
-  //the same set of keys (although not necessarily the same order),
-  ka.sort();
-  kb.sort();
-  //~~~cheap key test
-  for (i = ka.length - 1; i >= 0; i--) {
-    if (ka[i] != kb[i])
-      return false;
-  }
-  //equivalent values for every corresponding key, and
-  //~~~possibly expensive deep test
-  for (i = ka.length - 1; i >= 0; i--) {
-    key = ka[i];
-    if (!deepEqual(a[key], b[key])) return false;
-  }
-  return true;
-}
-
-},{}],"src/utilities/uuid.js":[function(require,module,exports) {
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = void 0;
-var serial = 0;
-
-var uuid = function uuid() {
-  serial++;
-  return (new Date().valueOf().toString(16) + // eg 127b795136 (11)
-  Math.floor(1000 + Math.random() * 1000).toString(13) + // eg aa7 (3)
-  (1000 + serial++ % 1000).toString(5) + // eg 13001 (5)
-  "").slice(-16);
-};
-
-var _default = uuid;
-exports.default = _default;
-},{}],"src/utilities/inflate.js":[function(require,module,exports) {
+},{"./config":"src/editor/config.json","./empty":"src/editor/empty.js","./htmlToStringArray":"src/editor/htmlToStringArray.js","./textToArray":"src/editor/textToArray.js","./getCandidateString":"src/editor/getCandidateString.js","./arrayToHtml":"src/editor/arrayToHtml.js","./editor.scss":"src/editor/editor.scss"}],"src/editor/collectionToHtml.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1155,108 +1272,114 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = void 0;
 
-var _sbd = _interopRequireDefault(require("sbd"));
+var _uuid = _interopRequireDefault(require("../utilities/uuid"));
+
+var _getCandidateString = _interopRequireDefault(require("./getCandidateString"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function inflate(text) {
-  // returns sentences broken into lines
-  var array = _sbd.default.sentences(text);
+function collectionToHtml(array) {
+  // returns HTML String
+  // Expected collection schema:
+  // [{text: String, versions: Object}, ...]
+  if (!array) return;
+  var html = array.map(function (row) {
+    var _row$text = row.text,
+        text = _row$text === void 0 ? "" : _row$text,
+        _row$versions = row.versions,
+        versions = _row$versions === void 0 ? "" : _row$versions;
+    var id = versions ? (0, _uuid.default)() : "";
+    var classname = versions && "locked" || "";
+    var value = text || versions && (0, _getCandidateString.default)(versions) || "";
+    var json = versions ? JSON.stringify(versions) : ""; // create DOM element to ensure json is parsed correctly
+    // when we use it as data-version String
 
-  return array.join("\n\n");
+    var div = document.createElement("div"); // only render relavant attributes
+
+    id && (div.id = id);
+    classname && (div.className = classname);
+    versions && (div.dataset.versions = json);
+    div.innerHTML = value || "<br/>";
+    return div.outerHTML;
+  });
+  return html.join("\n");
 }
 
-var _default = inflate;
+var _default = collectionToHtml;
 exports.default = _default;
-},{"sbd":"node_modules/sbd/lib/tokenizer.js"}],"src/utilities/index.js":[function(require,module,exports) {
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = void 0;
-
-var _deepIs = _interopRequireDefault(require("deep-is"));
-
-var _uuid = _interopRequireDefault(require("./uuid"));
-
-var _inflate = _interopRequireDefault(require("./inflate"));
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function time() {
-  return new Date().toString().replace(/.* (\d+:\d+:\d+) .*/g, "$1");
-}
-
-function storage() {
-  var sufix = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
-  var ns = ["rewrite", sufix].filter(function (val) {
-    return val;
-  }).join("-");
-  return {
-    read: function read() {
-      var data = localStorage[ns] || null;
-      return data && JSON.parse(data);
-    },
-    write: function write(obj) {
-      clearTimeout(timer);
-      count = (count || 0) + 1;
-      timer = setTimeout(function () {
-        console.log("localstroage SAVE", count, time());
-        localStorage[ns] = JSON.stringify(obj);
-        count = 0;
-      }, delay);
-    }
-  };
-}
-
-var _default = {
-  uuid: _uuid.default,
-  deepEqual: _deepIs.default,
-  inflate: _inflate.default,
-  storage: storage,
-  time: time
-};
-exports.default = _default;
-},{"deep-is":"node_modules/deep-is/index.js","./uuid":"src/utilities/uuid.js","./inflate":"src/utilities/inflate.js"}],"src/styles.scss":[function(require,module,exports) {
+},{"../utilities/uuid":"src/utilities/uuid.js","./getCandidateString":"src/editor/getCandidateString.js"}],"src/styles.scss":[function(require,module,exports) {
 var reloadCSS = require('_css_loader');
 
 module.hot.dispose(reloadCSS);
 module.hot.accept(reloadCSS);
-},{"_css_loader":"node_modules/parcel-bundler/src/builtins/css-loader.js"}],"src/index.js":[function(require,module,exports) {
+},{"_css_loader":"../../../.nvm/versions/node/v8.10.0/lib/node_modules/parcel-bundler/src/builtins/css-loader.js"}],"src/editor/startup.json":[function(require,module,exports) {
+module.exports = [{
+  "text": "kilroy",
+  "versions": ["kilroy", "", "> is here", "> might come here", "> was here."]
+}, {
+  "versions": ["kilroy", "is here", "> might come here", "", "> was here."]
+}, {
+  "text": "kilroy",
+  "versions": ["kilroy", "> is here", "", "> .... who's Kilroy"]
+}, {}, {}, {
+  "text": "Word is the the last word."
+}];
+},{}],"src/index.js":[function(require,module,exports) {
 "use strict";
-
-var _sbd = _interopRequireDefault(require("sbd"));
 
 var _functions = require("./functions");
 
+var _utilities = _interopRequireDefault(require("./utilities"));
+
 var _editor = _interopRequireDefault(require("./editor"));
 
-var _utilities = _interopRequireDefault(require("./utilities"));
+var _collectionToHtml = _interopRequireDefault(require("./editor/collectionToHtml"));
 
 require("./styles.scss");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var $focusOn;
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _nonIterableSpread(); }
+
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance"); }
+
+function _iterableToArray(iter) { if (Symbol.iterator in Object(iter) || Object.prototype.toString.call(iter) === "[object Arguments]") return Array.from(iter); }
+
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } }
+
 var messages = {
   confirmDelete: "\n    You are unlocking this paragraph. \n\n    This will delete the working versions and destill \n    the paragraph to the currently elected candidate.\n\n    CANCEL to keep working versions\n    OK to discard versions"
 };
 var editor = (0, _editor.default)("#sentences", {
-  autoTerminate: true,
-  prefixToken: "// "
-});
-editor.onChange(function (candidate, versions) {
-  return (0, _functions.dispatch)("updateparent", {
-    candidate: candidate,
-    versions: versions
-  });
+  autoTerminate: false
 }); // load some text into the DOM
 
+var $focusOn; // current node element
+
 var $doc = document.querySelector("#document");
-$doc.innerHTML = "\n      <div>Lorem Ipsum 11 word. Lorem Ipsum 12 word. Lorem Ipsum 13 word.</div>\n      <div><br /></div>\n      <div>Lorem Ipsum 21 word. Lorem Ipsum 22 word. Lorem Ipsum 23 word.</div>\n      <div><br /></div>\n      <div><br /></div>\n      <div><br /></div>\n      <div>Lorem Ipsum 31 word. Lorem Ipsum 32 word. Lorem Ipsum 33 word.</div\n";
-(0, _functions.subscribe)("updateparent", function (e) {
-  console.log("UPDATE-PARENT:", e.detail, e);
+
+var sample = require("./editor/startup.json");
+
+var local = _utilities.default.storage().read();
+
+function save($els) {
+  // parse DOM to collection
+  // save to localstrorage
+  var collection = _toConsumableArray($els).map(function (el) {
+    var _el$innerText = el.innerText,
+        innerText = _el$innerText === void 0 ? "" : _el$innerText,
+        dataset = el.dataset;
+    var versions = dataset.versions && JSON.parse(dataset.versions) || "";
+    return {
+      text: innerText,
+      versions: versions
+    };
+  });
+
+  _utilities.default.storage().write(collection);
+}
+
+function updateParent(e) {
   var _e$detail = e.detail,
       candidate = _e$detail.candidate,
       versions = _e$detail.versions;
@@ -1266,8 +1389,20 @@ $doc.innerHTML = "\n      <div>Lorem Ipsum 11 word. Lorem Ipsum 12 word. Lorem I
   if ($focusOn) {
     $focusOn.innerText = candidate;
     $focusOn.dataset.versions = JSON.stringify(versions);
+    save(document.querySelector("#document").children);
   }
-}); // document.getElementById("app").innerHTML = ``;
+} // Initial DOM injection
+
+
+$doc.innerHTML = (0, _collectionToHtml.default)(local || sample); // Passive events from Editor changes
+
+editor.onChange(function (candidate, versions) {
+  return (0, _functions.dispatch)("updateparent", {
+    candidate: candidate,
+    versions: versions
+  });
+});
+(0, _functions.subscribe)("updateparent", updateParent); // Acive DOM interaction Events
 
 document.querySelector("#document").ondblclick = function (e) {
   e.target.id = e.target.id || _utilities.default.uuid();
@@ -1298,10 +1433,25 @@ document.querySelector("#document").ondblclick = function (e) {
 
   var value = versions && JSON.parse(versions) || text || "";
   $focusOn = document.querySelector("#".concat(id));
-  $focusOn.classList.add("locked");
+  $focusOn.className = "locked selected";
   editor.load(value);
 };
-},{"sbd":"node_modules/sbd/lib/tokenizer.js","./functions":"src/functions.js","./editor":"src/editor/index.js","./utilities":"src/utilities/index.js","./styles.scss":"src/styles.scss"}],"../../../.nvm/versions/node/v8.10.0/lib/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+
+document.querySelector("#document").onclick = function (e) {
+  // de-select any existing nodes
+  var selected = document.querySelector(".selected");
+  selected && selected.classList.remove("selected"); // only load locked nodes
+
+  var _e$target2 = e.target,
+      id = _e$target2.id,
+      dataset = _e$target2.dataset;
+  if (!id || !dataset.versions) return;
+  console.log(333, e.target);
+  $focusOn = document.querySelector("#".concat(id));
+  $focusOn.classList.add("selected");
+  editor.load(JSON.parse(dataset.versions));
+};
+},{"./functions":"src/functions.js","./utilities":"src/utilities/index.js","./editor":"src/editor/index.js","./editor/collectionToHtml":"src/editor/collectionToHtml.js","./styles.scss":"src/styles.scss","./editor/startup.json":"src/editor/startup.json"}],"../../../.nvm/versions/node/v8.10.0/lib/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
