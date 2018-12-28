@@ -1,7 +1,8 @@
 import defaultConfig from "./config";
 import empty from "./empty";
-import terminate from "./terminate";
 import htmlToStringArray from "./htmlToStringArray";
+import textToArray from "./textToArray";
+import getCandidateString from "./getCandidateString";
 import arrayToHtml from "./arrayToHtml";
 
 import "./editor.scss";
@@ -41,32 +42,6 @@ const triggerDictionary = {
   shiftshift: toggleComment
 };
 
-function getCandidateString(value) {
-  // recieve String or Array
-  // returns string
-  // parse the DOM elements to simple Array
-  value = value || htmlToStringArray(editor.children);
-
-  const { autoTerminate } = config;
-  const is_array = value && value.constructor === Array;
-  const array = is_array ? value : textToArray(value);
-
-  return [...array]
-    .map(line =>
-      re_comments.test(line) ? null : terminate(line, autoTerminate)
-    )
-    .filter(s => s && s.length)
-    .join(" ")
-    .trim();
-}
-
-function textToArray(text) {
-  // returns simple text Array
-  // correcting for double line breaks
-
-  return text.replace(/\n\n/gm, "\n").split(/\n/g);
-}
-
 // ["Lorem ipsum 1","Lorem ipsum 2","> Lorem ipsum 4","","Lorem ipsum 3"]
 function clearVersions() {
   editor.innerHTML = "";
@@ -86,6 +61,9 @@ function load(value = null, options = {}) {
   config = Object.assign({}, config, options);
 
   editor.innerHTML = html;
+  editor.focus();
+  notifyChanges();
+
   return html;
 }
 
@@ -151,10 +129,12 @@ function notifyChanges() {
   // if the candidate is diffrent OR
   // if the version array is different
   // execute the change
+  const { children } = editor;
   const { candidate, versions } = { ...cache };
   const { onChange } = config;
+  const string = htmlToStringArray(children);
 
-  const nextCandidate = String(getCandidateString());
+  const nextCandidate = String(getCandidateString(string));
   const nextVersions = [...getVersionArray()];
 
   // cheap checks first ...
