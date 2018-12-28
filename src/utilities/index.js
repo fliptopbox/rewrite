@@ -2,6 +2,10 @@ import deepEqual from "deep-is";
 import uuid from "./uuid";
 import inflate from "./inflate";
 
+let timer;
+let count = 0;
+let delay = 250;
+
 function time() {
   return new Date().toString().replace(/.* (\d+:\d+:\d+) .*/g, "$1");
 }
