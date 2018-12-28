@@ -29,7 +29,11 @@ $min-width: 320px;
       padding: 5px 15px;
       line-height: 1.2;
       margin: 2px 0;
-      border-bottom: 1px solid #f0f0f0;
+      background-color: #f0f0f0;
+
+      &.selected {
+        background: #fdffe8;
+      }
 
       &.comment {
         text-decoration: line-through;
