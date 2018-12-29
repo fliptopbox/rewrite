@@ -1,18 +1,27 @@
 [
   {
-    "text": "kilroy",
-    "versions": ["kilroy", "", "> is here", "> might come here", "> was here."]
-  },
-  {
-    "versions": ["kilroy", "is here", "> might come here", "", "> was here."]
-  },
-  {
-    "text": "kilroy",
-    "versions": ["kilroy", "> is here", "", "> .... who's Kilroy"]
+    "text": "# Re:writing"
   },
   {},
+  {
+    "text": "Writing is rewriting."
+  },
   {},
   {
-    "text": "Word is the the last word."
+    "versions": [
+      "> This is a crude tool",
+      "> A new way to rewrite",
+      "This is a simple tool",
+      "",
+      "that allows",
+      "",
+      "the writer,",
+      "> the student,",
+      "> the author",
+      "",
+      "to systematically breakdown each paragraph into component sentences,",
+      "",
+      "and iterate over new versions until the paragraph is complete."
+    ]
   }
 ]

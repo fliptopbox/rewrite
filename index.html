@@ -1,24 +1,36 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>Parcel Sandbox</title>
-    <meta charset="UTF-8" />
-  </head>
 
-  <body>
-    <div class="commentbox">
-      <article id="sentences" contenteditable="true"></article>
+<head>
+	<title>Parcel Sandbox</title>
+	<meta charset="UTF-8" />
+</head>
+
+<body>
+
+	<div class="container">
+
+		<div class="document">
+			<article id="document" class="content" contenteditable="true"></article>
+		</div>
+
+		<div class="sentences">
+			<article id="sentences" class="content" contenteditable="true"></article>
+		</div>
+
+		<div class="divider" id="vertical">
+			<i>=</i>
+      <div class="left">A</div>
+      <div class="right">B</div>
     </div>
 
-    <article id="document" class="textarea" contenteditable="true"></article>
+		<div id="footer">
+			footer banner
+		</div>
 
-    <div id="footer">
-      <ul>
-        <li id="article">-</li>
-        <li id="versions">-</li>
-      </ul>
-    </div>
+		<script src="src/index.js">
 
-    <script src="src/index.js"></script>
-  </body>
+		</script>
+</body>
+
 </html>

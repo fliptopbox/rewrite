@@ -1,35 +1,98 @@
 body {
   font-family: sans-serif;
+  margin: 0;
+  padding: 0;
+  font-size: 24px;
 }
 
 * {
   outline: none;
 }
 
-.intLink {
-  cursor: pointer;
-}
-img.intLink {
-  border: 0;
-}
-#toolBar1 select {
-  font-size: 10px;
-}
-.textarea {
-  width: auto;
-  min-height: 150px;
-  border: 1px #000 solid;
-  padding: 12px;
-  overflow: auto;
+
+.container {
+  display: flex;
+  background: red;
+  height: 100%;
+  position: absolute;
+  // align-items: center;
 }
 
-.locked {
-  position: relative;
-  font-size: 1em;
-  &::before {
-    content: "*";
-    position: absolute;
-    left: 0;
-    margin: 0 -0.5em;
+$left: 65%;
+
+.hide-content .content {
+  opacity: 0;
+  transition: opacity 150ms;
+}
+
+.document {
+  & {
+    width: $left;
+    overflow: auto;
+    background: #eee;
+    color: #333;
+  }
+
+  .content {
+    padding: 20% 10% 20%;
+
+  }
+
+  .locked {
+    position: relative;
+    font-size: 1em;
+    &::before {
+      content: "";
+      position: absolute;
+      left: -10px;
+      margin: 0 -1em;
+      bottom: 0;
+      border-right: 1px solid;
+      padding: 0 10px 0 0;
+      top: 0; 
+    }
   }
 }
+.divider {
+  width: 6px;
+  position: absolute;
+  top:0;
+  bottom: 0;
+  right: auto;
+  left: $left;
+  background: transparent;
+  cursor: ew-resize;
+
+  &:hover{
+    background: #000;
+  }
+
+  .left{
+    position: absolute;
+    right: 0;
+  }
+  .right {
+    position: absolute;
+    left: 0;
+  }
+
+  .left,.right {
+    margin: 0 1em;
+  }
+}
+
+#footer{
+  position: absolute;
+  bottom: 0;
+  z-index: 9;
+  font-size: 10px;
+}
+
+// .content {
+//   width: auto;
+//   min-height: 150px;
+//   border: 1px #000 solid;
+//   padding: 12px;
+//   overflow: auto;
+// }
+

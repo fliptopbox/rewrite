@@ -42,8 +42,8 @@ function save($els) {
 
 function updateParent(e) {
   const { candidate, versions } = e.detail;
-  document.querySelector("#article").innerHTML = candidate;
-  document.querySelector("#versions").innerHTML = JSON.stringify(versions);
+  // document.querySelector("#article").innerHTML = candidate;
+  // document.querySelector("#versions").innerHTML = JSON.stringify(versions);
 
   if ($focusOn) {
     $focusOn.innerText = candidate;
@@ -113,3 +113,52 @@ document.querySelector("#document").onclick = e => {
 
   editor.load(JSON.parse(dataset.versions));
 };
+
+const state = {
+  dragging: false,
+  width: 50
+};
+
+const vertical = document.querySelector("#vertical");
+const A = document.querySelector(".document");
+const B = document.querySelector(".sentences");
+
+function resize(e, value) {
+  if (!state.dragging && !value) return;
+
+  if (e.stopPropagation) e.stopPropagation();
+  if (e.preventDefault) e.preventDefault();
+  e.cancelBubble = true;
+  e.returnValue = false;
+
+  const { pageX } = e;
+
+  let width = value || Number((pageX / window.innerWidth) * 100);
+  width = Math.max(1, width);
+  width = Math.min(99, width);
+
+  let percent = width;
+  A.classList.remove("hide-content");
+  B.classList.remove("hide-content");
+
+  if (width < 15) {
+    percent = 0.5;
+    A.classList.add("hide-content");
+  }
+  if (width > 85) {
+    percent = 99.5;
+    B.classList.add("hide-content");
+  }
+
+  A.style.width = `${percent}%`;
+  B.style.width = `${100 - percent}%`;
+  vertical.style.left = `${percent}%`;
+
+  state.width = percent;
+}
+
+vertical.onmousedown = () => (state.dragging = true);
+vertical.ondblclick = e => resize(e, 50);
+
+window.onmouseup = () => (state.dragging = false);
+window.onmousemove = resize;
