@@ -1,3 +1,5 @@
+@import './divider/divider';
+
 body {
   font-family: sans-serif;
   margin: 0;
@@ -18,7 +20,7 @@ body {
   // align-items: center;
 }
 
-$left: 65%;
+
 
 .hide-content .content {
   opacity: 0;
@@ -27,7 +29,7 @@ $left: 65%;
 
 .document {
   & {
-    width: $left;
+    // width: $left;
     overflow: auto;
     background: #eee;
     color: #333;
@@ -53,33 +55,7 @@ $left: 65%;
     }
   }
 }
-.divider {
-  width: 6px;
-  position: absolute;
-  top:0;
-  bottom: 0;
-  right: auto;
-  left: $left;
-  background: transparent;
-  cursor: ew-resize;
 
-  &:hover{
-    background: #000;
-  }
-
-  .left{
-    position: absolute;
-    right: 0;
-  }
-  .right {
-    position: absolute;
-    left: 0;
-  }
-
-  .left,.right {
-    margin: 0 1em;
-  }
-}
 
 #footer{
   position: absolute;

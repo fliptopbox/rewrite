@@ -1,31 +1,21 @@
-import { dispatch, subscribe } from "./functions";
-
 import u from "./utilities";
-import initialize from "./editor";
+import editorInit from "./editor";
+import divideInit from "./divider";
+import { dispatch, subscribe } from "./functions";
 import collectionToHtml from "./editor/collectionToHtml";
 
 import "./styles.scss";
 
-const messages = {
-  confirmDelete: `
-    You are unlocking this paragraph. 
-
-    This will delete the working versions and destill 
-    the paragraph to the currently elected candidate.
-
-    CANCEL to keep working versions
-    OK to discard versions`
-};
-
-const editor = initialize("#sentences", {
-  autoTerminate: false
-});
-
 // load some text into the DOM
 let $focusOn; // current node element
+
 const $doc = document.querySelector("#document");
 const sample = require("./editor/startup.json");
 const local = u.storage().read();
+const divider = divideInit("#vertical");
+const editor = editorInit("#sentences", {
+  autoTerminate: false
+});
 
 function save($els) {
   // parse DOM to collection
@@ -70,7 +60,7 @@ document.querySelector("#document").ondblclick = e => {
 
   if (versions) {
     // confirm delete
-    if (!window.confirm(messages.confirmDelete)) return;
+    if (!window.confirm(u.message("confirmDelete"))) return;
 
     // first clear editor
     editor.clear();
@@ -113,52 +103,3 @@ document.querySelector("#document").onclick = e => {
 
   editor.load(JSON.parse(dataset.versions));
 };
-
-const state = {
-  dragging: false,
-  width: 50
-};
-
-const vertical = document.querySelector("#vertical");
-const A = document.querySelector(".document");
-const B = document.querySelector(".sentences");
-
-function resize(e, value) {
-  if (!state.dragging && !value) return;
-
-  if (e.stopPropagation) e.stopPropagation();
-  if (e.preventDefault) e.preventDefault();
-  e.cancelBubble = true;
-  e.returnValue = false;
-
-  const { pageX } = e;
-
-  let width = value || Number((pageX / window.innerWidth) * 100);
-  width = Math.max(1, width);
-  width = Math.min(99, width);
-
-  let percent = width;
-  A.classList.remove("hide-content");
-  B.classList.remove("hide-content");
-
-  if (width < 15) {
-    percent = 0.5;
-    A.classList.add("hide-content");
-  }
-  if (width > 85) {
-    percent = 99.5;
-    B.classList.add("hide-content");
-  }
-
-  A.style.width = `${percent}%`;
-  B.style.width = `${100 - percent}%`;
-  vertical.style.left = `${percent}%`;
-
-  state.width = percent;
-}
-
-vertical.onmousedown = () => (state.dragging = true);
-vertical.ondblclick = e => resize(e, 50);
-
-window.onmouseup = () => (state.dragging = false);
-window.onmousemove = resize;

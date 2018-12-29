@@ -1,6 +1,7 @@
 import deepEqual from "deep-is";
 import uuid from "./uuid";
 import inflate from "./inflate";
+import message from "./message";
 
 let timer;
 let count = 0;
@@ -35,5 +36,6 @@ export default {
   deepEqual,
   inflate,
   storage,
+  message,
   time
 };
