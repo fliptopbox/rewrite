@@ -56,7 +56,7 @@ function resize(e, value) {
     A.classList.add("hide-content");
   }
   if (width > 100 - threshold) {
-    percent = 100 - 100 * (minWidth / innerWidth);
+    percent = 100 - 100 * ((minWidth * 1.5) / innerWidth);
     B.classList.add("hide-content");
   }
 
