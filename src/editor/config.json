@@ -6,5 +6,6 @@
   "selector": null,
   "alwaysOpen": true,
   "className": "comment",
-  "prefixToken": "> "
+  "prefixToken": "> ",
+  "renderMarkdown": false
 }

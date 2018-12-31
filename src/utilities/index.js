@@ -23,7 +23,7 @@ function storage(sufix = null) {
       clearTimeout(timer);
       count = (count || 0) + 1;
       timer = setTimeout(() => {
-        console.log("localstroage SAVE", count, time());
+        console.log("localstroage SAVE", count, time(), obj);
         localStorage[ns] = JSON.stringify(obj);
         count = 0;
       }, delay);

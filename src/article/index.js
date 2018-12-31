@@ -1,0 +1,184 @@
+import u from "../utilities";
+import collectionToHtml from "../editor/collectionToHtml";
+
+let article;
+let selected;
+let timer;
+let delay = 1000;
+
+const sample = require("./startup.json");
+const { read, write } = u.storage("article");
+
+const callbacks = {
+  click: () => {},
+  dblclick: () => {}
+};
+
+function callback(key, fn) {
+  callbacks[key.toLowerCase()] = fn;
+}
+
+function handleKeyDown(e) {
+  save();
+}
+
+function handleClick(e) {
+  // de-select any existing nodes
+  if (selected) {
+    selected.classList.remove("selected");
+  }
+
+  // only load locked nodes
+  let { id, dataset } = e.target;
+  if (!id || !dataset.versions) return;
+
+  selected = document.querySelector(`#${id}`);
+  selected.classList.add("selected");
+
+  const { versions } = dataset;
+  const json = versions && JSON.parse(versions);
+
+  callbacks.click(json, selected);
+}
+
+function handleDoubleClick(e) {
+  e.target.id = e.target.id || u.uuid();
+  let { id, innerText, dataset } = e.target;
+  const { versions } = dataset;
+  const text = u.inflate(innerText);
+  const value = (versions && JSON.parse(versions)) || text || "";
+
+  if (versions) {
+    // confirm delete
+    if (!window.confirm(u.message("confirmDelete"))) return;
+
+    // next ... remove DOM reference
+    selected.id = "";
+    selected = null;
+
+    // next cleanup this
+    e.target.className = "";
+    e.target.id = "";
+    e.target.dataset.versions = "";
+
+    // update local storage
+    console.log("toggle off", selected);
+    callbacks.dblclick(value, null);
+    return;
+  }
+
+  selected = document.querySelector(`#${id}`);
+  selected.className = "locked selected";
+  callbacks.dblclick(value, selected);
+}
+
+function list() {
+  const data = read();
+  const { articles } = data;
+  const keys = Object.keys(articles);
+  const list = keys.map((s, n) => n + ": " + s).join("\n");
+  console.log(list);
+  return keys;
+}
+
+function save() {
+  timer && clearTimeout(timer);
+  timer = setTimeout(() => {
+    const collection = [...article.children].map(el => {
+      const { innerText = "", dataset } = el;
+      const versions = dataset.versions && JSON.parse(dataset.versions);
+      return { text: innerText.trim(), versions: versions };
+    });
+    const data = read();
+    const now = new Date().valueOf();
+    const { current } = data;
+    Object.assign(data.articles[current], { data: collection, opened: now });
+    write(data);
+  }, delay);
+}
+
+function create(key, data, name) {
+  const id = key || u.uuid();
+  const created = new Date().valueOf();
+  return { id, name, data, created };
+}
+
+function open() {
+  const keys = list();
+  const index = window.prompt("choose one:");
+  load(keys[Number(index)]);
+}
+
+function load(key, name, collection) {
+  let id;
+  let data = read();
+  let current = null;
+  const ts = new Date().valueOf();
+
+  if (!data) {
+    const newobject = create(null, sample, "Untitled");
+    id = newobject.id;
+    data = { articles: {} };
+    data.articles[id] = { ...newobject };
+  }
+
+  // try to get the @key article
+  if (key && data.articles[key]) id = key;
+
+  // create a blank/new document
+  if (!id && (key || name || collection)) {
+    id = key || u.uuid();
+    name = name || "New document";
+    collection = collection || [{ text: name }];
+    data.articles[id] = create(id, collection, name);
+    console.log("NEW", data.articles);
+  }
+
+  // try to use last document edited
+  if (!id && data.current && data.articles[data.current]) id = data.current;
+
+  // last resort open first article
+  if (!id) id = Object.keys(data.articles)[0];
+
+  current = data.articles[id];
+  current.opened = ts;
+  data.current = id;
+
+  //   const objectArray;
+  //   const innerHTML = collectionToHtml(local);
+  article.innerHTML = collectionToHtml(current.data);
+  write({ ...data });
+}
+
+function update(candidate, versions) {
+  // updates the currently selected node
+  if (!selected) {
+    console.error("cant update selected node");
+    return;
+  }
+  selected.innerText = candidate;
+  selected.dataset.versions = JSON.stringify(versions);
+  save();
+}
+
+function initialize(selector = "#document") {
+  article = document.querySelector(selector);
+  article.ondblclick = handleDoubleClick;
+  article.onclick = handleClick;
+  article.onkeydown = handleKeyDown;
+
+  const methods = {
+    callback,
+    update,
+    load,
+    open,
+    save,
+    list
+  };
+
+  window.RE = {};
+  window.RE.article = methods;
+  return methods;
+}
+
+export default initialize;
