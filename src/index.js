@@ -24,6 +24,11 @@ article.load();
 // article.load("55555", "Kilroy!", [{ text: "Kilroy was here" }]);
 // article.open();
 
+setTimeout(() => {
+  document.querySelector(".container").classList.remove("hidden");
+  document.querySelector(".logo").classList.add("hidden");
+}, 550);
+
 function reloadEditor(versions, el) {
   editor.load(versions);
   el && ($focusOn = el);
