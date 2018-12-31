@@ -51,6 +51,12 @@ function clearVersions() {
   // issue onClose event
 }
 
+function wordcount() {
+  [...editor.children].map(
+    row => (row.dataset.wordcount = row.innerText.split(" ").length)
+  );
+}
+
 function load(value = null, options = {}) {
   if (!value) return;
   if (!editor) initialize();
@@ -62,6 +68,8 @@ function load(value = null, options = {}) {
 
   editor.innerHTML = html;
   editor.focus();
+
+  wordcount();
   notifyChanges();
 
   return html;
