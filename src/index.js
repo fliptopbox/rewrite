@@ -33,10 +33,3 @@ function toggleParagraph(versions, el) {
   editor.load(versions);
   $focusOn = el;
 }
-
-// On first run ...
-// resize to fullscreen
-// and use set-up text
-function runOnce() {
-  divider.resize(null, 99);
-}
