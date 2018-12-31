@@ -1,58 +1,95 @@
-.commentbox {
-  position: absolute;
-  margin: 5px 10px;
-  padding: 15px;
-  min-width: 320px;
-  max-width: 30%;
-  right: 0;
-  background: #fff;
-  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
-  border: 1px solid #ccc;
-  z-index: 9; }
-
-.commentbox h1 {
+.sentences {
+  position: relative;
   margin: 0;
   padding: 0;
-  font-weight: normal;
-  font-size: 10px; }
+  background-image: linear-gradient(90deg, #333 0, #222 30%, #444 100%);
+  overflow: auto;
+  color: #ccc; }
 
-.commentbox article div {
+.sentences .content {
+  padding: 20% 10% 20%; }
+
+.sentences .content div {
   position: relative;
   padding: 5px 15px;
   line-height: 1.2;
-  margin: 2px 0;
-  background-color: #f0f0f0; }
-  .commentbox article div.selected {
+  margin: 2px 0; }
+  .sentences .content div.selected {
     background: #fdffe8; }
-  .commentbox article div.comment {
+  .sentences .content div.comment {
     text-decoration: line-through; }
+.document {
+  width: 65%; }
+
+.sentences {
+  width: 35%; }
+
+.divider {
+  width: 6px;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: auto;
+  left: 65%;
+  background: transparent;
+  cursor: ew-resize; }
+  .divider.hide-menu-left .left,
+  .divider.hide-menu-right .right {
+    display: none; }
+  .divider:hover {
+    background: #000; }
+  .divider .left {
+    position: absolute;
+    right: 0; }
+  .divider .right {
+    position: absolute;
+    left: 0; }
+  .divider .left,
+  .divider .right {
+    margin: 0 1em; }
+
 body {
-  font-family: sans-serif; }
+  font-family: sans-serif;
+  margin: 0;
+  padding: 0;
+  font-size: 24px; }
 
 * {
   outline: none; }
 
-.intLink {
-  cursor: pointer; }
+.container {
+  display: flex;
+  background: red;
+  width: 100%;
+  height: 100%;
+  position: absolute; }
 
-img.intLink {
-  border: 0; }
+.hide-content .content {
+  display: none; }
 
-#toolBar1 select {
-  font-size: 10px; }
+.document {
+  overflow: auto;
+  background: #eee;
+  color: #333; }
 
-.textarea {
-  width: auto;
-  min-height: 150px;
-  border: 1px #000 solid;
-  padding: 12px;
-  overflow: auto; }
+.document .content {
+  padding: 20% 10% 20%; }
 
-.locked {
+.document .locked {
   position: relative;
   font-size: 1em; }
-  .locked::before {
-    content: "*";
+  .document .locked::before {
+    content: "";
     position: absolute;
-    left: 0;
-    margin: 0 -0.5em; }
+    left: -10px;
+    margin: 0 -1em;
+    bottom: 0;
+    border-right: 1px solid;
+    padding: 0 10px 0 0;
+    top: 0; }
+
+#footer {
+  position: absolute;
+  bottom: 0;
+  z-index: 9;
+  font-size: 10px; }

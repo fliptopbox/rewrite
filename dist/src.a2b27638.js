@@ -104,31 +104,7 @@ parcelRequire = (function (modules, cache, entry, globalName) {
 
   // Override the current require with this new one
   return newRequire;
-})({"src/functions.js":[function(require,module,exports) {
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.dispatch = dispatch;
-exports.subscribe = subscribe;
-
-function dispatch(name) {
-  var message = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
-  var elm = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : window;
-  var e = new CustomEvent(name, Object.assign({
-    bubbles: true
-  }, {
-    detail: message
-  }));
-  elm.dispatchEvent(e);
-}
-
-function subscribe(name, callback) {
-  var elm = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : window;
-  elm.addEventListener(name, callback);
-}
-},{}],"node_modules/deep-is/index.js":[function(require,module,exports) {
+})({"node_modules/deep-is/index.js":[function(require,module,exports) {
 var pSlice = Array.prototype.slice;
 var Object_keys = typeof Object.keys === 'function'
     ? Object.keys
@@ -242,11 +218,12 @@ exports.default = void 0;
 var serial = 0;
 
 var uuid = function uuid() {
+  var alpha = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "a";
   serial++;
-  return (new Date().valueOf().toString(16) + // eg 127b795136 (11)
+  return alpha + (new Date().valueOf().toString(16) + // eg 127b795136 (11)
   Math.floor(1000 + Math.random() * 1000).toString(13) + // eg aa7 (3)
   (1000 + serial++ % 1000).toString(5) + // eg 13001 (5)
-  "").slice(-16);
+  "").slice(-15);
 };
 
 var _default = uuid;
@@ -742,7 +719,21 @@ function inflate(text) {
 
 var _default = inflate;
 exports.default = _default;
-},{"sbd":"node_modules/sbd/lib/tokenizer.js"}],"src/utilities/index.js":[function(require,module,exports) {
+},{"sbd":"node_modules/sbd/lib/tokenizer.js"}],"src/utilities/message.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = _default;
+var messages = {
+  confirmDelete: "\nYou are unlocking this paragraph. \n\nThis will delete the working versions and destill \nthe paragraph to the currently elected candidate.\n\n[CANCEL] to keep working versions\n[OK] to discard versions\n"
+};
+
+function _default(key) {
+  return messages[key] || "WARNING:\n\nCan't find [".concat(key, "] message.");
+}
+},{}],"src/utilities/index.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -755,6 +746,8 @@ var _deepIs = _interopRequireDefault(require("deep-is"));
 var _uuid = _interopRequireDefault(require("./uuid"));
 
 var _inflate = _interopRequireDefault(require("./inflate"));
+
+var _message = _interopRequireDefault(require("./message"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -780,7 +773,7 @@ function storage() {
       clearTimeout(timer);
       count = (count || 0) + 1;
       timer = setTimeout(function () {
-        console.log("localstroage SAVE", count, time());
+        console.log("localstroage SAVE", count, time(), obj);
         localStorage[ns] = JSON.stringify(obj);
         count = 0;
       }, delay);
@@ -793,10 +786,11 @@ var _default = {
   deepEqual: _deepIs.default,
   inflate: _inflate.default,
   storage: storage,
+  message: _message.default,
   time: time
 };
 exports.default = _default;
-},{"deep-is":"node_modules/deep-is/index.js","./uuid":"src/utilities/uuid.js","./inflate":"src/utilities/inflate.js"}],"src/editor/config.json":[function(require,module,exports) {
+},{"deep-is":"node_modules/deep-is/index.js","./uuid":"src/utilities/uuid.js","./inflate":"src/utilities/inflate.js","./message":"src/utilities/message.js"}],"src/editor/config.json":[function(require,module,exports) {
 module.exports = {
   "resetDelay": 750,
   "doubleTap": 200,
@@ -805,7 +799,8 @@ module.exports = {
   "selector": null,
   "alwaysOpen": true,
   "className": "comment",
-  "prefixToken": "> "
+  "prefixToken": "> ",
+  "renderMarkdown": false
 };
 },{}],"src/editor/empty.js":[function(require,module,exports) {
 "use strict";
@@ -1264,7 +1259,151 @@ function initialize() {
 
 var _default = initialize;
 exports.default = _default;
-},{"./config":"src/editor/config.json","./empty":"src/editor/empty.js","./htmlToStringArray":"src/editor/htmlToStringArray.js","./textToArray":"src/editor/textToArray.js","./getCandidateString":"src/editor/getCandidateString.js","./arrayToHtml":"src/editor/arrayToHtml.js","./editor.scss":"src/editor/editor.scss"}],"src/editor/collectionToHtml.js":[function(require,module,exports) {
+},{"./config":"src/editor/config.json","./empty":"src/editor/empty.js","./htmlToStringArray":"src/editor/htmlToStringArray.js","./textToArray":"src/editor/textToArray.js","./getCandidateString":"src/editor/getCandidateString.js","./arrayToHtml":"src/editor/arrayToHtml.js","./editor.scss":"src/editor/editor.scss"}],"src/divider/index.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _utilities = _interopRequireDefault(require("../utilities"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; var ownKeys = Object.keys(source); if (typeof Object.getOwnPropertySymbols === 'function') { ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) { return Object.getOwnPropertyDescriptor(source, sym).enumerable; })); } ownKeys.forEach(function (key) { _defineProperty(target, key, source[key]); }); } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+var A;
+var B;
+var vertical;
+var dragging = false;
+
+var _u$storage = _utilities.default.storage("resizer"),
+    read = _u$storage.read,
+    write = _u$storage.write;
+
+var state = Object.assign({}, {
+  width: 50,
+  // initial ratio (percentage)
+  minWidth: 8,
+  // min pixel width
+  threshold: 20,
+  // screen width percentage
+  // DOM fixtures
+  vertical: "#vertical",
+  document: ".document",
+  sentences: ".sentences"
+}, read());
+
+function save() {
+  var obj = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+  var data = _objectSpread({}, state, obj);
+
+  write(data);
+  return obj;
+}
+
+function settings(key, value) {
+  if (!key) return; // key, value pairs
+
+  var temp = {};
+
+  if (key.constructor !== Object && value !== undefined) {
+    temp[key] = value;
+    key = _objectSpread({}, temp);
+  }
+
+  state = _objectSpread({}, state, {
+    key: key
+  });
+  return save(state);
+}
+
+function resize(e, value) {
+  if (!dragging && !value) return;
+
+  var _ref = e || {},
+      pageX = _ref.pageX;
+
+  if (e) {
+    // prevent cursor selecting during drag
+    e.stopPropagation && e.stopPropagation();
+    e.preventDefault && e.preventDefault();
+    e.cancelBubble = true;
+    e.returnValue = false;
+  }
+
+  var _state = state,
+      threshold = _state.threshold,
+      minWidth = _state.minWidth;
+  var _window = window,
+      innerWidth = _window.innerWidth;
+  pageX = pageX || (value || 50) / 100 * innerWidth;
+  var width = value || Number(pageX / innerWidth * 100);
+  width = Math.max(minWidth, width);
+  width = Math.min(100 - minWidth, width);
+  var percent = width;
+  A.classList.remove("hide-content");
+  B.classList.remove("hide-content");
+  vertical.classList.remove("hide-menu-left");
+  vertical.classList.remove("hide-menu-right");
+
+  if (width < threshold) {
+    // 15 (100-85) (innerWidth - minWidth) / innerWidth
+    percent = 100 * (minWidth / innerWidth);
+    A.classList.add("hide-content");
+    vertical.classList.add("hide-menu-left");
+  }
+
+  if (width > 100 - threshold) {
+    percent = 100 - 100 * (minWidth * 1.5 / innerWidth);
+    B.classList.add("hide-content");
+    vertical.classList.add("hide-menu-right");
+  }
+
+  A.style.width = "".concat(percent, "%");
+  B.style.width = "".concat(100 - percent, "%");
+  vertical.style.left = "".concat(percent, "%");
+  save({
+    width: Number(percent)
+  });
+}
+
+function initialize() {
+  var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+  vertical = document.querySelector(state.vertical);
+  A = document.querySelector(state.document);
+  B = document.querySelector(state.sentences);
+
+  vertical.onmousedown = function () {
+    return dragging = true;
+  };
+
+  vertical.ondblclick = function (e) {
+    return resize(e, 50);
+  };
+
+  window.onmouseup = function () {
+    dragging = false;
+    console.log("WINDOW [%s]", state.width);
+  };
+
+  window.onmousemove = resize;
+  save(options);
+  resize(null, state.width);
+  console.log("resizer initialized");
+  return {
+    resize: resize,
+    settings: settings
+  };
+}
+
+var _default = initialize;
+exports.default = _default;
+},{"../utilities":"src/utilities/index.js"}],"src/editor/collectionToHtml.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1307,37 +1446,31 @@ function collectionToHtml(array) {
 
 var _default = collectionToHtml;
 exports.default = _default;
-},{"../utilities/uuid":"src/utilities/uuid.js","./getCandidateString":"src/editor/getCandidateString.js"}],"src/styles.scss":[function(require,module,exports) {
-var reloadCSS = require('_css_loader');
-
-module.hot.dispose(reloadCSS);
-module.hot.accept(reloadCSS);
-},{"_css_loader":"../../../.nvm/versions/node/v8.10.0/lib/node_modules/parcel-bundler/src/builtins/css-loader.js"}],"src/editor/startup.json":[function(require,module,exports) {
+},{"../utilities/uuid":"src/utilities/uuid.js","./getCandidateString":"src/editor/getCandidateString.js"}],"src/article/startup.json":[function(require,module,exports) {
 module.exports = [{
-  "text": "kilroy",
-  "versions": ["kilroy", "", "> is here", "> might come here", "> was here."]
-}, {
-  "versions": ["kilroy", "is here", "> might come here", "", "> was here."]
-}, {
-  "text": "kilroy",
-  "versions": ["kilroy", "> is here", "", "> .... who's Kilroy"]
-}, {}, {}, {
-  "text": "Word is the the last word."
+  "text": "# Re:writing"
+}, {}, {
+  "text": "Writing is rewriting."
+}, {}, {
+  "versions": ["> This is a crude tool", "> A new way to rewrite", "This is a simple tool", "", "that allows", "", "the writer,", "> the student,", "> the author", "", "to systematically breakdown each paragraph into component sentences,", "", "and iterate over new versions until the paragraph is complete."]
 }];
-},{}],"src/index.js":[function(require,module,exports) {
+},{}],"src/article/index.js":[function(require,module,exports) {
 "use strict";
 
-var _functions = require("./functions");
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
 
-var _utilities = _interopRequireDefault(require("./utilities"));
+var _utilities = _interopRequireDefault(require("../utilities"));
 
-var _editor = _interopRequireDefault(require("./editor"));
-
-var _collectionToHtml = _interopRequireDefault(require("./editor/collectionToHtml"));
-
-require("./styles.scss");
+var _collectionToHtml = _interopRequireDefault(require("../editor/collectionToHtml"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; var ownKeys = Object.keys(source); if (typeof Object.getOwnPropertySymbols === 'function') { ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) { return Object.getOwnPropertyDescriptor(source, sym).enumerable; })); } ownKeys.forEach(function (key) { _defineProperty(target, key, source[key]); }); } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _nonIterableSpread(); }
 
@@ -1347,111 +1480,255 @@ function _iterableToArray(iter) { if (Symbol.iterator in Object(iter) || Object.
 
 function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } }
 
-var messages = {
-  confirmDelete: "\n    You are unlocking this paragraph. \n\n    This will delete the working versions and destill \n    the paragraph to the currently elected candidate.\n\n    CANCEL to keep working versions\n    OK to discard versions"
+var article;
+var selected;
+var timer;
+var delay = 1000;
+
+var sample = require("./startup.json");
+
+var _u$storage = _utilities.default.storage("article"),
+    read = _u$storage.read,
+    write = _u$storage.write;
+
+var callbacks = {
+  click: function click() {},
+  dblclick: function dblclick() {}
 };
-var editor = (0, _editor.default)("#sentences", {
-  autoTerminate: false
-}); // load some text into the DOM
 
-var $focusOn; // current node element
-
-var $doc = document.querySelector("#document");
-
-var sample = require("./editor/startup.json");
-
-var local = _utilities.default.storage().read();
-
-function save($els) {
-  // parse DOM to collection
-  // save to localstrorage
-  var collection = _toConsumableArray($els).map(function (el) {
-    var _el$innerText = el.innerText,
-        innerText = _el$innerText === void 0 ? "" : _el$innerText,
-        dataset = el.dataset;
-    var versions = dataset.versions && JSON.parse(dataset.versions) || "";
-    return {
-      text: innerText,
-      versions: versions
-    };
-  });
-
-  _utilities.default.storage().write(collection);
+function callback(key, fn) {
+  callbacks[key.toLowerCase()] = fn;
 }
 
-function updateParent(e) {
-  var _e$detail = e.detail,
-      candidate = _e$detail.candidate,
-      versions = _e$detail.versions;
-  document.querySelector("#article").innerHTML = candidate;
-  document.querySelector("#versions").innerHTML = JSON.stringify(versions);
+function handleKeyDown(e) {
+  save();
+}
 
-  if ($focusOn) {
-    $focusOn.innerText = candidate;
-    $focusOn.dataset.versions = JSON.stringify(versions);
-    save(document.querySelector("#document").children);
-  }
-} // Initial DOM injection
+function handleClick(e) {
+  // de-select any existing nodes
+  if (selected) {
+    selected.classList.remove("selected");
+  } // only load locked nodes
 
 
-$doc.innerHTML = (0, _collectionToHtml.default)(local || sample); // Passive events from Editor changes
-
-editor.onChange(function (candidate, versions) {
-  return (0, _functions.dispatch)("updateparent", {
-    candidate: candidate,
-    versions: versions
-  });
-});
-(0, _functions.subscribe)("updateparent", updateParent); // Acive DOM interaction Events
-
-document.querySelector("#document").ondblclick = function (e) {
-  e.target.id = e.target.id || _utilities.default.uuid();
   var _e$target = e.target,
       id = _e$target.id,
-      innerText = _e$target.innerText,
       dataset = _e$target.dataset;
+  if (!id || !dataset.versions) return;
+  selected = document.querySelector("#".concat(id));
+  selected.classList.add("selected");
   var versions = dataset.versions;
+  var json = versions && JSON.parse(versions);
+  callbacks.click(json, selected);
+}
+
+function handleDoubleClick(e) {
+  e.target.id = e.target.id || _utilities.default.uuid();
+  var _e$target2 = e.target,
+      id = _e$target2.id,
+      innerText = _e$target2.innerText,
+      dataset = _e$target2.dataset;
+  var versions = dataset.versions;
+
+  var text = _utilities.default.inflate(innerText);
+
+  var value = versions && JSON.parse(versions) || text || "";
 
   if (versions) {
     // confirm delete
-    if (!window.confirm(messages.confirmDelete)) return; // first clear editor
+    if (!window.confirm(_utilities.default.message("confirmDelete"))) return; // next ... remove DOM reference
 
-    editor.clear(); // next ... remove DOM reference
-
-    $focusOn.id = "";
-    $focusOn = null; // next cleanup this
+    selected.id = "";
+    selected = null; // next cleanup this
 
     e.target.className = "";
     e.target.id = "";
     e.target.dataset.versions = ""; // update local storage
 
-    console.log("toggle off", $focusOn);
+    console.log("toggle off", selected);
+    callbacks.dblclick(value, null);
     return;
   }
 
-  var text = _utilities.default.inflate(innerText);
+  selected = document.querySelector("#".concat(id));
+  selected.className = "locked selected";
+  callbacks.dblclick(value, selected);
+}
 
-  var value = versions && JSON.parse(versions) || text || "";
-  $focusOn = document.querySelector("#".concat(id));
-  $focusOn.className = "locked selected";
-  editor.load(value);
-};
+function list() {
+  var data = read();
+  var articles = data.articles;
+  var keys = Object.keys(articles);
+  var list = keys.map(function (s, n) {
+    return n + ": " + s;
+  }).join("\n");
+  console.log(list);
+  return keys;
+}
 
-document.querySelector("#document").onclick = function (e) {
-  // de-select any existing nodes
-  var selected = document.querySelector(".selected");
-  selected && selected.classList.remove("selected"); // only load locked nodes
+function save() {
+  timer && clearTimeout(timer);
+  timer = setTimeout(function () {
+    var collection = _toConsumableArray(article.children).map(function (el) {
+      var _el$innerText = el.innerText,
+          innerText = _el$innerText === void 0 ? "" : _el$innerText,
+          dataset = el.dataset;
+      var versions = dataset.versions && JSON.parse(dataset.versions);
+      return {
+        text: innerText.trim(),
+        versions: versions
+      };
+    });
 
-  var _e$target2 = e.target,
-      id = _e$target2.id,
-      dataset = _e$target2.dataset;
-  if (!id || !dataset.versions) return;
-  console.log(333, e.target);
-  $focusOn = document.querySelector("#".concat(id));
-  $focusOn.classList.add("selected");
-  editor.load(JSON.parse(dataset.versions));
-};
-},{"./functions":"src/functions.js","./utilities":"src/utilities/index.js","./editor":"src/editor/index.js","./editor/collectionToHtml":"src/editor/collectionToHtml.js","./styles.scss":"src/styles.scss","./editor/startup.json":"src/editor/startup.json"}],"../../../.nvm/versions/node/v8.10.0/lib/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+    var data = read();
+    var now = new Date().valueOf();
+    var current = data.current;
+    Object.assign(data.articles[current], {
+      data: collection,
+      opened: now
+    });
+    write(data);
+  }, delay);
+}
+
+function create(key, data, name) {
+  var id = key || _utilities.default.uuid();
+
+  var created = new Date().valueOf();
+  return {
+    id: id,
+    name: name,
+    data: data,
+    created: created
+  };
+}
+
+function open() {
+  var keys = list();
+  var index = window.prompt("choose one:");
+  load(keys[Number(index)]);
+}
+
+function load(key, name, collection) {
+  var id;
+  var data = read();
+  var current = null;
+  var ts = new Date().valueOf();
+
+  if (!data) {
+    var newobject = create(null, sample, "Untitled");
+    id = newobject.id;
+    data = {
+      articles: {}
+    };
+    data.articles[id] = _objectSpread({}, newobject);
+  } // try to get the @key article
+
+
+  if (key && data.articles[key]) id = key; // create a blank/new document
+
+  if (!id && (key || name || collection)) {
+    id = key || _utilities.default.uuid();
+    name = name || "New document";
+    collection = collection || [{
+      text: name
+    }];
+    data.articles[id] = create(id, collection, name);
+    console.log("NEW", data.articles);
+  } // try to use last document edited
+
+
+  if (!id && data.current && data.articles[data.current]) id = data.current; // last resort open first article
+
+  if (!id) id = Object.keys(data.articles)[0];
+  current = data.articles[id];
+  current.opened = ts;
+  data.current = id; //   const objectArray;
+  //   const innerHTML = collectionToHtml(local);
+
+  article.innerHTML = (0, _collectionToHtml.default)(current.data);
+  write(_objectSpread({}, data));
+}
+
+function update(candidate, versions) {
+  // updates the currently selected node
+  if (!selected) {
+    console.error("cant update selected node");
+    return;
+  }
+
+  selected.innerText = candidate;
+  selected.dataset.versions = JSON.stringify(versions);
+  save();
+}
+
+function initialize() {
+  var selector = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "#document";
+  article = document.querySelector(selector);
+  article.ondblclick = handleDoubleClick;
+  article.onclick = handleClick;
+  article.onkeydown = handleKeyDown;
+  var methods = {
+    callback: callback,
+    update: update,
+    load: load,
+    open: open,
+    save: save,
+    list: list
+  };
+  window.RE = {};
+  window.RE.article = methods;
+  return methods;
+}
+
+var _default = initialize;
+exports.default = _default;
+},{"../utilities":"src/utilities/index.js","../editor/collectionToHtml":"src/editor/collectionToHtml.js","./startup.json":"src/article/startup.json"}],"src/styles.scss":[function(require,module,exports) {
+var reloadCSS = require('_css_loader');
+
+module.hot.dispose(reloadCSS);
+module.hot.accept(reloadCSS);
+},{"_css_loader":"../../../.nvm/versions/node/v8.10.0/lib/node_modules/parcel-bundler/src/builtins/css-loader.js"}],"src/index.js":[function(require,module,exports) {
+"use strict";
+
+var _utilities = _interopRequireDefault(require("./utilities"));
+
+var _editor = _interopRequireDefault(require("./editor"));
+
+var _divider = _interopRequireDefault(require("./divider"));
+
+var _article = _interopRequireDefault(require("./article"));
+
+require("./styles.scss");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+// load some text into the DOM
+var $focusOn; // current node element
+
+var local = _utilities.default.storage().read();
+
+var divider = (0, _divider.default)();
+var article = (0, _article.default)("#document");
+var editor = (0, _editor.default)("#sentences"); // Passive events from Editor changes
+
+editor.onChange(article.update); // Initial DOM injection
+
+article.callback("click", reloadEditor);
+article.callback("dblclick", toggleParagraph);
+article.load(); // article.load("55555", "Kilroy!", [{ text: "Kilroy was here" }]);
+// article.open();
+
+function reloadEditor(versions, el) {
+  editor.load(versions);
+  el && ($focusOn = el);
+}
+
+function toggleParagraph(versions, el) {
+  editor.load(versions);
+  $focusOn = el;
+}
+},{"./utilities":"src/utilities/index.js","./editor":"src/editor/index.js","./divider":"src/divider/index.js","./article":"src/article/index.js","./styles.scss":"src/styles.scss"}],"../../../.nvm/versions/node/v8.10.0/lib/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -1478,7 +1755,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "38237" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "34599" + '/');
 
   ws.onmessage = function (event) {
     var data = JSON.parse(event.data);
