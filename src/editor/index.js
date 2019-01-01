@@ -4,6 +4,7 @@ import htmlToStringArray from "./htmlToStringArray";
 import textToArray from "./textToArray";
 import getCandidateString from "./getCandidateString";
 import arrayToHtml from "./arrayToHtml";
+import wordcount from "../utilities/wordcount";
 
 import "./editor.scss";
 
@@ -39,7 +40,8 @@ console.log(re_punctuation);
 
 const triggerDictionary = {
   cleanup: cleanupBlanks,
-  shiftshift: toggleComment
+  shiftshift: toggleComment,
+  controlt: toggleComment
 };
 
 // ["Lorem ipsum 1","Lorem ipsum 2","> Lorem ipsum 4","","Lorem ipsum 3"]
@@ -51,10 +53,16 @@ function clearVersions() {
   // issue onClose event
 }
 
-function wordcount() {
-  [...editor.children].map(
-    row => (row.dataset.wordcount = row.innerText.split(" ").length)
-  );
+function setWordcount(row) {
+  if (!row || !row.innerText) return;
+  const words = wordcount(row.innerText);
+  row.dataset.wordcount = words;
+}
+
+function updateWordCountDataset() {
+  if (config.showWordCount) {
+    [...editor.children].map(setWordcount);
+  }
 }
 
 function load(value = null, options = {}) {
@@ -69,9 +77,8 @@ function load(value = null, options = {}) {
   editor.innerHTML = html;
   editor.focus();
 
-  wordcount();
+  updateWordCountDataset();
   notifyChanges();
-
   return html;
 }
 
@@ -98,7 +105,7 @@ function executeTriggers(e, keyTime, keyHistory) {
 
   keyHistory = keyHistory.join("").toLowerCase();
 
-  const { cleanup } = triggerDictionary;
+  const { cleanup, wordCount } = triggerDictionary;
   const trigger =
     triggerDictionary[keyHistory] ||
     triggerDictionary[`id${keyHistory}`] ||
@@ -106,6 +113,7 @@ function executeTriggers(e, keyTime, keyHistory) {
 
   cleanup(children);
   trigger(parentNode);
+  setWordcount(parentNode);
   notifyChanges();
 }
 
@@ -147,7 +155,6 @@ function notifyChanges() {
 
   // cheap checks first ...
   const a = candidate !== nextCandidate;
-
   const b = a || versions.length !== nextVersions.length;
 
   // most expensive check

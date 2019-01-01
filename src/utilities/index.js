@@ -2,6 +2,7 @@ import deepEqual from "deep-is";
 import uuid from "./uuid";
 import inflate from "./inflate";
 import message from "./message";
+import wordcount from "./wordcount";
 
 let timer;
 let count = 0;
@@ -37,5 +38,6 @@ export default {
   inflate,
   storage,
   message,
+  wordcount,
   time
 };

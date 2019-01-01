@@ -7,5 +7,6 @@
   "alwaysOpen": true,
   "className": "comment",
   "prefixToken": "> ",
-  "renderMarkdown": false
+  "renderMarkdown": false,
+  "showWordCount": true
 }

@@ -9,13 +9,13 @@
 			display: none !important;
 		}
 
-		.logo {
+		.overlay {
 			position: fixed;
 			top: 0;
 			bottom: 0;
 			left: 0;
 			right: 0;
-			background: rgba(0, 0, 0, 0.9);
+			background-image: radial-gradient(#333, #111);
 			display: flex;
 		}
 
@@ -24,7 +24,7 @@
 			align-self: center;
 		}
 
-		svg {
+		.brand img {
 			width: 350px;
 			height: 114px;
 			padding: 0 10px 0 20px;
@@ -33,6 +33,7 @@
 			text-align: center;
 			margin: 0 auto;
 			border-radius: 2px;
+			box-shadow: 0 16px 50px 0 #000;
 		}
 	</style>
 </head>
@@ -46,7 +47,7 @@
 		</div>
 
 		<div class="sentences">
-			<article id="sentences" class="content" collapse contenteditable="true"></article>
+			<article id="sentences" class="content" contenteditable="true"></article>
 		</div>
 
 		<div class="divider" id="vertical">
@@ -80,13 +81,12 @@
 		footer banner
 	</div>
 
-	<div id="overlay" class="logo">
+	<div id="overlay" class="overlay">
 		<div class="brand">
 				<img src="./src/rewriting.svg" />
 		</div>
 	</div>
-		<script src="src/index.js">
-		</script>
+	<script src="src/index.js"></script>
 </body>
 
 </html>

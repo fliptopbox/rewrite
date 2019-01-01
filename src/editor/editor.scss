@@ -4,56 +4,45 @@
     position: relative;
     margin: 0;
     padding: 0;
-    // background-image: linear-gradient(90deg, #333 0, #222 30%, #444 100%);
-    // width: 35%;
     overflow: auto;
     color: #fff;
-  }
-
-  article[collapse] {
-    div.comment {
-        white-space: nowrap;
-        text-overflow: ellipsis;
-        display: block;
-        overflow: hidden;
-        color: #959595;
-        max-width: 80%;
-        margin: 0;
-        font-size: 0.9em;
-        font-style: italic;
-        padding-right: 1.2em;
-     
-      &:after {
-          content: attr(data-wordcount);
-          position: absolute;
-          right: 0;
-          background: #666;
-          font-size: 0.6em;
-          border-radius: 23px;
-          padding: 5px;
-      }
-    }
   }
 
   .content {
     & {
       padding: 20% 10% 20%;
-
-
     }
 
     div {
-      position: relative;
-      padding: 5px 15px;
-      line-height: 1.2;
-      margin: 20px 0;
-
-      &.selected {
-        background: #fdffe8;
+      & {
+        position: relative;
+        padding: 5px 15px;
+        line-height: 1.2;
+        margin: 20px 0;
       }
 
       &.comment {
         text-decoration: line-through;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        display: block;
+        overflow: hidden;
+        color: #959595;
+        max-width: 100%;
+        margin: 0;
+        font-size: 0.9em;
+        font-style: italic;
+        padding-right: 2em;
+
+        &:after {
+          content: attr(data-wordcount);
+          font-size: 0.8em;
+          padding: 5px;
+          margin: 0 8px;
+          position: absolute;
+          display: inline-block;
+          right: 0;
+        }
       }
     }
   }

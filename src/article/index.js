@@ -19,6 +19,7 @@ function callback(key, fn) {
 }
 
 function handleKeyDown(e) {
+  //! prevent locked rows from editing text
   save();
 }
 
@@ -34,6 +35,7 @@ function handleClick(e) {
 
   selected = document.querySelector(`#${id}`);
   selected.classList.add("selected");
+  selected.dataset.wordcount = u.wordcount(e.target.innerText);
 
   const { versions } = dataset;
   const json = versions && JSON.parse(versions);
@@ -156,8 +158,11 @@ function update(candidate, versions) {
     console.error("cant update selected node");
     return;
   }
+
   selected.innerText = candidate;
+  selected.dataset.wordcount = u.wordcount(candidate);
   selected.dataset.versions = JSON.stringify(versions);
+
   save();
 }
 

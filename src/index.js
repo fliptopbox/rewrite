@@ -26,7 +26,7 @@ article.load();
 
 setTimeout(() => {
   document.querySelector(".container").classList.remove("hidden");
-  document.querySelector(".logo").classList.add("hidden");
+  document.querySelector(".overlay").classList.add("hidden");
 }, 550);
 
 function reloadEditor(versions, el) {
