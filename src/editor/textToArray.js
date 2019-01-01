@@ -3,7 +3,8 @@ function textToArray(text = null) {
   // correcting for double line breaks
   if (!text) return;
 
-  return text.replace(/\n\n/gm, "\n").split(/\n/g);
+  return text.split(/\n/g);
+  // return text.replace(/\n\n/g, "\n").split(/\n/g);
 }
 
 export default textToArray;

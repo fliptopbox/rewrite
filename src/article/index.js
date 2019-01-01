@@ -1,5 +1,6 @@
 import u from "../utilities";
 import collectionToHtml from "../editor/collectionToHtml";
+import textToArray from "../editor/textToArray";
 
 let article;
 let selected;
@@ -83,14 +84,22 @@ function list() {
   return keys;
 }
 
+function htmlToCollection(children) {
+  return [...children].map(el => {
+    const { innerText = "", dataset } = el;
+    const versions = dataset.versions && JSON.parse(dataset.versions);
+
+    return {
+      text: innerText.trim(),
+      versions: versions
+    };
+  });
+}
+
 function save() {
   timer && clearTimeout(timer);
   timer = setTimeout(() => {
-    const collection = [...article.children].map(el => {
-      const { innerText = "", dataset } = el;
-      const versions = dataset.versions && JSON.parse(dataset.versions);
-      return { text: innerText.trim(), versions: versions };
-    });
+    const collection = htmlToCollection(article.children);
     const data = read();
     const now = new Date().valueOf();
     const { current } = data;
@@ -166,6 +175,59 @@ function update(candidate, versions) {
   save();
 }
 
+function importJSON(payload) {
+  let object;
+  let collection;
+  let text = payload || window.prompt("Please paste JSON export");
+
+  try {
+    object = JSON.parse(text);
+  } catch (e) {
+    console.error("JSON import error", e);
+  }
+
+  // payload is plainText
+  if (!object) {
+    collection = textToArray(text);
+    console.log("!!!!!", text, collection);
+    collection.map(row => {
+      text: row.trim();
+    });
+
+    object = {
+      id: u.uuid(),
+      name: "Untitled Import",
+      data: [...collection]
+    };
+  }
+
+  //! need to check the UUID does not exist OR
+  //! warn that it will replace the existring data
+
+  const { key, name, data } = object;
+
+  load(key, name, data);
+}
+
+function exportJSON() {
+  const local = read();
+  const { current } = local;
+  const { id, name } = local.articles[current];
+  const filename = `${name}-${id}`;
+  const text = JSON.stringify(local.articles[current]);
+
+  const element = document.createElement("a");
+  const payload = encodeURIComponent(text);
+
+  element.setAttribute("href", "data:text/json;charset=utf-8," + payload);
+  element.setAttribute("download", `${filename}.json`);
+  element.style.display = "none";
+
+  document.body.appendChild(element);
+  element.click();
+  document.body.removeChild(element);
+}
+
 function initialize(selector = "#document") {
   article = document.querySelector(selector);
   article.ondblclick = handleDoubleClick;
@@ -174,6 +236,8 @@ function initialize(selector = "#document") {
 
   const methods = {
     callback,
+    import: importJSON,
+    export: exportJSON,
     update,
     load,
     open,

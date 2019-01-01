@@ -2,7 +2,7 @@ import u from "./index";
 
 test("uuid", () => {
   const dict = {};
-  let i = 10000;
+  let i = 100000;
   let x = i;
   while (i--) {
     dict[u.uuid()] = true;
