@@ -79,7 +79,7 @@ function list() {
   const data = read();
   const { articles } = data;
   const keys = Object.keys(articles);
-  const list = keys.map((s, n) => n + ": " + s).join("\n");
+  const list = keys.map((s, n) => `${n}: ${s}  ${articles[s].name}`).join("\n");
   console.log(list);
   return keys;
 }
@@ -189,7 +189,6 @@ function importJSON(payload) {
   // payload is plainText
   if (!object) {
     collection = textToArray(text);
-    console.log("!!!!!", text, collection);
     collection.map(row => {
       text: row.trim();
     });

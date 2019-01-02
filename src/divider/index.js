@@ -2,6 +2,7 @@ import u from "../utilities";
 
 let A;
 let B;
+let left;
 let vertical;
 let dragging = false;
 const { read, write } = u.storage("resizer");
@@ -87,10 +88,23 @@ function resize(e, value) {
   save({ width: Number(percent) });
 }
 
+function bindMenuEvents() {
+  left.onclick = e => {
+    const { nodeName, dataset } = e.target;
+    if (nodeName !== "LI") return;
+    console.log(nodeName, dataset.fn);
+    const fn = dataset.fn;
+    window.RE.article[fn]();
+  };
+}
+
 function initialize(options = {}) {
   vertical = document.querySelector(state.vertical);
+  left = document.querySelector("#left-menu");
   A = document.querySelector(state.document);
   B = document.querySelector(state.sentences);
+
+  bindMenuEvents();
 
   vertical.onmousedown = () => (dragging = true);
   vertical.ondblclick = e => resize(e, 50);
