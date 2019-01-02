@@ -75,13 +75,13 @@ function handleDoubleClick(e) {
   callbacks.dblclick(value, selected);
 }
 
-function list() {
+function list(astext = false) {
   const data = read();
   const { articles } = data;
   const keys = Object.keys(articles);
   const list = keys.map((s, n) => `${n}: ${s}  ${articles[s].name}`).join("\n");
   console.log(list);
-  return keys;
+  return astext ? list : keys;
 }
 
 function htmlToCollection(children) {
@@ -227,6 +227,20 @@ function exportJSON() {
   document.body.removeChild(element);
 }
 
+function getMetaData(key, value) {
+  let local = read();
+  const { current, articles } = { ...local };
+  let currentValue = articles[current][key] || null;
+
+  if (key && value) {
+    articles[current][key] = value;
+    write(Object.assign({}, { current, articles }));
+    return;
+  }
+
+  return currentValue;
+}
+
 function initialize(selector = "#document") {
   article = document.querySelector(selector);
   article.ondblclick = handleDoubleClick;
@@ -237,6 +251,7 @@ function initialize(selector = "#document") {
     callback,
     import: importJSON,
     export: exportJSON,
+    meta: getMetaData,
     update,
     load,
     open,

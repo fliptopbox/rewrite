@@ -2,7 +2,7 @@ import u from "../utilities";
 
 let A;
 let B;
-let left;
+let action;
 let vertical;
 let dragging = false;
 const { read, write } = u.storage("resizer");
@@ -89,18 +89,43 @@ function resize(e, value) {
 }
 
 function bindMenuEvents() {
-  left.onclick = e => {
-    const { nodeName, dataset } = e.target;
-    if (nodeName !== "LI") return;
-    console.log(nodeName, dataset.fn);
+  action.onclick = e => {
+    const { nodeName, dataset, parentNode } = e.target;
+    const { article } = window.RE;
     const fn = dataset.fn;
-    window.RE.article[fn]();
+    let context;
+
+    if (nodeName !== "LI") return;
+    context = parentNode.className.match(/(left|right)/);
+
+    switch (fn) {
+      case "close":
+        resize(null, context[0] === "left" ? 1 : 99);
+        break;
+
+      case "name":
+        const name = "";
+        const value = prompt("Enter new name", name);
+        article.meta("name", value);
+        break;
+
+      case "list":
+        const ids = article.list();
+        const list = article.list(true);
+        const index = Number(prompt(list));
+        article.load(ids[index]);
+        break;
+
+      default:
+        window.RE.article[fn](e);
+        break;
+    }
   };
 }
 
 function initialize(options = {}) {
   vertical = document.querySelector(state.vertical);
-  left = document.querySelector("#left-menu");
+  action = document.querySelector(".divider");
   A = document.querySelector(state.document);
   B = document.querySelector(state.sentences);
 

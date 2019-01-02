@@ -6,6 +6,11 @@ $left: 65%;
 .sentences {
   width: 100 - $left;
 }
+.action {
+  li {
+    cursor: pointer;
+  }
+}
 
 .divider {
   width: 6px;
