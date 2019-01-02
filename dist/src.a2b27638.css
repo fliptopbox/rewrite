@@ -2,9 +2,8 @@
   position: relative;
   margin: 0;
   padding: 0;
-  background-image: linear-gradient(90deg, #333 0, #222 30%, #444 100%);
   overflow: auto;
-  color: #ccc; }
+  color: #fff; }
 
 .sentences .content {
   padding: 20% 10% 20%; }
@@ -13,11 +12,28 @@
   position: relative;
   padding: 5px 15px;
   line-height: 1.2;
-  margin: 2px 0; }
-  .sentences .content div.selected {
-    background: #fdffe8; }
-  .sentences .content div.comment {
-    text-decoration: line-through; }
+  margin: 20px 0; }
+
+.sentences .content div.comment {
+  text-decoration: line-through;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  display: block;
+  overflow: hidden;
+  color: #959595;
+  max-width: 100%;
+  margin: 0;
+  font-size: 0.9em;
+  font-style: italic;
+  padding-right: 2em; }
+  .sentences .content div.comment:after {
+    content: attr(data-wordcount);
+    font-size: 0.8em;
+    padding: 5px;
+    margin: 0 8px;
+    position: absolute;
+    display: inline-block;
+    right: 0; }
 .document {
   width: 65%; }
 
@@ -38,20 +54,32 @@
     display: none; }
   .divider:hover {
     background: #000; }
-  .divider .left {
-    position: absolute;
-    right: 0; }
-  .divider .right {
-    position: absolute;
-    left: 0; }
   .divider .left,
   .divider .right {
-    margin: 0 1em; }
+    list-style-type: none;
+    position: absolute;
+    margin: 0 10px;
+    padding: 0; }
+    .divider .left li,
+    .divider .right li {
+      text-align: center;
+      display: block;
+      border-top: 1px solid;
+      margin: 10px;
+      padding: 10px 0 0; }
+      .divider .left li:first-child,
+      .divider .right li:first-child {
+        margin: 0;
+        border: none; }
+  .divider .left {
+    right: 0; }
+  .divider .right {
+    left: 0; }
 
 body {
-  font-family: sans-serif;
   margin: 0;
   padding: 0;
+  background: #353535;
   font-size: 24px; }
 
 * {
@@ -59,10 +87,12 @@ body {
 
 .container {
   display: flex;
-  background: red;
   width: 100%;
   height: 100%;
-  position: absolute; }
+  position: absolute;
+  background: radial-gradient(ellipse at center, #858585, #353535); }
+  .container.hidden {
+    display: none; }
 
 .hide-content .content {
   display: none; }

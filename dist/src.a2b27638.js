@@ -215,14 +215,13 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.default = void 0;
-var serial = 0;
+var serial = -1;
 
 var uuid = function uuid() {
-  var alpha = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "a";
   serial++;
-  return alpha + (new Date().valueOf().toString(16) + // eg 127b795136 (11)
+  return String.fromCharCode(65 + serial % 26).toLowerCase() + (new Date().valueOf().toString(16) + // eg 127b795136 (11)
   Math.floor(1000 + Math.random() * 1000).toString(13) + // eg aa7 (3)
-  (1000 + serial++ % 1000).toString(5) + // eg 13001 (5)
+  (1000 + serial % 1000).toString(5) + // eg 13001 (5)
   "").slice(-15);
 };
 
@@ -733,6 +732,20 @@ var messages = {
 function _default(key) {
   return messages[key] || "WARNING:\n\nCan't find [".concat(key, "] message.");
 }
+},{}],"src/utilities/wordcount.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+function wordcount(value) {
+  return value.replace(/[\.\n]+/g, "").replace(/(\s\s+)/g, "").split(" ").length;
+}
+
+var _default = wordcount;
+exports.default = _default;
 },{}],"src/utilities/index.js":[function(require,module,exports) {
 "use strict";
 
@@ -748,6 +761,8 @@ var _uuid = _interopRequireDefault(require("./uuid"));
 var _inflate = _interopRequireDefault(require("./inflate"));
 
 var _message = _interopRequireDefault(require("./message"));
+
+var _wordcount = _interopRequireDefault(require("./wordcount"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -787,10 +802,11 @@ var _default = {
   inflate: _inflate.default,
   storage: storage,
   message: _message.default,
+  wordcount: _wordcount.default,
   time: time
 };
 exports.default = _default;
-},{"deep-is":"node_modules/deep-is/index.js","./uuid":"src/utilities/uuid.js","./inflate":"src/utilities/inflate.js","./message":"src/utilities/message.js"}],"src/editor/config.json":[function(require,module,exports) {
+},{"deep-is":"node_modules/deep-is/index.js","./uuid":"src/utilities/uuid.js","./inflate":"src/utilities/inflate.js","./message":"src/utilities/message.js","./wordcount":"src/utilities/wordcount.js"}],"src/editor/config.json":[function(require,module,exports) {
 module.exports = {
   "resetDelay": 750,
   "doubleTap": 200,
@@ -800,7 +816,8 @@ module.exports = {
   "alwaysOpen": true,
   "className": "comment",
   "prefixToken": "> ",
-  "renderMarkdown": false
+  "renderMarkdown": false,
+  "showWordCount": true
 };
 },{}],"src/editor/empty.js":[function(require,module,exports) {
 "use strict";
@@ -870,7 +887,7 @@ function textToArray() {
   // returns simple text Array
   // correcting for double line breaks
   if (!text) return;
-  return text.replace(/\n\n/gm, "\n").split(/\n/g);
+  return text.split(/\n/g); // return text.replace(/\n\n/g, "\n").split(/\n/g);
 }
 
 var _default = textToArray;
@@ -1058,6 +1075,8 @@ var _getCandidateString = _interopRequireDefault(require("./getCandidateString")
 
 var _arrayToHtml = _interopRequireDefault(require("./arrayToHtml"));
 
+var _wordcount = _interopRequireDefault(require("../utilities/wordcount"));
+
 require("./editor.scss");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -1106,7 +1125,8 @@ var re_comments = /^([\/\>\?\=\!]\s*?)/;
 console.log(re_punctuation);
 var triggerDictionary = {
   cleanup: cleanupBlanks,
-  shiftshift: toggleComment
+  shiftshift: toggleComment,
+  controlt: toggleComment
 }; // ["Lorem ipsum 1","Lorem ipsum 2","> Lorem ipsum 4","","Lorem ipsum 3"]
 
 function clearVersions() {
@@ -1114,6 +1134,18 @@ function clearVersions() {
   editor = null;
   cache.candidate = null;
   cache.versions = [null]; // issue onClose event
+}
+
+function setWordcount(row) {
+  if (!row || !row.innerText) return;
+  var words = (0, _wordcount.default)(row.innerText);
+  row.dataset.wordcount = words;
+}
+
+function updateWordCountDataset() {
+  if (config.showWordCount) {
+    _toConsumableArray(editor.children).map(setWordcount);
+  }
 }
 
 function load() {
@@ -1126,6 +1158,7 @@ function load() {
   config = Object.assign({}, config, options);
   editor.innerHTML = html;
   editor.focus();
+  updateWordCountDataset();
   notifyChanges();
   return html;
 }
@@ -1149,12 +1182,14 @@ function executeTriggers(e, keyTime, keyHistory) {
   var parentNode = window.getSelection().focusNode.parentNode;
   var children = parentNode.children;
   keyHistory = keyHistory.join("").toLowerCase();
-  var cleanup = triggerDictionary.cleanup;
+  var cleanup = triggerDictionary.cleanup,
+      wordCount = triggerDictionary.wordCount;
 
   var trigger = triggerDictionary[keyHistory] || triggerDictionary["id".concat(keyHistory)] || _empty.default;
 
   cleanup(children);
   trigger(parentNode);
+  setWordcount(parentNode);
   notifyChanges();
 }
 
@@ -1259,7 +1294,7 @@ function initialize() {
 
 var _default = initialize;
 exports.default = _default;
-},{"./config":"src/editor/config.json","./empty":"src/editor/empty.js","./htmlToStringArray":"src/editor/htmlToStringArray.js","./textToArray":"src/editor/textToArray.js","./getCandidateString":"src/editor/getCandidateString.js","./arrayToHtml":"src/editor/arrayToHtml.js","./editor.scss":"src/editor/editor.scss"}],"src/divider/index.js":[function(require,module,exports) {
+},{"./config":"src/editor/config.json","./empty":"src/editor/empty.js","./htmlToStringArray":"src/editor/htmlToStringArray.js","./textToArray":"src/editor/textToArray.js","./getCandidateString":"src/editor/getCandidateString.js","./arrayToHtml":"src/editor/arrayToHtml.js","../utilities/wordcount":"src/utilities/wordcount.js","./editor.scss":"src/editor/editor.scss"}],"src/divider/index.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1277,6 +1312,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
 var A;
 var B;
+var left;
 var vertical;
 var dragging = false;
 
@@ -1372,11 +1408,25 @@ function resize(e, value) {
   });
 }
 
+function bindMenuEvents() {
+  left.onclick = function (e) {
+    var _e$target = e.target,
+        nodeName = _e$target.nodeName,
+        dataset = _e$target.dataset;
+    if (nodeName !== "LI") return;
+    console.log(nodeName, dataset.fn);
+    var fn = dataset.fn;
+    window.RE.article[fn]();
+  };
+}
+
 function initialize() {
   var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
   vertical = document.querySelector(state.vertical);
+  left = document.querySelector("#left-menu");
   A = document.querySelector(state.document);
   B = document.querySelector(state.sentences);
+  bindMenuEvents();
 
   vertical.onmousedown = function () {
     return dragging = true;
@@ -1466,6 +1516,8 @@ var _utilities = _interopRequireDefault(require("../utilities"));
 
 var _collectionToHtml = _interopRequireDefault(require("../editor/collectionToHtml"));
 
+var _textToArray = _interopRequireDefault(require("../editor/textToArray"));
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; var ownKeys = Object.keys(source); if (typeof Object.getOwnPropertySymbols === 'function') { ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) { return Object.getOwnPropertyDescriptor(source, sym).enumerable; })); } ownKeys.forEach(function (key) { _defineProperty(target, key, source[key]); }); } return target; }
@@ -1501,6 +1553,7 @@ function callback(key, fn) {
 }
 
 function handleKeyDown(e) {
+  //! prevent locked rows from editing text
   save();
 }
 
@@ -1517,6 +1570,7 @@ function handleClick(e) {
   if (!id || !dataset.versions) return;
   selected = document.querySelector("#".concat(id));
   selected.classList.add("selected");
+  selected.dataset.wordcount = _utilities.default.wordcount(e.target.innerText);
   var versions = dataset.versions;
   var json = versions && JSON.parse(versions);
   callbacks.click(json, selected);
@@ -1560,26 +1614,29 @@ function list() {
   var articles = data.articles;
   var keys = Object.keys(articles);
   var list = keys.map(function (s, n) {
-    return n + ": " + s;
+    return "".concat(n, ": ").concat(s, "  ").concat(articles[s].name);
   }).join("\n");
   console.log(list);
   return keys;
 }
 
+function htmlToCollection(children) {
+  return _toConsumableArray(children).map(function (el) {
+    var _el$innerText = el.innerText,
+        innerText = _el$innerText === void 0 ? "" : _el$innerText,
+        dataset = el.dataset;
+    var versions = dataset.versions && JSON.parse(dataset.versions);
+    return {
+      text: innerText.trim(),
+      versions: versions
+    };
+  });
+}
+
 function save() {
   timer && clearTimeout(timer);
   timer = setTimeout(function () {
-    var collection = _toConsumableArray(article.children).map(function (el) {
-      var _el$innerText = el.innerText,
-          innerText = _el$innerText === void 0 ? "" : _el$innerText,
-          dataset = el.dataset;
-      var versions = dataset.versions && JSON.parse(dataset.versions);
-      return {
-        text: innerText.trim(),
-        versions: versions
-      };
-    });
-
+    var collection = htmlToCollection(article.children);
     var data = read();
     var now = new Date().valueOf();
     var current = data.current;
@@ -1658,8 +1715,60 @@ function update(candidate, versions) {
   }
 
   selected.innerText = candidate;
+  selected.dataset.wordcount = _utilities.default.wordcount(candidate);
   selected.dataset.versions = JSON.stringify(versions);
   save();
+}
+
+function importJSON(payload) {
+  var object;
+  var collection;
+  var text = payload || window.prompt("Please paste JSON export");
+
+  try {
+    object = JSON.parse(text);
+  } catch (e) {
+    console.error("JSON import error", e);
+  } // payload is plainText
+
+
+  if (!object) {
+    collection = (0, _textToArray.default)(text);
+    collection.map(function (row) {
+      text: row.trim();
+    });
+    object = {
+      id: _utilities.default.uuid(),
+      name: "Untitled Import",
+      data: _toConsumableArray(collection)
+    };
+  } //! need to check the UUID does not exist OR
+  //! warn that it will replace the existring data
+
+
+  var _object = object,
+      key = _object.key,
+      name = _object.name,
+      data = _object.data;
+  load(key, name, data);
+}
+
+function exportJSON() {
+  var local = read();
+  var current = local.current;
+  var _local$articles$curre = local.articles[current],
+      id = _local$articles$curre.id,
+      name = _local$articles$curre.name;
+  var filename = "".concat(name, "-").concat(id);
+  var text = JSON.stringify(local.articles[current]);
+  var element = document.createElement("a");
+  var payload = encodeURIComponent(text);
+  element.setAttribute("href", "data:text/json;charset=utf-8," + payload);
+  element.setAttribute("download", "".concat(filename, ".json"));
+  element.style.display = "none";
+  document.body.appendChild(element);
+  element.click();
+  document.body.removeChild(element);
 }
 
 function initialize() {
@@ -1670,6 +1779,8 @@ function initialize() {
   article.onkeydown = handleKeyDown;
   var methods = {
     callback: callback,
+    import: importJSON,
+    export: exportJSON,
     update: update,
     load: load,
     open: open,
@@ -1683,7 +1794,7 @@ function initialize() {
 
 var _default = initialize;
 exports.default = _default;
-},{"../utilities":"src/utilities/index.js","../editor/collectionToHtml":"src/editor/collectionToHtml.js","./startup.json":"src/article/startup.json"}],"src/styles.scss":[function(require,module,exports) {
+},{"../utilities":"src/utilities/index.js","../editor/collectionToHtml":"src/editor/collectionToHtml.js","../editor/textToArray":"src/editor/textToArray.js","./startup.json":"src/article/startup.json"}],"src/styles.scss":[function(require,module,exports) {
 var reloadCSS = require('_css_loader');
 
 module.hot.dispose(reloadCSS);
@@ -1718,6 +1829,11 @@ article.callback("click", reloadEditor);
 article.callback("dblclick", toggleParagraph);
 article.load(); // article.load("55555", "Kilroy!", [{ text: "Kilroy was here" }]);
 // article.open();
+
+setTimeout(function () {
+  document.querySelector(".container").classList.remove("hidden");
+  document.querySelector(".overlay").classList.add("hidden");
+}, 550);
 
 function reloadEditor(versions, el) {
   editor.load(versions);
@@ -1755,7 +1871,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "34599" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "34457" + '/');
 
   ws.onmessage = function (event) {
     var data = JSON.parse(event.data);

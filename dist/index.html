@@ -1,55 +1,69 @@
 <!DOCTYPE html>
 <html>
+  <head>
+    <title>Parcel Sandbox</title>
+    <meta charset="UTF-8">
+    <style>.hidden {
+        display: none !important;
+      }
 
-<head>
-	<title>Parcel Sandbox</title>
-	<meta charset="UTF-8">
-<link rel="stylesheet" href="/src.a2b27638.css"></head>
+      .overlay {
+        position: fixed;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background-image: radial-gradient(#333, #111);
+        display: flex;
+      }
 
-<body>
+      .brand {
+        flex: 1 0;
+        align-self: center;
+      }
 
-	<div class="container">
+      .brand img {
+        width: 350px;
+        height: 114px;
+        padding: 0 10px 0 20px;
+        display: block;
+        background: white;
+        text-align: center;
+        margin: 0 auto;
+        border-radius: 2px;
+        box-shadow: 0 16px 50px 0 #000;
+      }</style>
+  <link rel="stylesheet" href="/src.a2b27638.css"></head>
 
-		<div class="document">
-			<article id="document" class="content" contenteditable="true"></article>
-		</div>
-
-		<div class="sentences">
-			<article id="sentences" class="content" contenteditable="true"></article>
-		</div>
-
-		<div class="divider" id="vertical">
-
-			<div class="left">
-				A
-				<hr>
-				<i data-fn="palette">
-          @
-          <hr>
-          <i data-fn="">ff</i>
-          <i data-fn="">ff</i>
-        </i>
-        <i data-fn="files">ff</i>
+  <body>
+    <div class="container hidden">
+      <div class="document">
+        <article id="document" class="content" contenteditable="true"></article>
       </div>
 
-      <div class="right">
-        B
-        <hr>
-        <i data-fn="type">ty</i>
-        <i data-fn="page">pg</i>
-        <i data-fn="font">ff</i>
+      <div class="sentences">
+        <article id="sentences" class="content" contenteditable="true"></article>
+      </div>
 
-        <i data-fn="scroll">1</i>
+      <div class="divider" id="vertical">
+        <ul class="left" id="left-menu">
+          <li data-fn="close">[x]</li>
+          <li data-fn="import">im</li>
+          <li data-fn="export">ex</li>
+        </ul>
+        <ul class="right" id="right-menu">
+          <li data-fn="close">[x]</li>
+          <li data-fn="collapse">zz</li>
+          <li data-fn="wordcount">wc</li>
+        </ul>
       </div>
     </div>
 
-		<div id="footer">
-			footer banner
-		</div>
+    <div id="footer">footer banner</div>
 
-		<script src="/src.a2b27638.js">
-
-		</script>
-</div></body>
-
+    <div id="overlay" class="overlay">
+      <div class="brand"><img src="/rewriting.391005c7.svg"></div>
+    </div>
+    <script src="/src.a2b27638.js"></script>
+  </body>
 </html>
