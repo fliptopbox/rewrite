@@ -175,7 +175,7 @@ function update(candidate, versions) {
   save();
 }
 
-function importJSON(payload) {
+function importJSON(payload, filename) {
   let object;
   let collection;
   let text = payload || window.prompt("Please paste JSON export");
@@ -188,14 +188,11 @@ function importJSON(payload) {
 
   // payload is plainText
   if (!object) {
-    collection = textToArray(text);
-    collection.map(row => {
-      text: row.trim();
-    });
+    collection = textToArray(text).map(row => ({ text: row.trim() }));
 
     object = {
       id: u.uuid(),
-      name: "Untitled Import",
+      name: filename || "Untitled Import",
       data: [...collection]
     };
   }
@@ -241,17 +238,34 @@ function getMetaData(key, value) {
   return currentValue;
 }
 
+function readTextFile(e) {
+  const files = e.currentTarget.files;
+  const reader = new FileReader();
+  const file = files[0];
+  const filename = file.name;
+
+  reader.onload = e => {
+    const { result } = e.target;
+    console.log(2222222222222, filename, result);
+    importJSON(result, filename);
+  };
+  reader.readAsText(file);
+}
+
 function initialize(selector = "#document") {
   article = document.querySelector(selector);
   article.ondblclick = handleDoubleClick;
   article.onclick = handleClick;
   article.onkeydown = handleKeyDown;
 
+  document.getElementById("uploadInput").onchange = readTextFile;
+
   const methods = {
     callback,
     import: importJSON,
     export: exportJSON,
     meta: getMetaData,
+    read: readTextFile,
     update,
     load,
     open,

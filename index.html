@@ -58,6 +58,17 @@
           <li data-fn="import">im</li>
           <li data-fn="export">ex</li>
           <li data-fn="list">ls</li>
+          <li>
+            <label for="uploadInput">
+              up
+              <input
+                id="uploadInput"
+                type="file"
+                style="display:none;"
+                accept="text/*"
+              />
+            </label>
+          </li>
         </ul>
         <ul class="action right" id="right-menu">
           <li data-fn="close">[x]</li>
@@ -72,6 +83,7 @@
     <div id="overlay" class="overlay">
       <div class="brand"><img src="./src/rewriting.svg" /></div>
     </div>
+
     <script src="src/index.js"></script>
   </body>
 </html>
