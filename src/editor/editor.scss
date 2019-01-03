@@ -1,5 +1,7 @@
 
 .sentences {
+
+
   & {
     position: relative;
     margin: 0;
@@ -12,6 +14,24 @@
     & {
       padding: 20% 10% 20%;
     }
+
+  &.un-wrap {
+    div.comment {
+      white-space: normal;
+    }
+  }
+  
+  &.un-strike {
+    div.comment {
+    text-decoration: none;
+    }
+  }
+
+  &.wordcount {
+    div.comment:after {
+          display: inline-block;
+    }
+  }
 
     div {
       & {
@@ -40,7 +60,7 @@
           padding: 5px;
           margin: 0 8px;
           position: absolute;
-          display: inline-block;
+          display: none;
           right: 0;
         }
       }

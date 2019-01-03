@@ -30,6 +30,11 @@ function collectionToHtml(array) {
     return div.outerHTML;
   });
 
+  if (!/<br\s?\/?>/i.test(html.slice(-1))) {
+    console.log("add last line");
+    html.push("<div><br/></div>");
+  }
+
   return html.join("\n");
 }
 

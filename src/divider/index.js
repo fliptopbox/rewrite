@@ -93,6 +93,7 @@ function bindMenuEvents() {
     const { nodeName, dataset, parentNode } = e.target;
     const { article } = window.RE;
     const fn = dataset.fn;
+    let index;
     let context;
 
     if (nodeName !== "LI") return;
@@ -109,10 +110,22 @@ function bindMenuEvents() {
         article.meta("name", value);
         break;
 
+      case "unwrap":
+      case "unstrike":
+      case "wordcount":
+        const classnames = ["un-wrap", "un-strike", "wordcount"];
+        index = ["unwrap", "unstrike", "wordcount"].indexOf(fn);
+
+        console.log(index, fn);
+
+        const classvalue = classnames[index];
+        document.querySelector("#sentences").classList.toggle(classvalue);
+        break;
+
       case "list":
         const ids = article.list();
         const list = article.list(true);
-        const index = Number(prompt(list));
+        index = Number(prompt(list));
         article.load(ids[index]);
         break;
 
