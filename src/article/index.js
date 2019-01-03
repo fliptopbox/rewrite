@@ -257,7 +257,6 @@ function readTextFile(e) {
 
   reader.onload = e => {
     const { result } = e.target;
-    console.log(2222222222222, filename, result);
     importJSON(result, filename);
   };
   reader.readAsText(file);

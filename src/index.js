@@ -36,5 +36,8 @@ function reloadEditor(versions, el) {
 
 function toggleParagraph(versions, el) {
   editor.load(versions);
+  if (divider.settings().width > 80) {
+    divider.resize(null, 60);
+  }
   $focusOn = el;
 }

@@ -29,7 +29,7 @@ function save(obj = {}) {
 }
 
 function settings(key, value) {
-  if (!key) return;
+  if (!key) return state;
 
   // key, value pairs
   const temp = {};
@@ -116,8 +116,6 @@ function bindMenuEvents() {
         const classnames = ["un-wrap", "un-strike", "wordcount"];
         index = ["unwrap", "unstrike", "wordcount"].indexOf(fn);
 
-        console.log(index, fn);
-
         const classvalue = classnames[index];
         document.querySelector("#sentences").classList.toggle(classvalue);
         break;
@@ -147,11 +145,7 @@ function initialize(options = {}) {
   vertical.onmousedown = () => (dragging = true);
   vertical.ondblclick = e => resize(e, 50);
 
-  window.onmouseup = () => {
-    dragging = false;
-    console.log("WINDOW [%s]", state.width);
-  };
-
+  window.onmouseup = () => (dragging = false);
   window.onmousemove = resize;
 
   save(options);
