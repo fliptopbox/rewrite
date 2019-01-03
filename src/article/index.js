@@ -46,7 +46,13 @@ function handleClick(e) {
 
 function handleDoubleClick(e) {
   e.target.id = e.target.id || u.uuid();
-  let { id, innerText, dataset } = e.target;
+  let { id, innerText, dataset, nodeName } = e.target;
+
+  if (!/div/i.test(nodeName)) {
+    console.warn("WARNING! Element not div. Bypass", nodeName);
+    return;
+  }
+
   const { versions } = dataset;
   const text = u.inflate(innerText);
   const value = (versions && JSON.parse(versions)) || text || "";
@@ -85,21 +91,26 @@ function list(astext = false) {
 }
 
 function htmlToCollection(children) {
-  return [...children].map(el => {
-    const { innerText = "", dataset } = el;
+  const array = [...children].map(el => {
+    const { innerText = "", dataset, nodeName } = el;
     const versions = dataset.versions && JSON.parse(dataset.versions);
-
+    if (!/div/i.test(nodeName)) return null;
     return {
       text: innerText.trim(),
       versions: versions
     };
   });
+  return array.filter(row => row);
 }
 
 function save() {
   timer && clearTimeout(timer);
   timer = setTimeout(() => {
     const collection = htmlToCollection(article.children);
+    if (!collection || !collection.length) {
+      console.error("No DATA array", article.children);
+      return;
+    }
     const data = read();
     const now = new Date().valueOf();
     const { current } = data;
