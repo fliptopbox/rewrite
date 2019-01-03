@@ -31,7 +31,6 @@ function collectionToHtml(array) {
   });
 
   if (!/<br\s?\/?>/i.test(html.slice(-1))) {
-    console.log("add last line");
     html.push("<div><br/></div>");
   }
 

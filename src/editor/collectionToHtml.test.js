@@ -9,7 +9,9 @@ test("simple single value", () => {
   expect(collectionToHtml()).toBeUndefined();
 
   collection = [{ text: "kilroy" }];
-  expect(collectionToHtml(collection)).toEqual("<div>kilroy</div>");
+  expect(collectionToHtml(collection)).toEqual(
+    "<div>kilroy</div>\n<div><br/></div>"
+  );
 });
 
 test("collecion with versions data", () => {
