@@ -32,4 +32,29 @@ setTimeout(() => {
 function handleClick(versions, el) {
   editor.load(versions);
   el && ($focusOn = el);
+
+  console.log(divider.settings().width);
+  if (divider.settings().width > 80) {
+    divider.resize(null, 60);
+  }
 }
+
+let pressTimer;
+let downTime = 0;
+let diff = 0;
+let keyHistory = [];
+const keyTime = 275;
+
+window.onkeydown = e => {
+  diff = e.timeStamp - downTime;
+  downTime = e.timeStamp;
+  console.log(e.code, e.key, e.keyCode, downTime, diff);
+  keyHistory.push((e.key.trim() || e.code).toLowerCase());
+
+  pressTimer && clearTimeout(pressTimer);
+  pressTimer = setTimeout(() => {
+    editor.execute(e, keyHistory);
+    console.log("clear key history", keyHistory, diff);
+    keyHistory = [];
+  }, keyTime);
+};

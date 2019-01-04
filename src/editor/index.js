@@ -102,13 +102,13 @@ function cleanupBlanks(rows) {
   });
 }
 
-function executeTriggers(e, keyTime, keyHistory) {
+function executeTriggers(e, keyHistory) {
   const { parentNode } = window.getSelection().focusNode;
   const children = parentNode.children;
 
   keyHistory = keyHistory.join("").toLowerCase();
 
-  const { cleanup, wordCount } = triggerDictionary;
+  const { cleanup } = triggerDictionary;
   const trigger =
     triggerDictionary[keyHistory] ||
     triggerDictionary[`id${keyHistory}`] ||
@@ -124,19 +124,24 @@ function bindEvents() {
   let ts = 0;
   let hist = [];
 
-  editor.onkeyup = e => {
-    const { doubleTap, resetDelay } = config;
-    const diff = e.timeStamp - ts;
-    const delay = diff < doubleTap;
-    ts = e.timeStamp;
-
-    hist = diff > resetDelay ? [] : hist;
-
-    hist.push(e.key);
-    hist = hist.slice(-5);
-
-    setTimeout(() => executeTriggers(e, delay, hist), 0);
+  editor.ondblclick = e => {
+    hist = ["shift", "shift"];
+    return executeTriggers(e, hist);
   };
+
+  // editor.onkeyup = e => {
+  //   const { doubleTap, resetDelay } = config;
+  //   const diff = e.timeStamp - ts;
+  //   const delay = diff < doubleTap;
+  //   ts = e.timeStamp;
+
+  //   hist = diff > resetDelay ? [] : hist;
+
+  //   hist.push(e.key);
+  //   hist = hist.slice(-5);
+
+  //   setTimeout(() => executeTriggers(e, delay, hist), 0);
+  // };
 }
 
 function getVersionArray() {
@@ -197,15 +202,19 @@ function initialize(selector = null, options) {
   }
 
   bindEvents();
-  return {
+  const methods = {
     load,
     trigger,
+    execute: executeTriggers,
     clear: clearVersions,
     settings: () => config,
     onChange: addOnChange,
     candidate: getCandidateString,
     versions: htmlToStringArray
   };
+  window.RE = window.RE || {};
+  window.RE.editor = methods;
+  return methods;
 }
 
 export default initialize;

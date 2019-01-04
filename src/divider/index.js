@@ -108,6 +108,7 @@ function bindMenuEvents() {
         console.log(fn, index, widths[index], context[0]);
 
         resize(null, widths[index]);
+        save({ width: widths[index] });
 
         break;
 
