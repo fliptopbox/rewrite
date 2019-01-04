@@ -101,7 +101,14 @@ function bindMenuEvents() {
 
     switch (fn) {
       case "close":
-        resize(null, context[0] === "left" ? 1 : 99);
+      case "middle":
+        const widths = [1, 50, 99];
+        index = fn === "middle" ? 1 : null;
+        index = index || (context[0] === "left" ? 0 : 2);
+        console.log(fn, index, widths[index], context[0]);
+
+        resize(null, widths[index]);
+
         break;
 
       case "name":

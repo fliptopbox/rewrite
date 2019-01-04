@@ -24,15 +24,26 @@ function handleKeyDown(e) {
   save();
 }
 
-function handleClick(e) {
-  // de-select any existing nodes
-  if (selected) {
-    selected.classList.remove("selected");
-  }
+function deselect(reset = false) {
+  selected && selected.classList.remove("selected");
+  reset && (selected = null);
+}
 
+function handleClick(e) {
   // only load locked nodes
   let { id, dataset } = e.target;
   if (!id || !dataset.versions) return;
+
+  // de-select any existing nodes
+  if (selected) {
+    deselect();
+
+    if (selected.id === id) {
+      selected = null;
+      callbacks.click();
+      return;
+    }
+  }
 
   selected = document.querySelector(`#${id}`);
   selected.classList.add("selected");
@@ -46,6 +57,7 @@ function handleClick(e) {
 
 function handleDoubleClick(e) {
   e.target.id = e.target.id || u.uuid();
+  const bypassMsg = e.shiftKey;
   let { id, innerText, dataset, nodeName } = e.target;
 
   if (!/div/i.test(nodeName)) {
@@ -53,17 +65,16 @@ function handleDoubleClick(e) {
     return;
   }
 
+  deselect(true);
   const { versions } = dataset;
   const text = u.inflate(innerText);
   const value = (versions && JSON.parse(versions)) || text || "";
 
   if (versions) {
     // confirm delete
-    if (!window.confirm(u.message("confirmDelete"))) return;
-
-    // next ... remove DOM reference
-    selected.id = "";
-    selected = null;
+    const confirmed =
+      bypassMsg || window.confirm(u.message("confirmDelete")) || false;
+    if (!confirmed) return;
 
     // next cleanup this
     e.target.className = "";
@@ -71,8 +82,7 @@ function handleDoubleClick(e) {
     e.target.dataset.versions = "";
 
     // update local storage
-    console.log("toggle off", selected);
-    callbacks.dblclick(value, null);
+    callbacks.dblclick();
     return;
   }
 

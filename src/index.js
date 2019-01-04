@@ -17,8 +17,8 @@ const editor = editorInit("#sentences");
 editor.onChange(article.update);
 
 // Initial DOM injection
-article.callback("click", reloadEditor);
-article.callback("dblclick", toggleParagraph);
+article.callback("click", handleClick);
+article.callback("dblclick", handleClick);
 article.load();
 
 // article.load("55555", "Kilroy!", [{ text: "Kilroy was here" }]);
@@ -29,15 +29,7 @@ setTimeout(() => {
   document.querySelector(".overlay").classList.add("hidden");
 }, 550);
 
-function reloadEditor(versions, el) {
+function handleClick(versions, el) {
   editor.load(versions);
   el && ($focusOn = el);
-}
-
-function toggleParagraph(versions, el) {
-  editor.load(versions);
-  if (divider.settings().width > 80) {
-    divider.resize(null, 60);
-  }
-  $focusOn = el;
 }

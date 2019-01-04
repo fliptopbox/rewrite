@@ -66,7 +66,10 @@ function updateWordCountDataset() {
 }
 
 function load(value = null, options = {}) {
-  if (!value) return;
+  if (!value) {
+    editor.innerHTML = "";
+    return;
+  }
   if (!editor) initialize();
 
   const array = value.constructor === Array ? value : textToArray(value);
