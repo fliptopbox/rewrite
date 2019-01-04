@@ -13,8 +13,8 @@ test("inflate", () => {
     "Nostrud minim.";
 
   B =
-    "Ipsum dolor exercitationi.\n\n" +
-    "Dr. Amet cupidatat pariatur qui ex ... cillum quis voluptate.\n\n" +
+    "Ipsum dolor exercitationi.\n" +
+    "Dr. Amet cupidatat pariatur qui ex ... cillum quis voluptate.\n" +
     "Nostrud minim.";
 
   expect(u.inflate(A)).toEqual(B);
