@@ -39,18 +39,33 @@ body {
     padding: 20% 10% 20%;
   }
 
-  .locked {
-    position: relative;
-    font-size: 1em;
-    &::before {
-      content: "";
-      position: absolute;
-      left: -10px;
-      margin: 0 -1em;
-      bottom: 0;
-      border-right: 1px solid;
-      padding: 0 10px 0 0;
-      top: 0;
+  div {
+    & {
+      display: block;
+      padding: 0.1em 2% 0.1em 4%;
+      margin: 0;
+      min-height: 1em;
+      // position: relative;
+      font-size: 1em;
+    }
+
+    &.locked {
+      border-left: 4px solid;
+      border-color: #ccc;
+      &.selected {
+        border-color: #333;
+        background-color: #ddd;
+      }
+      // &::before {
+      //   border-right: 1px solid;
+      //   content: "";
+      //   position: absolute;
+      //   left: 0;
+      //   margin: 0;
+      //   bottom: 0;
+      //   padding: 0;
+      //   top: 0;
+      // }
     }
   }
 }
