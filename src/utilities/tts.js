@@ -31,7 +31,7 @@ function setVoice(i = 0) {
 function saythis(text, n = "") {
   // const text = monologue.slice(0,1);
   const tts = new SpeechSynthesisUtterance();
-  const voice = selectedVoice;
+  const voice = selectedVoice || initialize();
 
   Object.assign(tts, {
     volume: 1,
