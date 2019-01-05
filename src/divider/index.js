@@ -112,6 +112,11 @@ function bindMenuEvents() {
 
         break;
 
+      case "center":
+        const elm = document.querySelector(".selected");
+        elm && elm.scrollIntoViewIfNeeded();
+        break;
+
       case "name":
         const name = "";
         const value = prompt("Enter new name", name);
@@ -135,11 +140,20 @@ function bindMenuEvents() {
         article.load(ids[index]);
         break;
 
+      case "read":
+        triggers["read"] && triggers["read"]();
+        break;
+
       default:
         window.RE.article[fn](e);
         break;
     }
   };
+}
+
+const triggers = {};
+function delegate(key, fn) {
+  triggers[key] = fn;
 }
 
 function initialize(options = {}) {
@@ -161,7 +175,7 @@ function initialize(options = {}) {
 
   console.log("resizer initialized");
 
-  return { resize, settings };
+  return { resize, settings, delegate };
 }
 
 export default initialize;

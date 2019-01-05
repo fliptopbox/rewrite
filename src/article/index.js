@@ -102,12 +102,18 @@ function list(astext = false) {
 
 function htmlToCollection(children) {
   const array = [...children].map(el => {
-    const { innerText = "", dataset, nodeName } = el;
-    const versions = dataset.versions && JSON.parse(dataset.versions);
+    const { innerText = "", dataset, nodeName, classList } = el;
+
     if (!/div/i.test(nodeName)) return null;
+
+    const versions = dataset.versions && JSON.parse(dataset.versions);
+    const text = innerText.trim();
+    const selected = (classList && classList.contains("selected")) || undefined;
+
     return {
-      text: innerText.trim(),
-      versions: versions
+      text,
+      versions,
+      selected
     };
   });
   return array.filter(row => row);
@@ -133,6 +139,26 @@ function create(key, data, name) {
   const id = key || u.uuid();
   const created = new Date().valueOf();
   return { id, name, data, created };
+}
+
+function deleteArticle(id) {
+  const data = read();
+  const keys = list();
+  const index = !id && window.prompt("DELETE ARTICLE:\nChoose one:");
+  const { articles, current } = data;
+  const key = id || keys[Number(index)];
+
+  console.log("JEY [%s]", key, index);
+  if (articles[key]) {
+    delete articles[key];
+    console.log("DELETED [%s]", key);
+  }
+  write(data);
+  if (key === current) {
+    id = data.articles[0].id;
+    console.warn("DELETED CURRENT article [%s] loading first file", id);
+    load(id);
+  }
 }
 
 function open() {
@@ -179,7 +205,11 @@ function load(key, name, collection) {
   //   const objectArray;
   //   const innerHTML = collectionToHtml(local);
   article.innerHTML = collectionToHtml(current.data);
+  article.onload = scrollToView;
+
   write({ ...data });
+
+  setTimeout(scrollToView, 650);
 }
 
 function update(candidate, versions) {
@@ -209,7 +239,9 @@ function importJSON(payload, filename) {
 
   // payload is plainText
   if (!object) {
-    collection = textToArray(text).map(row => ({ text: row.trim() }));
+    collection = textToArray(text);
+    console.log(1232, collection);
+    collection = collection.map(row => ({ text: row || "" }));
 
     object = {
       id: u.uuid(),
@@ -221,7 +253,7 @@ function importJSON(payload, filename) {
   //! need to check the UUID does not exist OR
   //! warn that it will replace the existring data
 
-  const { key, name, data } = object;
+  const { key, name, data } = { ...object };
 
   load(key, name, data);
 }
@@ -272,6 +304,12 @@ function readTextFile(e) {
   reader.readAsText(file);
 }
 
+function scrollToView() {
+  const el = document.querySelector(".selected");
+  if (!el) return;
+  el.scrollIntoViewIfNeeded();
+}
+
 function initialize(selector = "#document") {
   article = document.querySelector(selector);
   article.ondblclick = handleDoubleClick;
@@ -286,10 +324,12 @@ function initialize(selector = "#document") {
     export: exportJSON,
     meta: getMetaData,
     read: readTextFile,
+    center: scrollToView,
     update,
     load,
     open,
     save,
+    delete: deleteArticle,
     list
   };
 

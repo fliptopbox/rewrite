@@ -205,9 +205,12 @@ function initialize(selector = null, options) {
   const methods = {
     load,
     trigger,
+
+    cache: () => ({ ...cache }),
+    settings: () => config,
+
     execute: executeTriggers,
     clear: clearVersions,
-    settings: () => config,
     onChange: addOnChange,
     candidate: getCandidateString,
     versions: htmlToStringArray

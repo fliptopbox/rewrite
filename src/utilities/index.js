@@ -3,6 +3,7 @@ import uuid from "./uuid";
 import inflate from "./inflate";
 import message from "./message";
 import wordcount from "./wordcount";
+import tts from "./tts";
 
 let timer;
 let count = 0;
@@ -39,5 +40,6 @@ export default {
   storage,
   message,
   wordcount,
-  time
+  time,
+  tts
 };

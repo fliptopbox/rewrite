@@ -12,6 +12,7 @@ const local = u.storage().read();
 const divider = divideInit();
 const article = articleInit("#document");
 const editor = editorInit("#sentences");
+const tts = u.tts();
 
 // Passive events from Editor changes
 editor.onChange(article.update);
@@ -45,11 +46,26 @@ let diff = 0;
 let keyHistory = [];
 const keyTime = 275;
 
+divider.delegate("read", readSelectedCandidate);
+
+function readSelectedCandidate() {
+  console.log("read selected candidate");
+  let { candidate } = editor.cache();
+  candidate = u.inflate(candidate, true);
+  tts.read(candidate);
+}
+
 window.onkeydown = e => {
   diff = e.timeStamp - downTime;
   downTime = e.timeStamp;
   console.log(e.code, e.key, e.keyCode, downTime, diff);
   keyHistory.push((e.key.trim() || e.code).toLowerCase());
+
+  if (keyHistory && keyHistory.join("") === "controlspace") {
+    readSelectedCandidate();
+    keyHistory = [];
+    return false;
+  }
 
   pressTimer && clearTimeout(pressTimer);
   pressTimer = setTimeout(() => {

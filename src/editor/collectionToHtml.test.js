@@ -43,3 +43,21 @@ test("collecion without text data should use version candidate", () => {
   expect(dataset.versions).toBeDefined();
   expect(id).toBeDefined();
 });
+
+test("should have a selected className", () => {
+  collection = [
+    { text: "kilroy", versions: [">is here", "was here"], selected: true }
+  ];
+
+  dom = new JSDOM(collectionToHtml(collection));
+  div = dom.window.document.querySelector("div");
+
+  let { innerHTML, id, dataset, classList } = div;
+
+  expect(innerHTML).toEqual("kilroy");
+  expect(classList.contains("locked")).toBe(true);
+  expect(classList.contains("selected")).toBe(true);
+  expect(dataset).toBeDefined();
+  expect(dataset.versions).toBeDefined();
+  expect(id).toBeDefined();
+});

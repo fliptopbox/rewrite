@@ -9,10 +9,15 @@ function collectionToHtml(array) {
   if (!array) return;
 
   const html = array.map(row => {
-    const { text = "", versions = "" } = row;
+    let classnames = [];
+    const { text = "", versions = "", selected = "" } = row;
 
     const id = versions ? uuid() : "";
-    const classname = (versions && "locked") || "";
+
+    classnames.push(versions ? "locked" : "");
+    classnames.push(selected ? "selected" : "");
+    classnames = classnames.join(" ").trim() || null;
+
     const value = text || (versions && getCandidateString(versions)) || "";
     const json = versions ? JSON.stringify(versions) : "";
 
@@ -22,7 +27,7 @@ function collectionToHtml(array) {
 
     // only render relavant attributes
     id && (div.id = id);
-    classname && (div.className = classname);
+    classnames ? (div.className = classnames) : null;
     versions && (div.dataset.versions = json);
 
     div.innerHTML = value || "<br/>";
@@ -30,6 +35,7 @@ function collectionToHtml(array) {
     return div.outerHTML;
   });
 
+  // ensure there is always one extra last line
   if (!/<br\s?\/?>/i.test(html.slice(-1))) {
     html.push("<div><br/></div>");
   }
