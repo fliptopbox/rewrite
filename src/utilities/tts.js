@@ -1,12 +1,21 @@
 const isenglish = /^en-(gb|us)/i;
 
 let english;
+let retry;
 let synth, voices;
 let selectedVoice = null;
 
 function initialize() {
   synth = window.speechSynthesis;
-  voices = window.speechSynthesis.getVoices();
+
+  if (synth && !synth.getVoices()) {
+    console.warn("retry snth reloading");
+    retry && clearTimeout(retry);
+    retry = setTimeout(initialize, 150);
+    return retry;
+  }
+
+  voices = synth.getVoices();
   let i = 0;
 
   english = voices.filter((item, n) => {
@@ -31,7 +40,15 @@ function setVoice(i = 0) {
 function saythis(text, n = "") {
   // const text = monologue.slice(0,1);
   const tts = new SpeechSynthesisUtterance();
-  const voice = selectedVoice || initialize();
+  const voice = selectedVoice || null;
+
+  if (!voice) {
+    return setTimeout(() => {
+      console.warn("Say this is not ready. Reloading.");
+      initialize();
+      saythis(text, n);
+    }, 350);
+  }
 
   Object.assign(tts, {
     volume: 1,
