@@ -33,7 +33,18 @@ function storage(sufix = null) {
   };
 }
 
-const { prompt, confirm } = window;
+// const { prompt, confirm, alert } = windowdd
+function prompt(s, value) {
+  return window.prompt(s, value);
+}
+
+function confirm(s) {
+  return window.confirm(s);
+}
+
+function alert(s) {
+  return window.alert(s);
+}
 
 export default {
   uuid,
@@ -44,6 +55,7 @@ export default {
   wordcount,
   prompt,
   confirm,
+  alert,
   time,
   tts
 };

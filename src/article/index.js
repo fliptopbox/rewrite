@@ -1,6 +1,8 @@
 import u from "../utilities";
 import collectionToHtml from "../editor/collectionToHtml";
-import textToArray from "../editor/textToArray";
+import importJSON from "./importJSON";
+// import textToArray from "../editor/textToArray";
+import htmlToCollection from "./htmlToCollection";
 
 let article;
 let selected;
@@ -100,25 +102,6 @@ function list(astext = false) {
   return astext ? list : keys;
 }
 
-function htmlToCollection(children) {
-  const array = [...children].map(el => {
-    const { innerText = "", dataset, nodeName, classList } = el;
-
-    if (!/div/i.test(nodeName)) return null;
-
-    const versions = dataset.versions && JSON.parse(dataset.versions);
-    const text = innerText.trim();
-    const selected = (classList && classList.contains("selected")) || undefined;
-
-    return {
-      text,
-      versions,
-      selected
-    };
-  });
-  return array.filter(row => row);
-}
-
 function save() {
   timer && clearTimeout(timer);
   timer = setTimeout(() => {
@@ -141,19 +124,20 @@ function create(key, data, name) {
   return { id, name, data, created };
 }
 
-function deleteArticle(id) {
+function deleteArticle(index = null) {
   const data = read();
   const keys = list();
-  const index = !id && window.prompt("DELETE ARTICLE:\nChoose one:");
-  const { articles, current } = data;
-  const key = id || keys[Number(index)];
 
-  console.log("JEY [%s]", key, index);
+  index = index || u.prompt("DELETE ARTICLE:\nChoose one:");
+  const { articles, current } = data;
+  const key = keys[Number(index)];
+
   if (articles[key]) {
     delete articles[key];
     console.log("DELETED [%s]", key);
+    write({ ...data });
   }
-  write(data);
+
   if (key === current) {
     id = data.articles[0].id;
     console.warn("DELETED CURRENT article [%s] loading first file", id);
@@ -163,7 +147,7 @@ function deleteArticle(id) {
 
 function open() {
   const keys = list();
-  const index = window.prompt("choose one:");
+  const index = u.prompt("choose one:");
   load(keys[Number(index)]);
 }
 
@@ -202,14 +186,9 @@ function load(key, name, collection) {
   current.opened = ts;
   data.current = id;
 
-  //   const objectArray;
-  //   const innerHTML = collectionToHtml(local);
   article.innerHTML = collectionToHtml(current.data);
-  article.onload = scrollToView;
-
-  write({ ...data });
-
   setTimeout(scrollToView, 650);
+  write({ ...data });
 }
 
 function update(candidate, versions) {
@@ -224,38 +203,6 @@ function update(candidate, versions) {
   selected.dataset.versions = JSON.stringify(versions);
 
   save();
-}
-
-function importJSON(payload, filename) {
-  let object;
-  let collection;
-  let text = payload || window.prompt("Please paste JSON export");
-
-  try {
-    object = JSON.parse(text);
-  } catch (e) {
-    console.error("JSON import error", e);
-  }
-
-  // payload is plainText
-  if (!object) {
-    collection = textToArray(text);
-    console.log(1232, collection);
-    collection = collection.map(row => ({ text: row || "" }));
-
-    object = {
-      id: u.uuid(),
-      name: filename || "Untitled Import",
-      data: [...collection]
-    };
-  }
-
-  //! need to check the UUID does not exist OR
-  //! warn that it will replace the existring data
-
-  const { key, name, data } = { ...object };
-
-  load(key, name, data);
 }
 
 function exportJSON() {
@@ -299,7 +246,8 @@ function readTextFile(e) {
 
   reader.onload = e => {
     const { result } = e.target;
-    importJSON(result, filename);
+    const { key, name, data } = importJSON(result, filename);
+    load(key, name, data);
   };
   reader.readAsText(file);
 }
@@ -333,8 +281,9 @@ function initialize(selector = "#document") {
     list
   };
 
-  window.RE = {};
-  window.RE.article = methods;
+  window.RE = window.RE || {
+    article: methods
+  };
   return methods;
 }
 

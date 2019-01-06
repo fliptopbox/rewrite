@@ -52,6 +52,7 @@ function readSelectedCandidate() {
   console.log("read selected candidate");
   let { candidate } = editor.cache();
   candidate = u.inflate(candidate, true);
+
   tts.read(candidate);
 }
 

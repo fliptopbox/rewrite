@@ -140,6 +140,10 @@ function bindMenuEvents() {
         article.load(ids[index]);
         break;
 
+      case "delete":
+        window.RE.article.delete();
+        break;
+
       case "read":
         triggers["read"] && triggers["read"]();
         break;
