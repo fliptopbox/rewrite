@@ -33,6 +33,8 @@ function storage(sufix = null) {
   };
 }
 
+const { prompt, confirm } = window;
+
 export default {
   uuid,
   deepEqual,
@@ -40,6 +42,8 @@ export default {
   storage,
   message,
   wordcount,
+  prompt,
+  confirm,
   time,
   tts
 };
