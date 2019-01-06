@@ -7,34 +7,47 @@ let selectedVoice = null;
 
 function initialize() {
   synth = window.speechSynthesis;
+  voices = synth.getVoices();
 
-  if (synth && !synth.getVoices()) {
-    console.warn("retry snth reloading");
+  if (!voices) {
+    console.warn("Voices not loaded. Reloading");
     retry && clearTimeout(retry);
     retry = setTimeout(initialize, 150);
     return retry;
   }
 
-  voices = synth.getVoices();
   let i = 0;
+  let index = null;
 
-  english = voices.filter((item, n) => {
+  voices.forEach((item, n) => {
     if (isenglish.test(item.lang)) {
-      console.log(i++, n, item.lang, item.name, item.default);
-      if (item.default) selectedVoice = item;
-      return true;
+      console.log(i, n, item.lang, item.name, item.default);
+      if (index === null && /female/i.test(item.name)) {
+        index = i;
+      }
+      english = english || [];
+      english.push(item);
+      i++;
     }
   });
 
-  selectedVoice = selectedVoice || english[0];
-  console.log("selected voice", selectedVoice);
+  console.log("TTS initialized", english && english.length, index);
+  selectedVoice = english && english[index || 0];
+
+  window.speechSynthesis.onvoiceschanged = function(e) {
+    console.log("voice has chagned", e.timeStamp);
+  };
+
   return methods;
 }
 
 function setVoice(i = 0) {
-  selectedVoice || initialize();
+  (english && english.length) || initialize();
   selectedVoice = english[i];
+
   console.log(selectedVoice.name, selectedVoice.lang);
+
+  return selectedVoice;
 }
 
 function saythis(text, n = "") {
@@ -57,11 +70,15 @@ function saythis(text, n = "") {
     voice,
     text
   });
-  console.log("%s) %s", n, voice.name, tts.text);
   return synth.speak(tts);
 }
 
 function textToSpeech(array, period = "") {
+  // this is a toggle function
+  // if it is already spleaking it stop
+  // otherwise it sets up and starts to read;
+
+  if (synth.speaking) return synth.cancel();
   if (!array) return;
 
   let text = array.constructor === Array ? array : array.split("\n");
@@ -69,12 +86,14 @@ function textToSpeech(array, period = "") {
   text.forEach((s, n) => saythis(`${s}${period}`, n));
 }
 
-// document.querySelector("button").onclick = textToSpeech;
 const methods = {
   say: saythis,
   read: textToSpeech,
-  voice: setVoice
+  voice: setVoice,
+  speaking: () => window.speechSynthesis.speaking,
+  cancel: () => window.speechSynthesis.cancel()
 };
+
 window.TTS = methods;
 
 export default initialize;
