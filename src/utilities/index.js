@@ -5,6 +5,9 @@ import message from "./message";
 import wordcount from "./wordcount";
 import focusOn from "./focusOn";
 import tts from "./tts";
+import childrenToVersionArray from "./childrenToVersionArray";
+import toggleStringCase from "./toggleStringCase";
+import selectedValueArray from "./selectedValueArray";
 
 let timer;
 let count = 0;
@@ -48,6 +51,9 @@ function alert(s) {
 }
 
 export default {
+  childrenToVersionArray,
+  toggleStringCase,
+  selectedValueArray,
   uuid,
   deepEqual,
   inflate,

@@ -1,142 +1,46 @@
-import u from "./utilities";
-import editorInit from "./editor";
-import divideInit from "./divider";
-import articleInit from "./article";
+import Article from "./modules/Article";
+import Sentences from "./modules/Sentences";
+
+// import PubSub from "pubsub-js";
 
 import "./styles.scss";
 
-// load some text into the DOM
-let $focusOn; // current node element
+const articleText = `
+"Corner to corner, that's it ... now, tip to tip. Great. Um, give me a minute, I need to remember how it goes ..."
 
-const local = u.storage().read();
-const divider = divideInit();
-const article = articleInit("#document");
-const editor = editorInit("#sentences");
-const tts = u.tts();
+I turn the folded paper over. Pinch the corners into a diamond, halve the edges, pull the long sides into the centre and stop.
 
-// Passive events from Editor changes
-editor.onChange(article.update);
+I unfold it, and start again.
 
-// Initial DOM injection
-article.callback("click", handleClick);
-article.callback("dblclick", handleClick);
-article.load();
+The paper is creased with failed attempts to make an origami crane. I have done this one thousand times.
 
-// article.load("55555", "Kilroy!", [{ text: "Kilroy was here" }]);
-// article.open();
+My world has rewinds five years. And now I’m with Shelly, we are making a paper crane. I look down, to make sure she is keeping up, she smiles at me, her fingers follow my lead. A varnished fingernail irons the fold into a sharp edge. She nods, ready to continue.        
 
-setTimeout(() => {
-  document.querySelector(".container").classList.remove("hidden");
-  document.querySelector(".overlay").classList.add("hidden");
-}, 550);
+But the next step is missing. That next fold, I just can't see it anymore. It’s forgotten. Everything else is vivid. Shelly’s chuckle, her bald shaven head, her turquoise surgical gown, her gaunt face ... where has it gone?
 
-function handleClick(versions, el) {
-  editor.load(versions);
-  el && ($focusOn = el);
-  u.focusOn(el, "focus");
+When Shelley died the next fold got lost.
 
-  if (divider.settings().width > 80) {
-    divider.resize(null, 60);
-  }
-}
+"James?"
+`;
 
-let context = 0;
-const contexts = ["article", "editor"];
+const body = document.getElementsByTagName("body")[0];
+const article = new Article("c1", { prefix: "a", defaultText: articleText });
+const sentences = new Sentences("c2", { prefix: "s", hidden: true });
 
-let diff = 0;
-let pressTimer;
-let downTime = 0;
-let keyHistory = [];
-const keyTime = 350;
+article.bindTo(sentences);
+sentences.bindTo(article);
 
-divider.delegate("read", readSelectedCandidate);
-
-function readSelectedCandidate() {}
-
-let $container;
-function changeContext(index = null) {
-  context = typeof index === "number" ? index : (context + 1) % contexts.length;
-  const current = contexts[context];
-  const id = ["document", "sentences"];
-
-  const focus = id[context];
-  let $el;
-
-  switch (focus) {
-    case "document":
-      $el = document.querySelector(".selected");
-      break;
-    case "sentences":
-      $el = document.querySelector(".current");
-      break;
-  }
-  // const $el = document.getElementById(id[context]).focus();
-
-  setTimeout(() => {
-    $container = $container || document.querySelector(".container");
-    $container.setAttribute("focus", current);
-    $el.focus();
-    console.log("context", context, $el);
-  }, 0);
-
-  return context;
-}
-
-window.changeContext = changeContext;
-changeContext(0);
-
-const triggerDict = {
-  tab: {
-    global: changeContext
-  },
-  controlspace: {
-    global: e => {
-      let { candidate } = editor.cache();
-      candidate = u.inflate(candidate, true);
-      tts.read(candidate);
-    }
-  },
-  shiftshiftl: {
-    article: e => {
-      const el = window.getSelection().focusNode;
-      article.toggle(el);
-      changeContext(1);
-    }
-  },
-
-  shiftshift: {
-    editor: (e, array) => {
-      return editor.execute(e, array);
-    }
+window.RE = {
+  typewriter: b => {
+    let forward = article.typewriter(b);
+    forward = b === undefined ? !forward : forward;
+    article.typewriter(forward);
+    body.classList[forward ? "add" : "remove"]("typewriter");
   }
 };
 
-function executeKeyTriggers(e) {
-  diff = e.timeStamp - downTime;
-  downTime = e.timeStamp;
-  keyHistory.push(e.key.trim() || e.code);
-
-  const ns = contexts[context];
-  const key = keyHistory.join("").toLowerCase();
-  const triggerKey = triggerDict[key];
-
-  console.log("exec triggers", ns, context);
-
-  // trigger can be context sensitive OR global
-  const triggerGlobal = triggerKey && triggerKey.global;
-  const callback = triggerGlobal || (triggerKey && triggerKey[ns]) || null;
-
-  pressTimer && clearTimeout(pressTimer);
-  pressTimer = setTimeout(() => {
-    console.log("clear history", keyHistory);
-    keyHistory = [];
-  }, keyTime);
-
-  if (callback) {
-    e.preventDefault();
-    e.stopPropagation();
-    return callback(e, keyHistory);
-  }
-}
-
-window.onkeydown = executeKeyTriggers;
+// article.typewriter(true);
+setTimeout(() => {
+  document.querySelector(".container").classList.remove("hidden");
+  document.querySelector(".overlay").classList.add("hidden");
+}, 1550);

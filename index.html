@@ -3,89 +3,12 @@
   <head>
     <title>Parcel Sandbox</title>
     <meta charset="UTF-8" />
-    <style>
-      .hidden {
-        display: none !important;
-      }
-
-      .overlay {
-        position: fixed;
-        top: 0;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        background-image: radial-gradient(#333, #111);
-        display: flex;
-      }
-
-      .brand {
-        flex: 1 0;
-        align-self: center;
-      }
-
-      .brand img {
-        width: 350px;
-        height: 114px;
-        padding: 0 10px 0 20px;
-        display: block;
-        background: white;
-        text-align: center;
-        margin: 0 auto;
-        border-radius: 2px;
-        box-shadow: 0 16px 50px 0 #000;
-      }
-    </style>
   </head>
 
   <body>
     <div class="container hidden">
-      <div class="document">
-        <article
-          id="document"
-          class="content"
-          tabindex="1"
-          contenteditable="true"
-        ></article>
-      </div>
-      <div class="sentences">
-        <article
-          id="sentences"
-          class="content"
-          tabindex="2"
-          contenteditable="true"
-        ></article>
-      </div>
-      <div class="divider" id="vertical">
-        <ul class="action left" id="left-menu">
-          <li data-fn="close">|[]</li>
-          <li data-fn="middle">[|]</li>
-          <li data-fn="name">rn</li>
-          <!-- <li data-fn="import">im</li> -->
-          <li data-fn="export">sv</li>
-          <li data-fn="list">ls</li>
-          <li data-fn="delete">rm</li>
-          <li>
-            <label for="uploadInput">
-              op
-              <input
-                id="uploadInput"
-                type="file"
-                style="display:none;"
-                accept="text/*"
-              />
-            </label>
-          </li>
-        </ul>
-        <ul class="action right" id="right-menu">
-          <li data-fn="close">[]|</li>
-          <li data-fn="middle">[|]</li>
-          <li data-fn="center">[+]</li>
-          <li data-fn="wordcount">wc</li>
-          <li data-fn="unwrap">wr</li>
-          <li data-fn="unstrike">st</li>
-          <li data-fn="read">rd</li>
-        </ul>
-      </div>
+      <div class="panel paragraphs" id="c1"></div>
+      <div class="panel sentences" id="c2"></div>
     </div>
 
     <div id="footer">footer banner</div>
