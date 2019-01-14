@@ -27,9 +27,26 @@ body {
   display: none;
 }
 
+.focus {
+  background: red !important;
+}
+.container {
+  &[focus="article"] .document,
+  &[focus="editor"] .sentences {
+    &:before {
+      content: "FOCUSED";
+      position: absolute;
+      top: 0;
+      left: 0;
+      border: 2px solid red;
+    }
+  }
+}
+
 .document {
   & {
     // width: $left;
+    position: relative;
     overflow: auto;
     background: #eee;
     color: #333;

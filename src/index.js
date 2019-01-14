@@ -33,45 +33,110 @@ setTimeout(() => {
 function handleClick(versions, el) {
   editor.load(versions);
   el && ($focusOn = el);
+  u.focusOn(el, "focus");
 
-  console.log(divider.settings().width);
   if (divider.settings().width > 80) {
     divider.resize(null, 60);
   }
 }
 
+let context = 0;
+const contexts = ["article", "editor"];
+
+let diff = 0;
 let pressTimer;
 let downTime = 0;
-let diff = 0;
 let keyHistory = [];
-const keyTime = 275;
+const keyTime = 350;
 
 divider.delegate("read", readSelectedCandidate);
 
-function readSelectedCandidate() {
-  console.log("read selected candidate");
-  let { candidate } = editor.cache();
-  candidate = u.inflate(candidate, true);
+function readSelectedCandidate() {}
 
-  tts.read(candidate);
+let $container;
+function changeContext(index = null) {
+  context = typeof index === "number" ? index : (context + 1) % contexts.length;
+  const current = contexts[context];
+  const id = ["document", "sentences"];
+
+  const focus = id[context];
+  let $el;
+
+  switch (focus) {
+    case "document":
+      $el = document.querySelector(".selected");
+      break;
+    case "sentences":
+      $el = document.querySelector(".current");
+      break;
+  }
+  // const $el = document.getElementById(id[context]).focus();
+
+  setTimeout(() => {
+    $container = $container || document.querySelector(".container");
+    $container.setAttribute("focus", current);
+    $el.focus();
+    console.log("context", context, $el);
+  }, 0);
+
+  return context;
 }
 
-window.onkeydown = e => {
+window.changeContext = changeContext;
+changeContext(0);
+
+const triggerDict = {
+  tab: {
+    global: changeContext
+  },
+  controlspace: {
+    global: e => {
+      let { candidate } = editor.cache();
+      candidate = u.inflate(candidate, true);
+      tts.read(candidate);
+    }
+  },
+  shiftshiftl: {
+    article: e => {
+      const el = window.getSelection().focusNode;
+      article.toggle(el);
+      changeContext(1);
+    }
+  },
+
+  shiftshift: {
+    editor: (e, array) => {
+      return editor.execute(e, array);
+    }
+  }
+};
+
+function executeKeyTriggers(e) {
   diff = e.timeStamp - downTime;
   downTime = e.timeStamp;
-  console.log(e.code, e.key, e.keyCode, downTime, diff);
-  keyHistory.push((e.key.trim() || e.code).toLowerCase());
+  keyHistory.push(e.key.trim() || e.code);
 
-  if (keyHistory && keyHistory.join("") === "controlspace") {
-    readSelectedCandidate();
-    keyHistory = [];
-    return false;
-  }
+  const ns = contexts[context];
+  const key = keyHistory.join("").toLowerCase();
+  const triggerKey = triggerDict[key];
+
+  console.log("exec triggers", ns, context);
+
+  // trigger can be context sensitive OR global
+  const triggerGlobal = triggerKey && triggerKey.global;
+  const callback = triggerGlobal || (triggerKey && triggerKey[ns]) || null;
 
   pressTimer && clearTimeout(pressTimer);
   pressTimer = setTimeout(() => {
-    editor.execute(e, keyHistory);
-    console.log("clear key history", keyHistory, diff);
+    console.log("clear history", keyHistory);
     keyHistory = [];
   }, keyTime);
-};
+
+  if (callback) {
+    e.preventDefault();
+    e.stopPropagation();
+    return callback(e, keyHistory);
+  }
+}
+
+window.onkeydown = executeKeyTriggers;

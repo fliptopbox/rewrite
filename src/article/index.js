@@ -23,11 +23,19 @@ function callback(key, fn) {
 
 function handleKeyDown(e) {
   //! prevent locked rows from editing text
+  const el = window.getSelection().focusNode.parentNode;
+  const { dataset } = el;
+  const passiveKey = /^arrow/i.test(e.key);
+  if (!passiveKey && dataset.versions) {
+    e.preventDefault();
+    return false;
+  }
   save();
 }
 
 function deselect(reset = false) {
-  selected && selected.classList.remove("selected");
+  const all = document.querySelectorAll(".selected");
+  all.length && [...all].forEach(el => el.classList.remove("selected"));
   reset && (selected = null);
 }
 
@@ -37,16 +45,16 @@ function handleClick(e) {
   if (!id || !dataset.versions) return;
 
   // de-select any existing nodes
-  if (selected) {
-    deselect();
+  // if (selected) {
+  // deselect();
+  //   if (selected.id === id) {
+  //     selected = null;
+  //     callbacks.click();
+  //     return;
+  //   }
+  // }
 
-    if (selected.id === id) {
-      selected = null;
-      callbacks.click();
-      return;
-    }
-  }
-
+  deselect();
   selected = document.querySelector(`#${id}`);
   selected.classList.add("selected");
   selected.dataset.wordcount = u.wordcount(e.target.innerText);
@@ -58,9 +66,14 @@ function handleClick(e) {
 }
 
 function handleDoubleClick(e) {
-  e.target.id = e.target.id || u.uuid();
-  const bypassMsg = e.shiftKey;
-  let { id, innerText, dataset, nodeName } = e.target;
+  const { parentNode, target, shiftKey, ctrlKey } = e;
+  const el = parentNode || target;
+  el.id = el.id || u.uuid();
+
+  if (!parentNode && !shiftKey) return;
+
+  const bypassMsg = parentNode || ctrlKey || false;
+  let { id, innerText, dataset, nodeName } = el;
 
   if (!/div/i.test(nodeName)) {
     console.warn("WARNING! Element not div. Bypass", nodeName);
@@ -69,9 +82,10 @@ function handleDoubleClick(e) {
 
   deselect(true);
   const { versions } = dataset;
-  const text = u.inflate(innerText);
+  const text = u.inflate(innerText, true);
   const value = (versions && JSON.parse(versions)) || text || "";
 
+  // the element is already locked. toggle.
   if (versions) {
     // confirm delete
     const confirmed =
@@ -79,9 +93,9 @@ function handleDoubleClick(e) {
     if (!confirmed) return;
 
     // next cleanup this
-    e.target.className = "";
-    e.target.id = "";
-    e.target.dataset.versions = "";
+    el.className = "";
+    el.id = "";
+    el.dataset.versions = "";
 
     // update local storage
     callbacks.dblclick();
@@ -268,6 +282,7 @@ function initialize(selector = "#document") {
 
   const methods = {
     callback,
+    toggle: handleDoubleClick,
     import: importJSON,
     export: exportJSON,
     meta: getMetaData,

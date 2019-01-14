@@ -78,7 +78,7 @@ function load(value = null, options = {}) {
   config = Object.assign({}, config, options);
 
   editor.innerHTML = html;
-  editor.focus();
+  // editor.focus();
 
   updateWordCountDataset();
   notifyChanges();
@@ -104,9 +104,13 @@ function cleanupBlanks(rows) {
 
 function executeTriggers(e, keyHistory) {
   const { parentNode } = window.getSelection().focusNode;
+
+  if (!parentNode) return;
+
   const children = parentNode.children;
 
   keyHistory = keyHistory.join("").toLowerCase();
+  console.log("editor 0 exec triggers", keyHistory);
 
   const { cleanup } = triggerDictionary;
   const trigger =
@@ -125,23 +129,11 @@ function bindEvents() {
   let hist = [];
 
   editor.ondblclick = e => {
+    // shift + double click
+    if (!e.shiftKey) return;
     hist = ["shift", "shift"];
     return executeTriggers(e, hist);
   };
-
-  // editor.onkeyup = e => {
-  //   const { doubleTap, resetDelay } = config;
-  //   const diff = e.timeStamp - ts;
-  //   const delay = diff < doubleTap;
-  //   ts = e.timeStamp;
-
-  //   hist = diff > resetDelay ? [] : hist;
-
-  //   hist.push(e.key);
-  //   hist = hist.slice(-5);
-
-  //   setTimeout(() => executeTriggers(e, delay, hist), 0);
-  // };
 }
 
 function getVersionArray() {

@@ -1,4 +1,5 @@
 $left: 65%;
+$scroll-bar-width: 22px;
 
 .document {
   width: $left;
@@ -53,7 +54,7 @@ $left: 65%;
     }
   }
   .left {
-    right: 0;
+    right: $scroll-bar-width;
   }
   .right {
     left: 0;

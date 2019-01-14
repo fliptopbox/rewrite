@@ -3,6 +3,7 @@ import uuid from "./uuid";
 import inflate from "./inflate";
 import message from "./message";
 import wordcount from "./wordcount";
+import focusOn from "./focusOn";
 import tts from "./tts";
 
 let timer;
@@ -53,6 +54,7 @@ export default {
   storage,
   message,
   wordcount,
+  focusOn,
   prompt,
   confirm,
   alert,

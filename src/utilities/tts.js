@@ -10,7 +10,7 @@ function initialize() {
   voices = synth.getVoices();
 
   if (!voices) {
-    console.warn("Voices not loaded. Reloading");
+    // console.warn("Voices not loaded. Reloading");
     retry && clearTimeout(retry);
     retry = setTimeout(initialize, 150);
     return retry;
@@ -21,7 +21,6 @@ function initialize() {
 
   voices.forEach((item, n) => {
     if (isenglish.test(item.lang)) {
-      console.log(i, n, item.lang, item.name, item.default);
       if (index === null && /female/i.test(item.name)) {
         index = i;
       }
@@ -31,7 +30,7 @@ function initialize() {
     }
   });
 
-  console.log("TTS initialized", english && english.length, index);
+  // console.log("TTS initialized", english && english.length, index);
   selectedVoice = english && english[index || 0];
 
   window.speechSynthesis.onvoiceschanged = function(e) {
@@ -44,9 +43,6 @@ function initialize() {
 function setVoice(i = 0) {
   (english && english.length) || initialize();
   selectedVoice = english[i];
-
-  console.log(selectedVoice.name, selectedVoice.lang);
-
   return selectedVoice;
 }
 

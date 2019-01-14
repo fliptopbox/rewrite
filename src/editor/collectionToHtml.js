@@ -30,6 +30,7 @@ function collectionToHtml(array) {
     classnames ? (div.className = classnames) : null;
     versions && (div.dataset.versions = json);
 
+    // div.setAttribute("tabindex", "-1");
     div.innerHTML = value || "<br/>";
 
     return div.outerHTML;
