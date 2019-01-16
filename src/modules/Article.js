@@ -8,6 +8,11 @@ class Article extends Texteditor {
     this.on("click", null, articleToggleActive);
     this.on("toggle", /(shiftshift)$/i, articleToggleActive);
     this.on("change", null, sentencesUpdateContent);
+    this.on("mode", /^(ControlControlt)/i, e => {
+      e.preventDefault();
+
+      return false;
+    });
     this.on(
       "typewriter",
       /(home|end|page|arrow|delete|backspace)/i,
@@ -23,6 +28,9 @@ export default Article;
 function sentencesUpdateContent() {
   const array = u.selectedValueArray(this.selected);
   this.parent.init(array);
+  // console.log("SAVE", this.export());
+  const data = u.childrenToVersionArray(this.texteditor.children);
+  u.storage("article").write(data);
 }
 
 function articleToggleActive(e) {
@@ -47,19 +55,18 @@ function articleToggleActive(e) {
   return false;
 }
 
-function typewriter(bool) {
-  let forwardOnly = false;
+function typewriter() {
+  let forwardOnly = false; // private variable
+
   return function(bool) {
-    forwardOnly = typeof bool === "boolean" ? Boolean(bool) : forwardOnly;
-    // console.log(">>> forwardOnly:", forwardOnly)
-    return forwardOnly;
+    return (forwardOnly = typeof bool === "boolean" ? bool : forwardOnly);
   };
 }
 
 function typewriterMode(e) {
-  console.log("typewriter", e.key, e.code);
-  if (this.typewriter()) {
-    e.preventDefault();
-    return false;
-  }
+  // console.log("typewriter", e.key, e.code);
+  if (!this.typewriter()) return;
+
+  e.preventDefault();
+  return false;
 }

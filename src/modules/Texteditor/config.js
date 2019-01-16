@@ -1,24 +1,17 @@
 const re = {
-  lineEnd: /(^\w|[\.\?\!]\s+\w)/g,
-  newLine: /^-{3,}/,
-  commentChars: /^(\s+)?[>?!/]+(\s+)?/,
-  passiveKeys: /^(arrow|shift|control|alt|tab)/i
-};
-
-const options = {
-  flag: "inactive",
-  re: /^(\s+)?[>?!/]+(\s+)?/,
-  tag: "p",
-  br: "<br/>"
+  lineEnd: /(^\w|[\.\?\!\;]\s+\w)/g, // alpha. beta? charlie! delta;
+  newLine: /^-{3,}/, // the magic sequence to add <br/> via editor
+  commentChars: /^(\s+)?[>?!/]+(\s+)?/, // so far ... the prefix comment tokens
+  passiveKeys: /^(arrow|shift|control|alt|tab)/i // keys that dont alter the sentence
 };
 
 const timer = {
-  default: 100,
-  delay: 0
+  // after: 2500, // the last event to fire, this is used to persist
+  default: 100, // the normal event delay in miliseconds
+  delay: 0 // dynamic var update depending on event type
 };
 
 export default {
   re,
-  options,
   timer
 };

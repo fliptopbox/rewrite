@@ -26,9 +26,8 @@ function handleKeyDown(e) {
     return re && re.test(keySequence) ? fn : null;
   });
 
-  // console.log("ONKEYDOWN", e.key, e.code, keySequence);
+  console.log("ONKEYDOWN", e.key, e.code, keySequence.slice(-5));
   return this.trigger(trigger, e);
-  // return trigger && this.triggers[trigger].fn.call(this, e);
 }
 
 function handleKeyUp(e) {

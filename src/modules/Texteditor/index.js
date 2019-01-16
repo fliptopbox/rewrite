@@ -1,6 +1,8 @@
 import marked from "marked";
 import bindEvents from "./bindEvents";
 import config from "./config";
+import arrayToHtml from "./arrayToHtml";
+import load from "./load";
 
 document.execCommand("defaultParagraphSeparator", false, "p");
 
@@ -14,7 +16,7 @@ class Texteditor {
     container.innerHTML = "";
     container.appendChild(texteditor);
 
-    this.id = null;
+    this.id = id;
     this.parent = null;
     this.keytime = null;
     this.selected = null;
@@ -30,6 +32,9 @@ class Texteditor {
       },
       change: {
         fn: s => console.warn("Default event. CHANGE [%s]", s)
+      },
+      after: {
+        fn: s => console.warn("Default event. AFTER [%s]", s)
       }
     };
 
@@ -42,11 +47,13 @@ class Texteditor {
     defaultText = defaultText ? defaultText.split("\n") : [];
     defaultText.push("");
 
-    this.init(defaultText);
-    this.show(!hidden);
-
     // external modules
     bindEvents.bind(this)();
+    this.arrayToHtml = arrayToHtml.bind(this);
+
+    // and lastly ... instanate
+    this.init(defaultText);
+    this.show(!hidden);
   }
 
   bindTo(parent) {
@@ -64,6 +71,7 @@ class Texteditor {
     if (!ns || !this.triggers[ns]) return;
 
     const { fn, data } = this.triggers[ns];
+    console.log("!", fn);
     const result = fn.call(this, e);
 
     // pass result to callback
@@ -75,16 +83,19 @@ class Texteditor {
     return result;
   }
 
-  defer(ns, fn) {
+  defer(ns, fn, ms) {
     const { timer } = this;
 
+    if (!fn) return;
+
     timer[ns] = timer[ns] || { ns, fn, t: null };
+    timer[ns].t = timer[ns].t || null;
     timer[ns].t && clearTimeout(timer[ns].t);
     timer[ns].t = setTimeout(() => {
       fn();
       delete timer[ns];
       // console.log("EXECUTING DEFERRED [%s]", ns);
-    }, timer.delay);
+    }, ms || timer.delay);
   }
 
   updateKeysPressed(string = null) {
@@ -101,10 +112,6 @@ class Texteditor {
 
     return (this.keyHistory = [...keyHistory]);
   }
-
-  // executeToggle(e) {
-  //   return this.triggers.toggle.fn.call(this, e);
-  // }
 
   on(key, re, fn, data) {
     this.triggers[key] = { re, fn, data };
@@ -128,34 +135,8 @@ class Texteditor {
     }
   }
 
-  parse(array, obj) {
-    // update the global parsing settings
-    if (obj) {
-      this.options = {
-        ...this.options,
-        ...obj
-      };
-    }
-
-    // no array ... exit
-    if (!array) return;
-
-    // shortcut to the settings
-    const { flag, re, tag, br } = this.options;
-
-    // iterare over incoming array of strings
-    // output a catenated DOM string (innerHTML)
-    return [...array]
-      .map(s => {
-        let innerText = `${s}`.replace(re, "").trim() || br;
-        const className = re.test(s || "") ? ` class="${flag}"` : "";
-        return `<${tag}${className}>${innerText}</${tag}>`;
-      })
-      .join("\n");
-  }
-
   init(array) {
-    this.texteditor.innerHTML = this.parse(array);
+    this.texteditor.innerHTML = this.arrayToHtml(array);
     this.show();
   }
 
@@ -183,12 +164,16 @@ class Texteditor {
       this.selected[innerText ? "innerText" : "innerHTML"] =
         innerText || "(empty)";
     }
+
+    // this MUST be the very last trigger event.
+    this.defer("after", this.triggers.after.fn.call(this), this.timer.after);
   }
 
   export(n = 0) {
     const format = ["innerText", "innerHTML"];
     const value = this.texteditor[format[n]];
-    console.log("EXPORT [%s]", format[n], value.length);
+    console.log("EXPORT [%s]", format[n], value);
+    return value;
   }
 
   toHtml() {
@@ -199,6 +184,8 @@ class Texteditor {
     return () => `${prefix}${i++}`;
   }
 }
+
+Texteditor.prototype.load = load;
 
 export default Texteditor;
 

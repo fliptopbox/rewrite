@@ -4,7 +4,11 @@ import u from "../utilities/";
 class Senetences extends Texteditor {
   constructor(id, options) {
     super(id, options);
-    this.parse(null, { flag: "inactive", hidden: true });
+
+    // update the options
+    this.arrayToHtml(null, { hidden: true });
+
+    // create the local triggers
     this.on("change", null, updateSelectedParagraph);
     this.on("toggle", /(shiftshift)$/i, toggleInactiveFlag);
     this.on("capitalize", /(altenter)$/i, toggleStringCase);
