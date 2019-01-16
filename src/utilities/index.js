@@ -8,6 +8,7 @@ import tts from "./tts";
 import childrenToVersionArray from "./childrenToVersionArray";
 import toggleStringCase from "./toggleStringCase";
 import selectedValueArray from "./selectedValueArray";
+import collectionToHtml from "./collectionToHtml";
 
 let timer;
 let count = 0;
@@ -52,6 +53,7 @@ function alert(s) {
 
 export default {
   childrenToVersionArray,
+  collectionToHtml,
   toggleStringCase,
   selectedValueArray,
   uuid,
