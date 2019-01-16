@@ -1,5 +1,7 @@
+import u from "./utilities/";
 import Article from "./modules/Article";
 import Sentences from "./modules/Sentences";
+import Controller from "./modules/Controller";
 
 // import PubSub from "pubsub-js";
 
@@ -24,23 +26,42 @@ When Shelley died the next fold got lost.
 `;
 
 const body = document.getElementsByTagName("body")[0];
-const article = new Article("c1", { prefix: "a", defaultText: articleText });
+const article = new Article("c1", { prefix: "a" });
 const sentences = new Sentences("c2", { prefix: "s", hidden: true });
+const ctrl = new Controller();
+
+article.on("after", null, saveToDisk);
+sentences.on("after", null, saveToDisk);
 
 article.bindTo(sentences);
 sentences.bindTo(article);
 
 window.RE = {
-  typewriter: b => {
-    let forward = article.typewriter(b);
-    forward = b === undefined ? !forward : forward;
-    article.typewriter(forward);
-    body.classList[forward ? "add" : "remove"]("typewriter");
-  }
+  typewriter: toggleTypewriterMode,
+  collapse: ctrl.collapse,
+  strikeThrough: ctrl.strikeThrough,
+  export: article.export
 };
 
-// article.typewriter(true);
-setTimeout(() => {
-  document.querySelector(".container").classList.remove("hidden");
-  document.querySelector(".overlay").classList.add("hidden");
-}, 1550);
+function toggleTypewriterMode(b) {
+  let forward = article.typewriter(b);
+  forward = b === undefined ? !forward : forward;
+  article.typewriter(forward);
+  body.classList[forward ? "add" : "remove"]("typewriter");
+}
+
+function saveToDisk() {
+  const children = article.texteditor.children;
+  const data = u.childrenToVersionArray(children);
+  u.storage("article").write(data);
+}
+
+const startup = (function() {
+  setTimeout(() => {
+    document.querySelector(".container").classList.remove("hidden");
+    document.querySelector(".overlay").classList.add("hidden");
+  }, 750);
+  return Function;
+})();
+
+startup();

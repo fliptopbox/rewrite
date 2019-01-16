@@ -17,17 +17,6 @@ body {
   font-size: 10px;
 }
 
-article {
-  p {
-    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-    margin: 0 0 3px 0;
-    padding: 2px 3px 5px;
-    line-height: 1.6;
-    min-height: 1em;
-    position: relative;
-  }
-}
-
 .container {
   display: flex;
   width: 100%;
@@ -43,17 +32,32 @@ article {
     display: none;
   }
 }
+
 .panel {
   & {
     margin: 1%;
     padding: 5%;
-    // background: white;
+    width: 50%;
     border: 1px solid rgba(0, 0, 0, 0.3);
     overflow: auto;
   }
 
+  p {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    margin: 0 0 3px 0;
+    padding: 2px 3px 5px;
+    line-height: 1.6;
+    min-height: 1em;
+    position: relative;
+  }
+
   &.paragraphs {
     background: #efefef;
+    overflow-y: scroll;
+
+    article {
+      padding: 30% 0 70%;
+    }
   }
 
   &.hidden {
@@ -90,6 +94,29 @@ article {
     }
   }
 }
+
+.sentences {
+  p {
+    margin: 0.5em 0;
+  }
+}
+
+/* global modifiers (on BODY) */
+.inactive {
+  & {
+    line-height: 0.8;
+  }
+  .collapsed & {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    margin: 0;
+  }
+  .strikethrough & {
+    text-decoration: line-through;
+  }
+}
+
 .hidden {
   display: none !important;
 }
