@@ -3,7 +3,7 @@ function htmlToCollection(children) {
   const array = [...children].map(el => {
     const { innerText = "", innerHTML, dataset, nodeName, classList } = el;
 
-    if (!/div/i.test(nodeName)) return null;
+    if (!/(div|p)/i.test(nodeName)) return null;
 
     const text = (innerText && innerText.trim()) || "";
     const string = text || (innerHTML && innerHTML.replace(reHtmlTags, ""));
