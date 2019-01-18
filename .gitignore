@@ -1,4 +1,9 @@
 node_modules/*
 build/*
 .cache/*
-dist/*
+dist/*src/dist/
+src/.cache/
+src/.cache/*
+src/dist/*
+src/dist/*
+*/dist/*

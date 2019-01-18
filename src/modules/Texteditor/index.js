@@ -16,7 +16,7 @@ class Texteditor {
     container.innerHTML = "";
     container.appendChild(texteditor);
 
-    this.id = id;
+      this.id = id; // container ID
     this.parent = null;
     this.keytime = null;
     this.selected = null;
@@ -71,7 +71,6 @@ class Texteditor {
     if (!ns || !this.triggers[ns]) return;
 
     const { fn, data } = this.triggers[ns];
-    console.log("!", fn);
     const result = fn.call(this, e);
 
     // pass result to callback
@@ -135,6 +134,13 @@ class Texteditor {
     }
   }
 
+    /*
+
+    init method is used to open of create an article.
+    - open: document id
+    - create: document string
+
+    */
   init(array) {
     this.texteditor.innerHTML = this.arrayToHtml(array);
     this.show();
@@ -169,6 +175,20 @@ class Texteditor {
     this.defer("after", this.triggers.after.fn.call(this), this.timer.after);
   }
 
+    // export needs to take the current DOM, parse it into a collectio
+    // then it needs to add onther meta data so that it can be
+    // used as a definitive article-key
+    //
+
+    /*
+     {
+        uuid: "ace123ace123ace321",
+        filename: "finding the fold".
+        created: Timestamp,
+        opened: Timestamp
+        data: [..collection]
+     }
+    */
   export(n = 0) {
     const format = ["innerText", "innerHTML"];
     const value = this.texteditor[format[n]];

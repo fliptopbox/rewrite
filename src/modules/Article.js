@@ -28,9 +28,6 @@ export default Article;
 function sentencesUpdateContent() {
   const array = u.selectedValueArray(this.selected);
   this.parent.init(array);
-  // console.log("SAVE", this.export());
-  const data = u.childrenToVersionArray(this.texteditor.children);
-  u.storage("article").write(data);
 }
 
 function articleToggleActive(e) {
