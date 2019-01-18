@@ -20,21 +20,29 @@ function time() {
 }
 function storage(sufix = null) {
   const ns = ["rewrite", sufix].filter(val => val).join("-");
-
+  const localStorage = this.localStorage || window.localStorage;
   return {
+    data: () => {
+      return localStorage;
+    },
+    delete: () => {
+      delete localStorage[ns];
+    },
     read: () => {
       const data = localStorage[ns] || null;
-      return data && JSON.parse(data);
+      const isJson = data && /^[\[\{\"]/.test(data);
+      return isJson ? JSON.parse(data) : data;
     },
 
     write: obj => {
-      clearTimeout(timer);
-      count = (count || 0) + 1;
-      timer = setTimeout(() => {
-        console.log("localstroage SAVE", count, time(), obj);
-        localStorage[ns] = JSON.stringify(obj);
-        count = 0;
-      }, delay);
+      // clearTimeout(timer);
+      // count = (count || 0) + 1;
+      // timer = setTimeout(() => {
+      // console.log("localstroage SAVE", count, time(), obj);
+      localStorage[ns] = JSON.stringify(obj);
+      // count = 0;
+      // return true;
+      // }, delay);
     }
   };
 }
