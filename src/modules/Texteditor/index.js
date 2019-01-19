@@ -4,6 +4,7 @@ import config from "./config";
 import arrayToHtml from "./arrayToHtml";
 import load from "./load";
 import defer from "../../utilities/defer";
+import uuid from "../../utilities/uuid";
 import updateKeysPressed from "./updateKeysPressed";
 
 document.execCommand("defaultParagraphSeparator", false, "p");
@@ -22,7 +23,6 @@ class Texteditor {
     this.parent = null;
     this.keytime = null;
     this.selected = null;
-    this.uuid = this.uuid(this.prefix);
 
     this.container = container;
     this.texteditor = texteditor;
@@ -50,6 +50,7 @@ class Texteditor {
     // external modules
     bindEvents.bind(this)();
     this.defer = defer.bind(this);
+    this.uuid = uuid.bind(this);
     this.arrayToHtml = arrayToHtml.bind(this);
     this.updateKeysPressed = updateKeysPressed.bind(this);
 
@@ -162,20 +163,20 @@ class Texteditor {
         data: [..collection]
      }
     */
-  export(n = 0) {
-    const format = ["innerText", "innerHTML"];
-    const value = this.texteditor[format[n]];
-    console.log("EXPORT [%s]", format[n], value);
-    return value;
-  }
+  // export(n = 0) {
+  //   const format = ["innerText", "innerHTML"];
+  //   const value = this.texteditor[format[n]];
+  //   console.log("EXPORT [%s]", format[n], value);
+  //   return value;
+  // }
 
-  toHtml() {
-    // parses the current dom candidates as markdown
-    return marked(this.export(0));
-  }
-  uuid(prefix = "a", i = 0) {
-    return () => `${prefix}${i++}`;
-  }
+  // toHtml() {
+  //   // parses the current dom candidates as markdown
+  //   return marked(this.export(0));
+  // }
+  // (prefix = "a", i = 0) {
+  //   return () => `${prefix}${i++}`;
+  // }
 }
 
 Texteditor.prototype.load = load;

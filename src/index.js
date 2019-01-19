@@ -43,6 +43,7 @@ function saveToDisk() {
   const data = u.htmlToCollection(children);
   // console.log(123, data, article.texteditor);
   //console.log(456, sentences.parent.texteditor.innerHTML);
+  console.log(store.current);
   store.write(data);
 }
 
