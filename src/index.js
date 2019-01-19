@@ -41,7 +41,7 @@ function toggleTypewriterMode(b) {
 function saveToDisk() {
   const children = article.texteditor.children;
   const data = u.htmlToCollection(children);
-  console.log(123, data, article.texteditor);
+  // console.log(123, data, article.texteditor);
   //console.log(456, sentences.parent.texteditor.innerHTML);
   store.write(data);
 }

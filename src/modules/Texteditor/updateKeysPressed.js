@@ -1,17 +1,15 @@
-//
+let timer = null; // timer symbol
+let keyHistory = []; // stack of keyspressed
+const reset = 250; // truncate history miliseconds
 
-let timer = null;
-const ms = 250;
-
-export default function(string = null) {
-  let keyHistory = [...this.keyHistory];
-
-  if (!string) return (this.keyHistory = []);
+export default function(e, join) {
+  const string = e.key.trim() || e.code;
 
   keyHistory.push(string);
 
   timer && clearTimeout(timer);
-  timer = setTimeout(() => (this.keyHistory = []), ms);
+  timer = setTimeout(() => (keyHistory = []), reset);
 
-  return (this.keyHistory = [...keyHistory]);
+  // retrun catenated strings OR array literal?
+  return join ? keyHistory.join("") : [...keyHistory];
 }

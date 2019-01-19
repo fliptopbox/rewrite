@@ -22,7 +22,6 @@ class Texteditor {
     this.parent = null;
     this.keytime = null;
     this.selected = null;
-    this.keyHistory = [];
     this.uuid = this.uuid(this.prefix);
 
     this.container = container;

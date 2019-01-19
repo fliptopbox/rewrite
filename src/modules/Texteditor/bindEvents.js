@@ -9,7 +9,7 @@ function bindEvents() {
 export default bindEvents;
 
 function handleKeyDown(e) {
-  // if the row is flagged then skip
+  // if the row is flagged (ie. locked) then skip
   // all non-passive key strokes
 
   const passive = this.re.passiveKeys.test(e.key);
@@ -17,10 +17,8 @@ function handleKeyDown(e) {
 
   if (versions && !passive) return false;
 
-  this.updateKeysPressed(e.key.trim() || e.code);
-
   // execute the registered triggers
-  const keySequence = this.keyHistory.join("");
+  const keySequence = this.updateKeysPressed(e, true);
   const trigger = Object.keys(this.triggers).find(key => {
     const { re, fn } = this.triggers[key];
     return re && re.test(keySequence) ? fn : null;
@@ -64,7 +62,7 @@ function handleKeyUp(e) {
   });
 
   // this MUST be the very last trigger event.
-  this.defer("after", this.triggers.after.fn, this.timer.after, true);
+  this.defer("after", this.triggers.after.fn, this.timer.after);
 }
 
 function handleClick(e) {
