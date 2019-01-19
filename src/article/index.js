@@ -35,7 +35,8 @@ function handleKeyDown(e) {
 
 function deselect(reset = false) {
   const all = document.querySelectorAll(".selected");
-  all.length && [...all].forEach(el => el.classList.remove("selected"));
+  all.length &&
+    [...all].forEach(el => el.classList && el.classList.remove("selected"));
   reset && (selected = null);
 }
 

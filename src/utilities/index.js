@@ -10,39 +10,58 @@ import toggleStringCase from "./toggleStringCase";
 import selectedValueArray from "./selectedValueArray";
 import collectionToHtml from "./collectionToHtml";
 import htmlToCollection from "./htmlToCollection";
+import defer from "./defer";
 
-let timer;
-let count = 0;
-let delay = 250;
+export default {
+  childrenToVersionArray,
+  collectionToHtml,
+  htmlToCollection,
+  toggleStringCase,
+  selectedValueArray,
+  uuid,
+  deepEqual,
+  defer,
+  inflate,
+  storage,
+  message,
+  wordcount,
+  focusOn,
+  prompt,
+  confirm,
+  alert,
+  time,
+  tts
+};
 
 function time() {
   return new Date().toString().replace(/.* (\d+:\d+:\d+) .*/g, "$1");
 }
+
 function storage(sufix = null) {
+  let delay = 250;
   const ns = ["rewrite", sufix].filter(val => val).join("-");
+
+  // this looks strange. leave it! it's for JEST testing.
   const localStorage = this.localStorage || window.localStorage;
+
   return {
     data: () => {
       return localStorage;
     },
+
     delete: () => {
       delete localStorage[ns];
     },
+
     read: () => {
       const data = localStorage[ns] || null;
       const isJson = data && /^[\[\{\"]/.test(data);
       return isJson ? JSON.parse(data) : data;
     },
 
-    write: obj => {
-      // clearTimeout(timer);
-      // count = (count || 0) + 1;
-      // timer = setTimeout(() => {
-      // console.log("localstroage SAVE", count, time(), obj);
-      localStorage[ns] = JSON.stringify(obj);
-      // count = 0;
-      // return true;
-      // }, delay);
+    write: (obj, async = false) => {
+      const fn = () => (localStorage[ns] = JSON.stringify(obj));
+      return async ? defer(ns, fn, delay, true) : fn();
     }
   };
 }
@@ -59,23 +78,3 @@ function confirm(s) {
 function alert(s) {
   return window.alert(s);
 }
-
-export default {
-  childrenToVersionArray,
-  collectionToHtml,
-  htmlToCollection,
-  toggleStringCase,
-  selectedValueArray,
-  uuid,
-  deepEqual,
-  inflate,
-  storage,
-  message,
-  wordcount,
-  focusOn,
-  prompt,
-  confirm,
-  alert,
-  time,
-  tts
-};

@@ -8,11 +8,6 @@ class Article extends Texteditor {
     this.on("click", null, articleToggleActive);
     this.on("toggle", /(shiftshift)$/i, articleToggleActive);
     this.on("change", null, sentencesUpdateContent);
-    this.on("mode", /^(ControlControlt)/i, e => {
-      e.preventDefault();
-
-      return false;
-    });
     this.on(
       "typewriter",
       /(home|end|page|arrow|delete|backspace)/i,
@@ -34,8 +29,10 @@ function articleToggleActive(e) {
   e.preventDefault();
   e.stopPropagation();
 
+  if (!this.selected) return;
   // let versions;
   let array = u.selectedValueArray(this.selected);
+
   let { classList, dataset } = this.selected;
   let { versions } = this.selected.dataset;
   const locked = versions && versions.trim();

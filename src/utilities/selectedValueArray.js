@@ -1,6 +1,7 @@
 import sbd from "sbd";
 
 function selectedValueArray(selected) {
+  if (!selected) return;
   const { dataset } = selected;
   let { innerText } = selected;
   const versions = dataset.versions;

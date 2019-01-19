@@ -3,6 +3,8 @@ import bindEvents from "./bindEvents";
 import config from "./config";
 import arrayToHtml from "./arrayToHtml";
 import load from "./load";
+import defer from "../../utilities/defer";
+import updateKeysPressed from "./updateKeysPressed";
 
 document.execCommand("defaultParagraphSeparator", false, "p");
 
@@ -16,7 +18,7 @@ class Texteditor {
     container.innerHTML = "";
     container.appendChild(texteditor);
 
-      this.id = id; // container ID
+    this.id = id; // container ID
     this.parent = null;
     this.keytime = null;
     this.selected = null;
@@ -42,14 +44,15 @@ class Texteditor {
     Object.assign(this, config, options);
 
     let { defaultText, hidden } = this;
-
     defaultText = (defaultText || "").trim();
     defaultText = defaultText ? defaultText.split("\n") : [];
     defaultText.push("");
 
     // external modules
     bindEvents.bind(this)();
+    this.defer = defer.bind(this);
     this.arrayToHtml = arrayToHtml.bind(this);
+    this.updateKeysPressed = updateKeysPressed.bind(this);
 
     // and lastly ... instanate
     this.init(defaultText);
@@ -82,36 +85,6 @@ class Texteditor {
     return result;
   }
 
-  defer(ns, fn, ms) {
-    const { timer } = this;
-
-    if (!fn) return;
-
-    timer[ns] = timer[ns] || { ns, fn, t: null };
-    timer[ns].t = timer[ns].t || null;
-    timer[ns].t && clearTimeout(timer[ns].t);
-    timer[ns].t = setTimeout(() => {
-      fn();
-      delete timer[ns];
-      // console.log("EXECUTING DEFERRED [%s]", ns);
-    }, ms || timer.delay);
-  }
-
-  updateKeysPressed(string = null) {
-    let keyHistory = [...this.keyHistory];
-
-    if (!string) return (this.keyHistory = []);
-
-    keyHistory.push(string);
-
-    this.keytimer && clearTimeout(this.keytimer);
-    this.keytimer = setTimeout(() => {
-      this.keyHistory = [];
-    }, 250);
-
-    return (this.keyHistory = [...keyHistory]);
-  }
-
   on(key, re, fn, data) {
     this.triggers[key] = { re, fn, data };
   }
@@ -134,7 +107,7 @@ class Texteditor {
     }
   }
 
-    /*
+  /*
 
     init method is used to open of create an article.
     - open: document id
@@ -149,7 +122,7 @@ class Texteditor {
   // updates the currently selected element
   // transforms (versions) string array into innerText
   update(array = null) {
-    // console.log("UPDATE [%s]\n", array, this.selected);
+    console.log("UPDATE [%s]\n", array, this.selected);
 
     if (this.selected && array) {
       const { newLine, commentChars } = this.re;
@@ -171,16 +144,17 @@ class Texteditor {
         innerText || "(empty)";
     }
 
-    // this MUST be the very last trigger event.
-    this.defer("after", this.triggers.after.fn.call(this), this.timer.after);
+    // // this MUST be the very last trigger event.
+    // console.log("UPDATE", this.id);
+    // this.defer("after", this.triggers.after.fn, this.timer.after);
   }
 
-    // export needs to take the current DOM, parse it into a collectio
-    // then it needs to add onther meta data so that it can be
-    // used as a definitive article-key
-    //
+  // export needs to take the current DOM, parse it into a collectio
+  // then it needs to add onther meta data so that it can be
+  // used as a definitive article-key
+  //
 
-    /*
+  /*
      {
         uuid: "ace123ace123ace321",
         filename: "finding the fold".

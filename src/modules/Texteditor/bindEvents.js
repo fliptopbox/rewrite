@@ -40,8 +40,6 @@ function handleKeyUp(e) {
 
   if (nodeName !== "P") return;
 
-  // console.log("ONKEYUP [%s] <%s>", type, nodeName, key);
-
   const el = focusNode.parentNode;
   const { innerText } = el;
 
@@ -56,10 +54,17 @@ function handleKeyUp(e) {
   this.selected.classList.add("selected");
   this.selected.id = this.selected.id || this.uuid();
 
+  console.log("ONKEYUP [%s] <%s>", type, nodeName, key);
+
   // after all triggers always emit the change event.
   // ensure arrowkeys are processed immediately
   this.timer.delay = passive ? 25 : this.timer.default;
-  this.defer("change", () => this.triggers.change.fn.call(this, e));
+  this.defer("change", () => {
+    this.triggers.change.fn.call(this, e);
+  });
+
+  // this MUST be the very last trigger event.
+  this.defer("after", this.triggers.after.fn, this.timer.after, true);
 }
 
 function handleClick(e) {
