@@ -1,9 +1,5 @@
-let options = {
-  flag: "inactive",
-  re: /^(\s+)?[>?!/]+(\s+)?/,
-  tag: "p",
-  br: "<br/>"
-};
+import config from "../../config";
+let { options } = config;
 
 function arrayToHtml(array, obj) {
   // update the global parsing settings

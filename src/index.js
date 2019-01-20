@@ -3,6 +3,7 @@ import Article from "./modules/Article";
 import Sentences from "./modules/Sentences";
 import Controller from "./modules/Controller";
 import Storage from "./modules/Storage/";
+import Parse from "./utilities/Parse";
 
 // import PubSub from "pubsub-js";
 
@@ -40,7 +41,7 @@ function toggleTypewriterMode(b) {
 
 function saveToDisk() {
   const children = article.texteditor.children;
-  const data = u.htmlToCollection(children);
+  const data = new Parse(children).toCollection();
   store.write(data);
 
   // update wordcount

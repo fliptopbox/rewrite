@@ -1,12 +1,13 @@
 import marked from "marked";
 import bindEvents from "./bindEvents";
-import config from "./config";
+import config from "../../config";
 import arrayToHtml from "./arrayToHtml";
 import load from "./load";
 import defer from "../../utilities/defer";
 import uuid from "../../utilities/uuid";
 import collectionToHtml from "../../utilities/collectionToHtml";
 import updateKeysPressed from "./updateKeysPressed";
+import Parse from "../../utilities/Parse";
 
 document.execCommand("defaultParagraphSeparator", false, "p");
 
@@ -92,7 +93,9 @@ class Texteditor {
 
   deselect(selector = "selected") {
     const array = this.texteditor.querySelectorAll(`.${selector}`);
-    [...array].forEach(el => el.classList.remove(selector));
+    [...array].forEach(el => {
+      el.classList.remove(selector);
+    });
     this.selected = null;
   }
 
@@ -119,18 +122,23 @@ class Texteditor {
     // console.log(array);
     if (!array) return;
 
-    const isTextArray = typeof array[0];
-    let html;
+    const p = new Parse(array);
 
-    if (isTextArray === "string") {
-      html = this.arrayToHtml(array);
-    }
+    // const isTextArray = typeof array[0];
+    // let html;
 
-    if (isTextArray === "object") {
-      html = collectionToHtml(array);
-    }
+    // if (isTextArray === "string") {
+    //   console.log(1);
+    //   html = this.arrayToHtml(array);
+    // }
 
-    this.texteditor.innerHTML = html;
+    // if (isTextArray === "object") {
+    //   console.log(2);
+    //   html = collectionToHtml(array);
+    // }
+
+    this.texteditor.innerHTML = p.toHTML();
+    // this.texteditor.innerHTML = html;
     this.show();
   }
 
