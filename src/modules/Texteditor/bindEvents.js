@@ -15,7 +15,10 @@ function handleKeyDown(e) {
   const passive = this.re.passiveKeys.test(e.key);
   const versions = this.selected && this.selected.dataset.versions;
 
-  if (versions && !passive) return false;
+  if (versions && !passive) {
+    console.log("versions and NOT passive");
+    return false;
+  }
 
   // execute the registered triggers
   const keySequence = this.updateKeysPressed(e, true);
@@ -36,13 +39,17 @@ function handleKeyUp(e) {
   const { focusNode } = window.getSelection();
   const { nodeName } = focusNode.parentNode;
 
-  if (nodeName !== "P") return;
+  if (nodeName !== "P") {
+    console.log("not P tag");
+    return;
+  }
 
   const el = focusNode.parentNode;
   const { innerText } = el;
 
   // ignore empty lines.
   if (!innerText || !innerText.trim()) {
+    console.log("no inner text");
     this.selected = null;
     return;
   }
@@ -56,13 +63,12 @@ function handleKeyUp(e) {
 
   // after all triggers always emit the change event.
   // ensure arrowkeys are processed immediately
+  const ms = this.timer.after;
   this.timer.delay = passive ? 25 : this.timer.default;
-  this.defer("change", () => {
-    this.triggers.change.fn.call(this, e);
-  });
+  this.defer("change", () => this.triggers.change.fn.call(this, e));
 
   // this MUST be the very last trigger event.
-  this.defer("after", this.triggers.after.fn, this.timer.after);
+  this.defer("after", () => this.triggers.after.fn.call(this), ms);
 }
 
 function handleClick(e) {

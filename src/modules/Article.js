@@ -29,7 +29,11 @@ function articleToggleActive(e) {
   e.preventDefault();
   e.stopPropagation();
 
-  if (!this.selected) return;
+  console.log(e.code);
+  if (!this.selected) {
+    console.log("no selected element");
+    return;
+  }
   // let versions;
   let array = u.selectedValueArray(this.selected);
 
