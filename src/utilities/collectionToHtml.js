@@ -36,7 +36,7 @@ function collectionToHtml(array) {
     return div.outerHTML;
   });
 
-  // ensure there is always one extra last line
+  // ensure there is always an extra last line
   if (!/<br\s?\/?>/i.test(html.slice(-1))) {
     html.push("<div><br/></div>");
   }

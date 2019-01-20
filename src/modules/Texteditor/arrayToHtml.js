@@ -26,7 +26,15 @@ function arrayToHtml(array, obj) {
     .map(s => {
       let innerText = `${s}`.replace(re, "").trim() || br;
       innerText = typeof s !== "string" ? br : innerText;
-      const className = re.test(s || "") ? ` class="${flag}"` : "";
+
+      let className = [];
+
+      re.test(s || "") && className.push(flag);
+
+      // s && s.className && className.push(s.className);
+      className = className.length ? className.join(" ") : null;
+      className = (className && ` class="${className}"`) || "";
+
       return `<${tag}${className}>${innerText}</${tag}>`;
     })
     .join("\n");

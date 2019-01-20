@@ -31,7 +31,7 @@ window.RE = {
 };
 
 function toggleTypewriterMode(b) {
-  const body = document.getEementsByTagName("body")[0];
+  const body = document.querySelector("body");
   let forward = article.typewriter(b);
   forward = b === undefined ? !forward : forward;
   article.typewriter(forward);
@@ -41,10 +41,21 @@ function toggleTypewriterMode(b) {
 function saveToDisk() {
   const children = article.texteditor.children;
   const data = u.htmlToCollection(children);
-  // console.log(123, data, article.texteditor);
-  //console.log(456, sentences.parent.texteditor.innerHTML);
-  console.log(store.current);
   store.write(data);
+
+  // update wordcount
+  updateWordCount(article.texteditor);
+}
+
+function updateWordCount(el) {
+  return u.defer(
+    "wordcount",
+    () => {
+      const text = el.innerText;
+      console.log("WORDCOUNT", u.wordcount(text));
+    },
+    500
+  );
 }
 
 const startup = (function() {

@@ -5,6 +5,7 @@ import arrayToHtml from "./arrayToHtml";
 import load from "./load";
 import defer from "../../utilities/defer";
 import uuid from "../../utilities/uuid";
+import collectionToHtml from "../../utilities/collectionToHtml";
 import updateKeysPressed from "./updateKeysPressed";
 
 document.execCommand("defaultParagraphSeparator", false, "p");
@@ -115,7 +116,21 @@ class Texteditor {
 
     */
   init(array) {
-    this.texteditor.innerHTML = this.arrayToHtml(array);
+    // console.log(array);
+    if (!array) return;
+
+    const isTextArray = typeof array[0];
+    let html;
+
+    if (isTextArray === "string") {
+      html = this.arrayToHtml(array);
+    }
+
+    if (isTextArray === "object") {
+      html = collectionToHtml(array);
+    }
+
+    this.texteditor.innerHTML = html;
     this.show();
   }
 
