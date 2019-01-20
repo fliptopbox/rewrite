@@ -1,36 +1,39 @@
+import childrenToVersionArray from "./childrenToVersionArray";
+import collectionToHtml from "./collectionToHtml";
 import deepEqual from "deep-is";
-import uuid from "./uuid";
+import defer from "./defer";
+import focusOn from "./focusOn";
+import htmlToCollection from "./htmlToCollection";
 import inflate from "./inflate";
 import message from "./message";
-import wordcount from "./wordcount";
-import focusOn from "./focusOn";
-import tts from "./tts";
-import childrenToVersionArray from "./childrenToVersionArray";
-import toggleStringCase from "./toggleStringCase";
 import selectedValueArray from "./selectedValueArray";
-import collectionToHtml from "./collectionToHtml";
-import htmlToCollection from "./htmlToCollection";
-import defer from "./defer";
+import toggleStringCase from "./toggleStringCase";
+import tts from "./tts";
+import unwrap from "../utilities/unwrap";
+import uuid from "./uuid";
+import wordcount from "./wordcount";
 
 export default {
+  alert,
+  confirm,
+  prompt,
+
   childrenToVersionArray,
   collectionToHtml,
-  htmlToCollection,
-  toggleStringCase,
-  selectedValueArray,
-  uuid,
   deepEqual,
   defer,
-  inflate,
-  storage,
-  message,
-  wordcount,
   focusOn,
-  prompt,
-  confirm,
-  alert,
+  htmlToCollection,
+  inflate,
+  message,
+  selectedValueArray,
+  storage,
   time,
-  tts
+  toggleStringCase,
+  tts,
+  unwrap,
+  uuid,
+  wordcount
 };
 
 function time() {

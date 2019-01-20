@@ -1,5 +1,6 @@
 import collectionToHtml from "../utilities/collectionToHtml";
 import htmlToCollection from "../utilities/htmlToCollection";
+import unwrapColumns from "../utilities/unwrap";
 
 let _collection;
 
@@ -31,8 +32,9 @@ class Parse {
         // this is a MD of txt file convert it to collection
         //? permit fountain screenplay detection
 
+        const { unwrap } = this.options;
         value = linebreaks(value);
-        value = unwrap(value);
+        value = unwrap ? unwrapColumns(value) : value;
         value = arrayToCollection(value);
         break;
 
@@ -78,21 +80,6 @@ class Parse {
 
 export default Parse;
 
-/** * /
-
-let q = new Parse("alpha\nbravo charlie\n\ndelta");
-q.toCollection(); //?
-q.toText(); //?
-
-q = new Parse([
-  { text: "alpha", versions: ["alpha", "> bravo", "> charlie"] },
-  { text: "" },
-  { text: "", versions: ["> alpha", "> bravo", "> charlie"] }
-]);
-q.toHTML(); //?
-
-/** */
-
 function toTextArray(collection) {
   return [...collection].map(o => `${o.text}`);
 }
@@ -101,24 +88,6 @@ function linebreaks(plaintext = "") {
   // remove carridge returns (aka CrLf => Lf)
   if (/\r/.test(plaintext)) plaintext = plaintext.replace(/\r/gm, "");
   return plaintext;
-}
-
-function unwrap(text = "") {
-  // unwrap hardline breaks.
-  let catenated = text;
-  catenated = catenated.split(/\n{2,}/gm);
-  catenated = catenated.map(
-    s =>
-      s
-        .replace(/\n+/g, " ")
-        .replace(/\s{2,}/g, " ")
-        .trim() || ""
-  );
-  // normalize the paragraph breaks
-  catenated = catenated.join("\n\n");
-  catenated = catenated.split(/\n/g);
-
-  return [...catenated];
 }
 
 function arrayToCollection(array) {
