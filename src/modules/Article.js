@@ -46,6 +46,16 @@ function articleToggleActive(e) {
     classList.remove("locked");
     dataset.versions = "";
     array = [""];
+
+    // empty lines are deleted from the DOM
+    if (this.selected.classList.contains("empty")) {
+      this.selected.innerText = "";
+      this.selected.className = "";
+      this.selected.remove();
+      this.selected = null;
+      this.parent.init([""]);
+      return false;
+    }
   }
 
   // re-load the sentence instatance
