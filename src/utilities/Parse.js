@@ -18,7 +18,7 @@ class Parse {
     // cast the value as Object literal
     if (!value) value = "";
 
-    const { re, unwrap } = this;
+    const { re, unwrap } = this.options;
     const constructor = value.constructor;
     const type =
       (constructor === String && "string") ||
@@ -34,7 +34,8 @@ class Parse {
         //? permit fountain screenplay detection
 
         value = linebreaks(value);
-        value = unwrap ? unwrapColumns(value) : value;
+        value = unwrap ? unwrapColumns(value) : value.split(/\n/g);
+        console.log("--------", unwrap);
         value = arrayToCollection(value, re);
         break;
 
@@ -91,6 +92,7 @@ function linebreaks(plaintext = "") {
 }
 
 function arrayToCollection(array, re = /.*/) {
+  console.log("asdf", array);
   return array.map(row => {
     return typeof row === "string"
       ? {
