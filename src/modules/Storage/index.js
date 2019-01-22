@@ -1,4 +1,6 @@
 import uuid from "../../utilities/uuid";
+import download from "../../utilities/download";
+import readTextFile from "../../utilities/readTextFile";
 const startup = require("./startup.json");
 
 class Storage {
@@ -8,6 +10,8 @@ class Storage {
     this.storage = storage;
     this.uuid = uuid;
     this.current = null; // currently open article
+
+    this.create = createArticle.bind(this);
   }
 
   filename(guid, path) {
@@ -75,49 +79,39 @@ class Storage {
   // open
   // presents a file picker to load an external file
   // same as import, without id or plainText string
-  open() {}
+  open(files, fn) {
+    if (!files) {
+      console.error("Cant open, require files array");
+    }
+
+    // remember read file is async
+    return readTextFile(files, function(name, data) {
+      // console.log("read text file", name, data);
+      return fn(name, data);
+    });
+  }
 
   // save
   // causes a download dialoge box to appear
   // the filename derived from the currently selected file
-  save() {}
+  save(filename) {
+    if (!this.current) {
+      console.error("No current article to download");
+      return;
+    }
+    const { guid, name, data } = this.current;
+    const metadata = {
+      id: guid,
+      name: filename || name,
+      data
+    };
+
+    return download(metadata);
+  }
 
   // rename
   // assigns a new filename to the given guid
   rename(guid, filename) {}
-
-  create(guid, name, schema) {
-    if (!schema) {
-      console.error("Create requires article schema");
-      return;
-    }
-
-    // generate the initial metadata
-    guid = guid || uuid();
-    name = name || "Untitled";
-    const created = new Date().valueOf();
-    const opened = new Date().valueOf();
-    const row = { guid, name, created, opened };
-
-    // append to list of articles
-    const articles = this.storage("articles");
-    const array = articles.read() || [];
-    array.push(row);
-    articles.write(array);
-
-    // save the article data
-    const key = this.filename(guid);
-    this.storage(key).write(schema);
-    this.storage("previous").write(guid);
-
-    this.current = {
-      ...row,
-      data: schema,
-      previous: guid
-    };
-
-    return this.current;
-  }
 
   // delete
   // deletes the associated files by guid
@@ -158,3 +152,36 @@ class Storage {
 }
 
 export default Storage;
+
+function createArticle(guid, name, schema) {
+  if (!schema) {
+    console.error("Create requires article schema");
+    return;
+  }
+
+  // generate the initial metadata
+  guid = guid || uuid();
+  name = name || "Untitled";
+  const created = new Date().valueOf();
+  const opened = new Date().valueOf();
+  const row = { guid, name, created, opened };
+
+  // append to list of articles
+  const articles = this.storage("articles");
+  const array = articles.read() || [];
+  array.push(row);
+  articles.write(array);
+
+  // save the article data
+  const key = this.filename(guid);
+  this.storage(key).write(schema);
+  this.storage("previous").write(guid);
+
+  this.current = {
+    ...row,
+    data: schema,
+    previous: guid
+  };
+
+  return this.current;
+}

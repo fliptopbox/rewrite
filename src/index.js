@@ -67,4 +67,14 @@ const startup = (function() {
   return Function;
 })();
 
+document.querySelector("#uploadInput").onchange = function(e) {
+  store.open(e, function(name, text) {
+    const p = new Parse(text);
+    // console.log(222, name, text);
+    const current = store.create(null, name, p.toCollection());
+    article.init(current.data);
+  });
+  // window.RE.storage.open(e, window.RE.storage.create);
+};
+
 startup();
