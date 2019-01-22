@@ -27,7 +27,7 @@ to make a home of my own.”`;
   const collection = p.toCollection();
   expect(collection).toHaveLength(3);
   expect(collection[0]).toHaveProperty("text");
-  expect(collection[1]).toEqual({ text: "" });
+  expect(collection[1].text).toEqual("");
   expect(collection[2]).toHaveProperty("text");
 });
 

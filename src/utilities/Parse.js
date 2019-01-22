@@ -35,7 +35,6 @@ class Parse {
 
         value = linebreaks(value);
         value = unwrap ? unwrapColumns(value) : value.split(/\n/g);
-        console.log("--------", unwrap);
         value = arrayToCollection(value, re);
         break;
 
@@ -92,7 +91,6 @@ function linebreaks(plaintext = "") {
 }
 
 function arrayToCollection(array, re = /.*/) {
-  console.log("asdf", array);
   return array.map(row => {
     return typeof row === "string"
       ? {
