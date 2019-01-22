@@ -2,10 +2,12 @@ import childrenToVersionArray from "./childrenToVersionArray";
 import collectionToHtml from "./collectionToHtml";
 import deepEqual from "deep-is";
 import defer from "./defer";
+import download from "./download";
 import focusOn from "./focusOn";
 import htmlToCollection from "./htmlToCollection";
 import inflate from "./inflate";
 import message from "./message";
+import readTextFile from "./readTextFile";
 import selectedValueArray from "./selectedValueArray";
 import toggleStringCase from "./toggleStringCase";
 import tts from "./tts";
@@ -22,10 +24,12 @@ export default {
   collectionToHtml,
   deepEqual,
   defer,
+  download,
   focusOn,
   htmlToCollection,
   inflate,
   message,
+  readTextFile,
   selectedValueArray,
   storage,
   time,
