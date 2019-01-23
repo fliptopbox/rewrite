@@ -6,7 +6,7 @@ import htmlToCollection from "./htmlToCollection";
 const article = `
 <article id="document" class="content" contenteditable="true">
 <div># Tunnel vision</div>
-<div>by Bruce Thomas</div>
+<div class="authors">by Bruce Thomas</div>
 <div><br></div>
 <div><br></div>
 <div>Draft 1 - UK English</div>
@@ -21,7 +21,7 @@ const article = `
 <div><br></div>
 <div
     id="u401548985013040"
-    class="locked"
+    class="locked inactive"
     data-versions='[
         "A new generation, a new narcotic and a new paradigm for self discovery."
     ]'>"A new generation, a new narcotic and a new paradigm for self discovery."</div>
@@ -43,6 +43,12 @@ test("the collection row has predictable text", () => {
   expect(array[0]).toHaveProperty("text", "# Tunnel vision");
 });
 
+test("custom classNames occur as object props", () => {
+  expect(array[1]).toHaveProperty("text");
+  expect(array[1]).not.toHaveProperty("versions");
+  expect(array[1]).toHaveProperty("authors");
+});
+
 test("get an Object literal from DOM children", () => {
   expect(array[7]).toHaveProperty("text");
   expect(array[7]).toHaveProperty("versions");
@@ -61,4 +67,12 @@ test("get an Object with no meta data", () => {
   expect(array[6]).toHaveProperty("text", "");
   expect(array[6]).not.toHaveProperty("versions");
   expect(array[6]).not.toHaveProperty("selected");
+});
+
+test("get an Object literal from DOM children", () => {
+  expect(array[7]).toHaveProperty("text");
+  expect(array[7]).toHaveProperty("versions");
+  expect(array[7]).toHaveProperty("inactive");
+  expect(array[7].versions).toHaveLength(1);
+  expect(array[7]).not.toHaveProperty("selected");
 });

@@ -59,7 +59,7 @@ test("should have a selected className", () => {
   expect(dataset.versions).toBeDefined();
   expect(id).toBeDefined();
 });
-test("should have a emty className", () => {
+test("should have a emtpy className", () => {
   collection = [
     { text: "", versions: [">is here", "> was here"], selected: true }
   ];
@@ -71,6 +71,33 @@ test("should have a emty className", () => {
 
   expect(innerHTML).toEqual("<br>");
   expect(classList.contains("locked")).toBe(true);
+  expect(classList.contains("selected")).toBe(true);
+  expect(classList.contains("empty")).toBe(true);
+  expect(dataset).toBeDefined();
+  expect(dataset.versions).toBeDefined();
+  expect(id).toBeDefined();
+});
+
+test("all additional object keys (aka non-essentials) are classNames", () => {
+  collection = [
+    {
+      text: "",
+      versions: [">is here", "> was here"],
+      selected: true,
+      inactive: true,
+      "custom-value": true
+    }
+  ];
+
+  dom = new JSDOM(collectionToHtml(collection));
+  p = dom.window.document.querySelector("p");
+
+  let { innerHTML, id, dataset, classList } = p;
+
+  expect(innerHTML).toEqual("<br>");
+  expect(classList.contains("locked")).toBe(true);
+  expect(classList.contains("custom-value")).toBe(true);
+  expect(classList.contains("inactive")).toBe(true);
   expect(classList.contains("selected")).toBe(true);
   expect(classList.contains("empty")).toBe(true);
   expect(dataset).toBeDefined();

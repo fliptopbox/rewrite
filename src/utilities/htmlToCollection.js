@@ -8,13 +8,17 @@ function htmlToCollection(children) {
     const text = (innerText && innerText.trim()) || "";
     const string = text || (innerHTML && innerHTML.replace(reHtmlTags, ""));
 
+    // const inactive = classList.contains("inactive");
+    // const selected = (classList && classList.contains("selected")) || undefined;
     const versions = dataset.versions && JSON.parse(dataset.versions);
-    const selected = (classList && classList.contains("selected")) || undefined;
     const obj = {};
 
     obj.text = string || "";
     versions && (obj.versions = versions);
-    selected && (obj.selected = selected);
+
+    // convert all classNames to object keys
+    classList.remove("locked"); // derived is versions exist
+    [...classList].forEach(s => (obj[s] = s));
 
     return obj;
   });

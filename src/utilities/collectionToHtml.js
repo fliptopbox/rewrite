@@ -15,8 +15,9 @@ function v2(array, options) {
   let unique = true; // ensure only one selected DOM element
 
   const html = array.map(row => {
-    let classnames = [];
+    let classnames = {};
 
+    const exclude = /^(text|versions|locked|selected)/i;
     const { text = "", versions = "", selected = "" } = row;
     const id = versions ? uuid() : "";
     const candidate = versions && getCandidateString(versions);
@@ -24,14 +25,26 @@ function v2(array, options) {
     const json = versions ? JSON.stringify(versions) : "";
 
     const isEmpty = versions && !candidate ? true : false;
-    const isInactive = re.test(value);
+    const isInactive = re.test(value) || row.inactive;
 
     // derived classNames
-    classnames.push(versions ? "locked" : "");
-    classnames.push(isInactive ? flag : "");
-    classnames.push(unique && selected ? "selected" : "");
-    classnames.push(isEmpty ? "empty" : "");
-    classnames = classnames.join(" ").trim() || null;
+    classnames.locked = versions ? true : null;
+    classnames[flag] = isInactive ? true : null;
+    classnames.selected = unique && selected ? true : null;
+    classnames.empty = isEmpty ? true : null;
+
+    // only add non-existant keys
+    Object.keys(row).forEach(key => {
+      if (exclude.test(key) || key in classnames) return;
+      classnames[key] = true;
+    });
+
+    // flattern keys into string
+    classnames =
+      Object.keys(classnames)
+        .map(key => (classnames[key] ? key : ""))
+        .join(" ")
+        .trim() || null;
 
     // ensure the "selected" element is unique
     unique = selected ? false : unique;
