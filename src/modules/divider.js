@@ -12,7 +12,7 @@ let state = Object.assign(
   {
     width: 50, // initial ratio (percentage)
     minWidth: 8, // min pixel width
-    threshold: 20 // screen width percentage
+    threshold: 15 // screen width percentage
 
     // DOM fixtures
   },

@@ -32,6 +32,13 @@ body {
   &.hidden {
     display: none;
   }
+  article {
+    max-width: 1024px;
+    margin: 0 auto;
+    .hide-content & {
+      display: none;
+    }
+  }
 }
 
 .panel {
