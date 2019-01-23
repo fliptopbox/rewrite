@@ -5,23 +5,53 @@
     <meta charset="UTF-8" />
   </head>
 
-  <body>
+  <body class="xdark">
     <div class="container hidden">
       <div class="panel paragraphs"><div class="inner" id="c1"></div></div>
-      <div class="panel sentences" id="c2"></div>
+      <div class="panel sentences"><div class="inner" id="c2"></div></div>
+      <div class="divider" id="vertical"></div>
     </div>
 
     <div id="footer">
+      <label for="menuItems">
+        <span>#</span>
+        <button id="menuItems" class="hidden"
+          onclick="window.RE.toggleMenu()"
+        >
+      </label>
       <label for="uploadInput">
         <span>upload</span>
         <input
-          id="uploadInput"
+          id="uploadInput" class="hidden"
           type="file"
-          style="display:none;"
           accept="text/*"
         />
       </label>
-    </div>
+      <label for="themeToggle">
+        <span>Toggle Theme</span>
+        <button
+          id="themeToggle" class="hidden"
+          onclick="window.RE.toggleTheme()"
+        >
+      </label>
+    <label for="fontsize" class="fontsize">
+      <input type="range" id="fontsize" name="fontsize"
+      list="sizes"
+      min="14"
+      max="48"
+      oninput="window.RE.fontsize(this.value)"
+      value="24">
+      <div id="fontvalue">24</div>
+      <datalist id="sizes">
+        <option value="14" label="14">
+        <option value="16">
+        <option value="18">
+        <option value="21">
+        <option value="24" label="24">
+        <option value="36">
+        <option value="48" label="48">
+      </datalist>
+    </label>
 
     <div id="overlay" class="overlay">
       <div class="brand"><img src="./src/rewriting.svg" /></div>

@@ -6,7 +6,9 @@ class Article extends Texteditor {
     super(id, options);
 
     this.on("click", null, articleToggleActive);
-    this.on("toggle", /(shiftshift)$/i, articleToggleActive);
+    this.on("toggle", /(altalt)$/i, articleToggleActive);
+    this.on("collapse", /(shiftshift)$/i, collapseSelectedParagraph);
+
     this.on("change", null, sentencesUpdateContent);
     this.on(
       "typewriter",
@@ -19,6 +21,14 @@ class Article extends Texteditor {
 }
 
 export default Article;
+
+function collapseSelectedParagraph() {
+  if (!this.selected) {
+    console.warn("no selected paragraph");
+    return;
+  }
+  this.selected.classList.toggle("inactive");
+}
 
 function sentencesUpdateContent() {
   const array = u.selectedValueArray(this.selected);

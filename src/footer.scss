@@ -15,6 +15,7 @@
       margin: 0 0.1em;
       padding: 1em 2em;
       color: white;
+      position: relative;
     }
 
     &:first-child {
@@ -25,9 +26,26 @@
       display: inline-block;
     }
 
-    input,
-    button {
+    .hidden {
       display: none;
     }
+    &.fontsize {
+      margin: 0;
+      padding: 0 4em 0 1.5em;
+    }
   }
+}
+
+#fontvalue {
+  position: absolute;
+  right: 0;
+  color: white;
+  top: 0;
+  font-size: 1.6em;
+  margin: 0.5em;
+}
+#fontsize {
+  vertical-align: middle;
+  padding: 0;
+  margin: 0;
 }

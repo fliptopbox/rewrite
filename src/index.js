@@ -4,6 +4,7 @@ import Sentences from "./modules/Sentences";
 import Controller from "./modules/Controller";
 import Storage from "./modules/Storage/";
 import Parse from "./utilities/Parse";
+import divider from "./modules/divider";
 
 // import PubSub from "pubsub-js";
 
@@ -25,9 +26,11 @@ article.init(articleText.data);
 
 window.RE = {
   typewriter: toggleTypewriterMode,
+  toggleTheme: ctrl.toggleTheme,
+  toggleMenu: ctrl.toggleMenu,
+  fontsize: ctrl.fontsize,
   collapse: ctrl.collapse,
   strikeThrough: ctrl.strikeThrough,
-  export: article.export,
   storage: store
 };
 
@@ -63,6 +66,7 @@ const startup = (function() {
   setTimeout(() => {
     document.querySelector(".container").classList.remove("hidden");
     document.querySelector(".overlay").classList.add("hidden");
+    divider();
   }, 950);
   return Function;
 })();

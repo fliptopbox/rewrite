@@ -123,22 +123,7 @@ class Texteditor {
     if (!array) return;
 
     const p = new Parse(array);
-
-    // const isTextArray = typeof array[0];
-    // let html;
-
-    // if (isTextArray === "string") {
-    //   console.log(1);
-    //   html = this.arrayToHtml(array);
-    // }
-
-    // if (isTextArray === "object") {
-    //   console.log(2);
-    //   html = collectionToHtml(array);
-    // }
-
     this.texteditor.innerHTML = p.toHTML();
-    // this.texteditor.innerHTML = html;
     this.show();
   }
 
