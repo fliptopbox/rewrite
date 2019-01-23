@@ -1,0 +1,33 @@
+#footer {
+  position: fixed;
+  bottom: 0;
+  z-index: 9;
+  font-size: 10px;
+  left: 0;
+  right: auto;
+  top: auto;
+  margin: 1em;
+
+  label {
+    & {
+      display: none;
+      background: #000;
+      margin: 0 0.1em;
+      padding: 1em 2em;
+      color: white;
+    }
+
+    &:first-child {
+      display: block;
+    }
+
+    .showfooter & {
+      display: inline-block;
+    }
+
+    input,
+    button {
+      display: none;
+    }
+  }
+}

@@ -1,3 +1,10 @@
+@import "./divider";
+@import "./footer.scss";
+@import "./overlay.scss";
+@import "./theme.scss";
+
+$empty: "empty";
+
 body {
   font-family: sans-serif;
   margin: 0;
@@ -8,13 +15,6 @@ body {
 
 * {
   outline: none;
-}
-
-#footer {
-  position: absolute;
-  bottom: 0;
-  z-index: 9;
-  font-size: 10px;
 }
 
 .container {
@@ -35,69 +35,74 @@ body {
 
 .panel {
   & {
-    margin: 1%;
-    padding: 5%;
+    margin: 0;
+    padding: 0;
     width: 50%;
-    border: 1px solid rgba(0, 0, 0, 0.3);
     overflow: auto;
   }
 
   p {
-    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
     margin: 0 0 3px 0;
-    padding: 2px 3px 5px;
-    line-height: 1.6;
+    padding: 0px 1em;
+    line-height: 1.5;
     min-height: 1em;
     position: relative;
   }
 
-  &.paragraphs {
-    background: #efefef;
-    overflow-y: scroll;
-
-    article {
-      padding: 30% 0 70%;
-    }
+  .inner {
+    padding: 0 10%;
   }
 
   &.hidden {
     display: none;
   }
+}
 
-  .selected {
-    // background: rgba(0, 0, 0, 0.1);
+.selected {
+  &:before {
+    content: " ";
+    width: 3px;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0em;
   }
+}
 
-  .locked {
-    background: #fbfbfb;
-  }
+.empty {
+  color: transparent;
+  display: block;
 
-  .selected.locked {
-    background: rgb(255, 255, 231);
-  }
-
-  .inactive {
-    opacity: 0.2;
-    color: #ccc;
-  }
-
-  .empty {
-    color: transparent;
-    width: 100%;
-    display: block;
-    &::after {
-      color: #999;
-      content: "inctive";
+  &::after {
+    & {
+      font-size: 0.8em;
+      margin: 0.2em;
+      content: $empty;
       position: absolute;
-      padding: 0 10px 0 0;
+      padding: 0 10px 0;
       right: 0;
+      top: 0;
+      border-radius: 3px;
+      opacity: 0.2;
+      text-align: center;
     }
+  }
+}
+
+.paragraphs {
+  overflow-y: scroll;
+
+  article {
+    padding: 30% 0 70%;
   }
 }
 
 .sentences {
   p {
     margin: 0.5em 0;
+  }
+  .inner {
+    padding: 12%;
   }
 }
 
@@ -119,31 +124,4 @@ body {
 
 .hidden {
   display: none !important;
-}
-
-.overlay {
-  position: fixed;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background-image: radial-gradient(#333, #111);
-  display: flex;
-}
-
-.brand {
-  flex: 1 0;
-  align-self: center;
-}
-
-.brand img {
-  width: 350px;
-  height: 114px;
-  padding: 0 10px 0 20px;
-  display: block;
-  background: white;
-  text-align: center;
-  margin: 0 auto;
-  border-radius: 2px;
-  box-shadow: 0 16px 50px 0 #000;
 }

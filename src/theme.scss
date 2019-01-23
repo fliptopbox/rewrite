@@ -1,0 +1,51 @@
+.paragraphs {
+  & {
+    background: #efefef;
+  }
+  .dark & {
+    background: #171717;
+    color: #b9b9b9;
+  }
+}
+
+.locked {
+  background: #fbfbfb;
+  .dark & {
+    background: #25252566;
+  }
+}
+
+.selected.locked {
+  background: rgb(255, 255, 231);
+  .dark & {
+    background: #191919;
+  }
+}
+
+.inactive {
+  opacity: 0.2;
+  color: #ccc;
+}
+
+.empty {
+  &::after {
+    & {
+      color: #999;
+      background: #000;
+    }
+    .dark & {
+      color: #545454;
+      background: black;
+    }
+  }
+}
+.panel {
+  p {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.02);
+  }
+}
+.selected {
+  &:before {
+    background: black;
+  }
+}

@@ -1,0 +1,13 @@
+$bg: black;
+
+.divider {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 3px;
+  background: $bg;
+  border: 1px solid transparent;
+  border-width: 0 1px;
+  cursor: ew-resize;
+}
