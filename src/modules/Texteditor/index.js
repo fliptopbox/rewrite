@@ -5,7 +5,7 @@ import arrayToHtml from "./arrayToHtml";
 import load from "./load";
 import defer from "../../utilities/defer";
 import uuid from "../../utilities/uuid";
-import collectionToHtml from "../../utilities/collectionToHtml";
+// import collectionToHtml from "../../utilities/collectionToHtml";
 import updateKeysPressed from "./updateKeysPressed";
 import Parse from "../../utilities/Parse";
 
@@ -17,6 +17,7 @@ class Texteditor {
     const texteditor = document.createElement("article");
 
     texteditor.setAttribute("contenteditable", "");
+    texteditor.setAttribute("spellcheck", "true");
 
     container.innerHTML = "";
     container.appendChild(texteditor);

@@ -74,6 +74,10 @@ function textToSpeech(array, period = "") {
   // if it is already spleaking it stop
   // otherwise it sets up and starts to read;
 
+  if (!synth) {
+    initialize();
+  }
+
   if (synth.speaking) return synth.cancel();
   if (!array) return;
 

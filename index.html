@@ -27,14 +27,14 @@
           accept="text/*"
         />
       </label>
-      <label for="themeToggle">
-        <span>Toggle Theme</span>
+      <label for="themeToggle" title="Toggle Dark/Light Theme">
+        <span>A|B</span>
         <button
           id="themeToggle" class="hidden"
           onclick="window.RE.toggleTheme()"
         >
       </label>
-    <label for="fontsize" class="fontsize">
+    <label for="fontsize" class="fontsize" title="Change relative font size">
       <input type="range" id="fontsize" name="fontsize"
       list="sizes"
       min="14"
@@ -53,6 +53,14 @@
       </datalist>
     </label>
 
+      <label for="readSelected" title="Read the selected paragraph">
+        <span>[></span>
+        <button
+          id="readSelected" class="hidden"
+          onclick="window.RE.read()"
+        >
+      </label>
+    </div>
     <div id="overlay" class="overlay">
       <div class="brand"><img src="./src/rewriting.svg" /></div>
     </div>

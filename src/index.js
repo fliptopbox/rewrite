@@ -31,7 +31,8 @@ window.RE = {
   fontsize: ctrl.fontsize,
   collapse: ctrl.collapse,
   strikeThrough: ctrl.strikeThrough,
-  storage: store
+  storage: store,
+  read: readSelected
 };
 
 function toggleTypewriterMode(b) {
@@ -60,6 +61,15 @@ function updateWordCount(el) {
     },
     500
   );
+}
+
+function readSelected() {
+  // looks for selected paragraph and reads it
+  const current = article.selected;
+  if (!current) return;
+  const array = u.inflate(current.innerText, true);
+  console.log("TTS array\n", array);
+  window.TTS.read(array);
 }
 
 const startup = (function() {
