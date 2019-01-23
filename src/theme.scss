@@ -43,9 +43,36 @@
   p {
     border-bottom: 1px solid rgba(0, 0, 0, 0.02);
   }
+
+  &::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.05);
+  }
+  &::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.2);
+  }
 }
 .selected {
   &:before {
     background: black;
+  }
+}
+.divider {
+  & {
+    background: rgb(44, 44, 44);
+    border-color: rgb(255, 255, 255);
+    .dark & {
+      background: rgb(0, 0, 0);
+      border-color: #111;
+    }
+  }
+  &:hover {
+    & {
+      background: rgb(26, 26, 26);
+      border-color: rgb(255, 255, 255);
+    }
+    .dark & {
+      background: rgb(0, 0, 0);
+      border-color: rgb(255, 255, 255);
+    }
   }
 }
