@@ -19,23 +19,21 @@ class Controller {
     );
 
     this.save = this.save.bind(this);
-    this.fontsize = this.fontsize.bind(this);
-    this.collapse = this.collapse.bind(this);
-    this.strikeThrough = this.strikeThrough.bind(this);
-    this.toggleTheme = this.toggleTheme.bind(this);
-    this.toggleMenu = this.toggleMenu.bind(this);
 
     // enforce the current settings
     for (let key in this.state.modifiers) {
       console.log(key, this.state.modifiers[key]);
       this.toggleClassName(key, this.state[key]);
     }
-    // enforce the current settings
+    // enforce the current values
     for (let key in this.state.values) {
       const value = this.state.values[key];
       console.log(key, value);
 
-      this[key](value);
+      if (this[key]) {
+        this[key](value);
+      }
+
       // this.toggleClassName(key, this.state[key]);
     }
   }
@@ -45,47 +43,80 @@ class Controller {
     write(data);
     return data;
   }
+
   toggleClassName(string, value, selector = "body") {
     if (typeof value === "boolean") {
       this.state.modifiers[string] = value;
     }
 
     const element = document.querySelector(selector);
-    const method = this.state.modifiers[string] ? "add" : "remove";
+    const current = this.state.modifiers[string];
+    const method = current ? "add" : "remove";
     element.classList[method](string);
     this.save();
+    return current;
+  }
+  addButton(options) {
+    const { id, title, text, className, fn, groupId } = options;
+    const footer = document.querySelector(`#${groupId}`);
+    const button = document.createElement("button");
+
+    button.id = id;
+    button.setAttribute("title", title);
+    button.innerHTML = `<span>${text}</span>`;
+    button.onclick = fn.bind(this);
+
+    footer.appendChild(button);
   }
 
-  collapse() {
-    const { collapsed } = this.state.modifiers;
-    this.state.modifiers.collapsed = !collapsed;
-    this.toggleClassName("collapsed");
-    return collapsed;
+  addCustomButton(options) {
+    const {
+      id,
+      tag,
+      groupId,
+      innerHTML,
+      className = "",
+      title = "",
+      element,
+      on,
+      fn
+    } = options;
+
+    const footer = document.querySelector(`#${groupId}`);
+    const el = document.createElement(tag);
+    el.setAttribute("for", id);
+    el.setAttribute("title", title);
+    el.className = className;
+    el.innerHTML = innerHTML;
+    const handle = el.querySelector(element);
+    handle[`on${on}`] = fn.bind(this);
+    footer.appendChild(el);
   }
 
-  strikeThrough() {
-    const { strikethrough } = this.state.modifiers;
-    this.state.modifiers.strikethrough = !strikethrough;
-    this.toggleClassName("strikethrough");
-    return strikethrough;
+  addGroup(options) {
+    const { id, groupId, className } = options;
+    const footer = document.querySelector(`#${groupId}`);
+    const g = document.createElement("div");
+    g.id = id;
+    g.className = "group group-" + groupId + " " + className;
+    footer.appendChild(g);
   }
 
-  toggleTheme() {
-    const { dark = false } = this.state.modifiers;
-    this.state.modifiers.dark = !dark;
-    this.toggleClassName("dark");
-  }
-  toggleMenu(id) {
-    const { showfooter = false } = this.state.modifiers;
-    this.state.modifiers.showfooter = !showfooter;
-    this.toggleClassName("showfooter");
-    this.save();
-  }
-  fontsize(value) {
-    document.querySelector("body").style.fontSize = `${value}px`;
-    document.querySelector("#fontvalue").innerText = `${value}`;
-    this.state.values.fontsize = Number(value);
-    this.save();
+  initialize(array) {
+    document.querySelector("#footer").innerHTML = "";
+    const that = this;
+    array.forEach(row => {
+      if (row.type === "button") {
+        this.addButton.call(that, row);
+      }
+      if (row.type === "custom") {
+        this.addCustomButton.call(that, row);
+      }
+      if (row.type === "group") {
+        this.addGroup(row);
+      }
+      return;
+    });
   }
 }
 

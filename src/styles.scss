@@ -52,14 +52,6 @@ body {
     width: 0.5em;
   }
 
-  &::-webkit-scrollbar-track {
-    // -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
-  }
-  &::-webkit-scrollbar-thumb {
-    // background-color: rgb(0, 0, 0);
-    // outline: 1px solid slategrey;
-  }
-
   p {
     margin: 0 0 3px 0;
     padding: 0px 1em;
@@ -77,6 +69,7 @@ body {
   }
 }
 
+.locked,
 .selected {
   &:before {
     content: " ";
@@ -112,7 +105,7 @@ body {
   overflow-y: scroll;
 
   article {
-    padding: 30% 0 70%;
+    padding: 20% 0 70%;
   }
 }
 
@@ -123,6 +116,10 @@ body {
   .inner {
     padding: 12%;
   }
+}
+
+.group {
+  display: inline-block;
 }
 
 /* global modifiers (on BODY) */

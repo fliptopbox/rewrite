@@ -56,6 +56,11 @@
     background: black;
   }
 }
+.locked {
+  &:before {
+    background: #4444;
+  }
+}
 .divider {
   & {
     background: rgb(44, 44, 44);

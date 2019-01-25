@@ -8,6 +8,8 @@ import divider from "./modules/divider";
 
 // import PubSub from "pubsub-js";
 
+import buttons from "./modules/ui-buttons";
+
 import "./styles.scss";
 
 const store = new Storage(u.storage.bind(window));
@@ -25,22 +27,65 @@ const articleText = store.initilize();
 article.init(articleText.data);
 
 window.RE = {
-  typewriter: toggleTypewriterMode,
-  toggleTheme: ctrl.toggleTheme,
-  toggleMenu: ctrl.toggleMenu,
-  fontsize: ctrl.fontsize,
-  collapse: ctrl.collapse,
-  strikeThrough: ctrl.strikeThrough,
-  storage: store,
-  read: readSelected
+  storage: store
 };
 
-function toggleTypewriterMode(b) {
-  const body = document.querySelector("body");
-  let forward = article.typewriter(b);
-  forward = b === undefined ? !forward : forward;
+const startup = (function() {
+  setTimeout(() => {
+    document.querySelector(".container").classList.remove("hidden");
+    document.querySelector(".overlay").classList.add("hidden");
+    divider();
+  }, 950);
+  return Function;
+})();
+
+startup();
+
+/*
+ * some UI buttons need links
+ * to objects defined later
+ * like the Article instance 
+ * or the store Object
+ *
+ * These late bindings are handled here ...
+ *
+*/
+const callbackHash = {
+  typewriter: toggleTypewriterMode,
+  readSelected: readSelected,
+  uploadInput: importAndOpen
+};
+
+buttons.map(obj => (obj.fn = callbackHash[obj.id] || obj.fn));
+
+ctrl.initialize(buttons);
+
+function toggleTypewriterMode() {
+  const { typewriter = false } = this.state.modifiers;
+  this.state.modifiers.typewriter = !typewriter;
+
+  const bool = this.toggleClassName("typewriter");
+
+  let forward = article.typewriter(bool);
+  forward = bool === undefined ? !forward : forward;
   article.typewriter(forward);
-  body.classList[forward ? "add" : "remove"]("typewriter");
+}
+
+function importAndOpen(e) {
+  store.open(e, function(name, text) {
+    const p = new Parse(text);
+    const current = store.create(null, name, p.toCollection());
+    article.init(current.data);
+  });
+}
+
+function readSelected() {
+  // looks for selected paragraph and reads it
+  const current = article.selected;
+  if (!current) return;
+  const array = u.inflate(current.innerText, true);
+  console.log("TTS array\n", array);
+  window.TTS.read(array);
 }
 
 function saveToDisk() {
@@ -62,33 +107,3 @@ function updateWordCount(el) {
     500
   );
 }
-
-function readSelected() {
-  // looks for selected paragraph and reads it
-  const current = article.selected;
-  if (!current) return;
-  const array = u.inflate(current.innerText, true);
-  console.log("TTS array\n", array);
-  window.TTS.read(array);
-}
-
-const startup = (function() {
-  setTimeout(() => {
-    document.querySelector(".container").classList.remove("hidden");
-    document.querySelector(".overlay").classList.add("hidden");
-    divider();
-  }, 950);
-  return Function;
-})();
-
-document.querySelector("#uploadInput").onchange = function(e) {
-  store.open(e, function(name, text) {
-    const p = new Parse(text);
-    // console.log(222, name, text);
-    const current = store.create(null, name, p.toCollection());
-    article.init(current.data);
-  });
-  // window.RE.storage.open(e, window.RE.storage.create);
-};
-
-startup();
