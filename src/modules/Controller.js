@@ -102,7 +102,10 @@ class Controller {
     footer.appendChild(g);
   }
 
-  initialize(array) {
+  initialize(array, store, article) {
+    this.store = store;
+    this.article = article;
+
     document.querySelector("#footer").innerHTML = "";
     const that = this;
     array.forEach(row => {

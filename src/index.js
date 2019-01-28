@@ -42,12 +42,13 @@ const startup = (function() {
 startup();
 
 /*
- * some UI buttons need links
- * to objects defined later
- * like the Article instance
- * or the store Object
+ * some UI buttons need links to objects defined
+ * outside the loader script, for example:
+ * the Article instance or the store Object
  *
  * These late bindings are handled here ...
+ * the default UI buttons (array) is updated
+ * to assign the callbacks with instance references
  *
  */
 const callbackHash = {
