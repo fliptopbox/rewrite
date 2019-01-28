@@ -60,6 +60,71 @@ function storage(sufix = null) {
       delete localStorage[ns];
     },
 
+    backup: (label = null) => {
+      const id = `${ns}-backup`;
+      const defaults = { averages: [], datas: [] };
+      return defer(
+        id,
+        function() {
+          const threshold = 88; // % of difference
+          const name = label || new Date().valueOf();
+          const current = localStorage[ns] || null;
+          const row = { tag: name, data: current };
+
+          let index = 0;
+          let backups = localStorage[id] || null;
+          let percent = [99];
+          let array = [row];
+
+          backups = backups ? JSON.parse(backups) : defaults;
+
+          if (backups.datas.length) {
+            index = backups.datas.length - 1;
+            const A = JSON.stringify(row);
+            const B = JSON.stringify(backups.datas.slice(-1));
+            const min = Math.min(A.length, B.length);
+            const max = Math.max(A.length, B.length);
+            const ratio = parseInt((min / max) * 100, 10);
+
+            const total = backups.averages.reduce((a, c) => a + Number(c || 0));
+            const mean = total / backups.averages.length;
+            const insertRow = (ratio / mean) * 100 < threshold;
+
+            console.log(
+              insertRow,
+              (ratio / mean) * 100,
+              threshold,
+              ratio,
+              mean,
+              total,
+              backups.averages
+            );
+
+            // if a dramatic difference is detected then add another row
+            if (insertRow) {
+              console.log("insert");
+              backups.datas.push(row);
+            } else {
+              console.log("update", index);
+              backups.averages.push(ratio);
+              backups.datas[index] = row;
+            }
+
+            percent = backups.averages.slice(-25);
+            array = backups.datas;
+          }
+
+          console.log("BACKUP [%s]", id);
+          backups = {
+            averages: percent,
+            datas: array
+          };
+          localStorage[id] = JSON.stringify(backups);
+        },
+        1000
+      );
+    },
+
     read: () => {
       const data = localStorage[ns] || null;
       const isJson = data && /^[\[\{\"]/.test(data);

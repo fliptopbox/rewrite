@@ -53,7 +53,11 @@ class Storage {
     if (!guid) return null;
 
     const localkey = filename(guid);
-    storage(localkey).write(object);
+    const local = storage(localkey);
+
+    local.write(object);
+    local.backup();
+
     this.current = { ...this.current, data: object };
     return this.current;
   }
