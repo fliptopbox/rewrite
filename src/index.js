@@ -8,7 +8,7 @@ import divider from "./modules/divider";
 
 // import PubSub from "pubsub-js";
 
-import buttons from "./modules/ui-buttons";
+import buttons from "./modules/uibuttons";
 
 import "./styles.scss";
 
@@ -44,12 +44,12 @@ startup();
 /*
  * some UI buttons need links
  * to objects defined later
- * like the Article instance 
+ * like the Article instance
  * or the store Object
  *
  * These late bindings are handled here ...
  *
-*/
+ */
 const callbackHash = {
   typewriter: toggleTypewriterMode,
   readSelected: readSelected,
@@ -58,7 +58,7 @@ const callbackHash = {
 
 buttons.map(obj => (obj.fn = callbackHash[obj.id] || obj.fn));
 
-ctrl.initialize(buttons);
+ctrl.initialize(buttons, store, article);
 
 function toggleTypewriterMode() {
   const { typewriter = false } = this.state.modifiers;
@@ -84,7 +84,6 @@ function readSelected() {
   const current = article.selected;
   if (!current) return;
   const array = u.inflate(current.innerText, true);
-  console.log("TTS array\n", array);
   window.TTS.read(array);
 }
 

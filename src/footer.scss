@@ -10,7 +10,7 @@
 
   label {
     & {
-      display: none;
+      //display: none;
       background: #000;
       margin: 0 0.1em;
       padding: 1em 2em;
@@ -19,12 +19,12 @@
     }
 
     &:first-child {
-      display: block;
+      //display: block;
     }
 
-    .showfooter & {
-      display: inline-block;
-    }
+    //.showfooter & {
+    //display: inline-block;
+    //}
 
     .hidden {
       display: none;

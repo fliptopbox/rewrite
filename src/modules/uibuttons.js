@@ -26,16 +26,6 @@ const buttons = [
   },
   { id: "gfiles", type: "group", groupId: "main", className: "hidden" },
   {
-    id: "uploadInput",
-    groupId: "gfiles",
-    type: "custom",
-    tag: "label",
-    innerHTML: `<span>upload</span><input id="uploadInput" class="hidden" type="file" accept="text/*" >`,
-    element: "#uploadInput",
-    on: "change",
-    fn: function() {}
-  },
-  {
     id: "menuItemsFont",
     groupId: "main",
     type: "button",
@@ -125,16 +115,75 @@ const buttons = [
     className: "",
     title: "Read the selected paragraph (play|pause)",
     fn: function() {}
-  },
-  {
-    id: "typewriter",
-    groupId: "main",
-    type: "button",
-    text: ">>",
-    className: "",
-    title: "Typewriter mode. Disables editing.",
-    fn: function() {}
   }
 ];
+
+buttons.push({
+  id: "uploadInput",
+  groupId: "gfiles",
+  type: "custom",
+  tag: "label",
+  innerHTML: `<span>upload</span><input id="uploadInput" class="hidden" type="file" accept="text/*" >`,
+  element: "#uploadInput",
+  on: "change",
+  fn: function() {}
+});
+
+buttons.push({
+  id: "typewriter",
+  groupId: "main",
+  type: "button",
+  text: ">>",
+  className: "",
+  title: "Typewriter mode. Disables editing.",
+  fn: function() {}
+});
+
+buttons.push({
+  id: "filesList",
+  groupId: "gfiles",
+  type: "button",
+  text: "list",
+  title: "list of files",
+  fn: function() {
+    const list = this.store.list().map(row => `${row.name} (${row.guid})`);
+    console.log(list);
+  }
+});
+
+buttons.push({
+  id: "filesRenamer",
+  groupId: "gfiles",
+  type: "button",
+  text: "rename",
+  title: "Rename current file",
+  fn: function() {}
+});
+
+buttons.push({
+  id: "filesBlank",
+  groupId: "gfiles",
+  type: "button",
+  text: "new",
+  title: "Create a new file",
+  fn: function() {}
+});
+
+buttons.push({
+  id: "filesDownload",
+  groupId: "gfiles",
+  type: "button",
+  text: "download",
+  title: "Download the current file",
+  fn: function() {}
+});
+buttons.push({
+  id: "filesExport",
+  groupId: "gfiles",
+  type: "button",
+  text: "export",
+  title: "Export as text or JSON",
+  fn: function() {}
+});
 
 export default buttons;
