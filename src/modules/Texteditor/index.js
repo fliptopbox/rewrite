@@ -114,7 +114,7 @@ class Texteditor {
 
   /*
 
-    init method is used to open of create an article.
+    init method is used to open or create an article.
     - open: document id
     - create: document string
 

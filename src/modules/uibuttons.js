@@ -139,15 +139,54 @@ buttons.push({
   fn: function() {}
 });
 
+function getList(asArray = false) {
+  const list = this.store.list();
+  const string = list.map((row, n) => `${n + 1}) ${row.name} (${row.guid})`);
+  return asArray ? list : string.join("\n");
+}
+
+buttons.push({
+  id: "filesLoad",
+  groupId: "gfiles",
+  type: "button",
+  text: "load",
+  title: "Load an existing file",
+  fn: function() {
+    const list = getList.call(this, true);
+    const string = getList.call(this, false);
+    const message = [
+      "",
+      "",
+      "0) Cancel",
+      string,
+      "",
+      "Select file index."
+    ].join("\n");
+
+    const index = window.prompt(message) || 0;
+    const value = Number(index) - 1;
+    const max = Math.min(list.length - 1, value);
+
+    if (value < 0) return;
+
+    console.log(value, max, index);
+    const guid = list[max].guid;
+    const { data } = this.store.read(guid);
+    if (!data) {
+      console.log("cant find document", index, value, guid, data);
+      return;
+    }
+    this.article.init(data);
+  }
+});
 buttons.push({
   id: "filesList",
   groupId: "gfiles",
   type: "button",
   text: "list",
-  title: "list of files",
+  title: "list of files!",
   fn: function() {
-    const list = this.store.list().map(row => `${row.name} (${row.guid})`);
-    console.log(list);
+    console.log(getList.call(this));
   }
 });
 
