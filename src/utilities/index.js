@@ -61,13 +61,20 @@ function storage(sufix = null) {
     },
 
     backup: (label = null) => {
+      /*
+       * a discreet save, and drasric change deetector
+       * if too much changes happers, a new record is
+       * created as a precaution
+       * */
+
       const id = `${ns}-backup`;
       const defaults = { averages: [], datas: [] };
+      const threshold = 100 - 22; // % of difference
+      const name = label || new Date().valueOf();
+
       return defer(
         id,
         function() {
-          const threshold = 88; // % of difference
-          const name = label || new Date().valueOf();
           const current = localStorage[ns] || null;
           const row = { tag: name, data: current };
 
@@ -90,17 +97,10 @@ function storage(sufix = null) {
             const mean = total / backups.averages.length;
             const insertRow = (ratio / mean) * 100 < threshold;
 
-            console.log(
-              insertRow,
-              (ratio / mean) * 100,
-              threshold,
-              ratio,
-              mean,
-              total,
-              backups.averages
-            );
+            console.log("INSERT", insertRow, (ratio / mean) * 100, threshold);
 
             // if a dramatic difference is detected then add another row
+            // asfasf asfasfdasfd asfasfasf asfasfasf asdfasfasf
             if (insertRow) {
               console.log("insert");
               backups.datas.push(row);
@@ -119,6 +119,7 @@ function storage(sufix = null) {
             averages: percent,
             datas: array
           };
+
           localStorage[id] = JSON.stringify(backups);
         },
         1000

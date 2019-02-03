@@ -86,6 +86,20 @@ function resize(e, value) {
   save({ width: Number(percent) });
 }
 
+const elements = {};
+function update(id, text) {
+  elements[id].innerText = text;
+  console.log("divider update [%s]", text, id);
+}
+
+function add(id) {
+  const div = document.createElement("div"); // Create a text node
+  div.id = id;
+  div.className = `divider-${id}`;
+  vertical.appendChild(div); // Append the text to <li>
+  elements[id] = div;
+}
+
 function initialize(options = {}) {
   vertical = document.querySelector("#vertical");
   A = document.querySelector(".paragraphs");
@@ -102,7 +116,7 @@ function initialize(options = {}) {
 
   console.log("resizer initialized");
 
-  return { resize, settings };
+  return { resize, settings, add, update };
 }
 
 export default initialize;

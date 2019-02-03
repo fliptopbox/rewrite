@@ -4,7 +4,7 @@ import Sentences from "./modules/Sentences";
 import Controller from "./modules/Controller";
 import Storage from "./modules/Storage/";
 import Parse from "./utilities/Parse";
-import divider from "./modules/divider";
+import dividerinit from "./modules/divider";
 
 // import PubSub from "pubsub-js";
 
@@ -12,6 +12,7 @@ import buttons from "./modules/uibuttons";
 
 import "./styles.scss";
 
+let divider;
 const store = new Storage(u.storage.bind(window));
 const article = new Article("c1", { prefix: "a" });
 const sentences = new Sentences("c2", { prefix: "s", hidden: true });
@@ -34,7 +35,8 @@ const startup = (function() {
   setTimeout(() => {
     document.querySelector(".container").classList.remove("hidden");
     document.querySelector(".overlay").classList.add("hidden");
-    divider();
+    divider = dividerinit();
+    divider.add("wordcount");
   }, 950);
   return Function;
 })();
@@ -102,7 +104,9 @@ function updateWordCount(el) {
     "wordcount",
     () => {
       const text = el.innerText;
-      console.log("WORDCOUNT", u.wordcount(text));
+      const wordcount = u.wordcount(text);
+      divider.update("wordcount", wordcount);
+      console.log("WORDCOUNT", wordcount);
     },
     500
   );

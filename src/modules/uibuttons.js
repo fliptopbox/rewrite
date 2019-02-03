@@ -155,8 +155,8 @@ buttons.push({
     const list = getList.call(this, true);
     const string = getList.call(this, false);
     const message = [
-      "",
-      "",
+      "SELECT INDEX OF FILE TO LOAD:",
+      "-----------------------------",
       "0) Cancel",
       string,
       "",
@@ -186,7 +186,14 @@ buttons.push({
   text: "list",
   title: "list of files!",
   fn: function() {
-    console.log(getList.call(this));
+    const string = getList.call(this, false);
+    const msg = `
+LIST OF FILES:
+-------------
+${string}
+      `;
+    window.alert(msg);
+    //console.log(getList.call(this));
   }
 });
 
@@ -216,6 +223,7 @@ buttons.push({
   title: "Download the current file",
   fn: function() {}
 });
+
 buttons.push({
   id: "filesExport",
   groupId: "gfiles",

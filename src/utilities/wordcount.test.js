@@ -2,8 +2,8 @@ import wordcount from "./wordcount";
 
 test("correctly calculates the word count", () => {
   let words = `
-  "one two. three four five. six. " 
-  seven. 8. nine ""
+  "one two. three four... five. six. " 
+  seven. 8.. nine ""
                              ten
   eleven ...
   

@@ -65,9 +65,15 @@
   & {
     background: rgb(44, 44, 44);
     border-color: rgb(255, 255, 255);
+    &-wordcount {
+      color: #d3d3d3;
+    }
     .dark & {
       background: rgb(0, 0, 0);
       border-color: #111;
+      &-wordcount {
+        color: #2a2a2a;
+      }
     }
   }
   &:hover {
