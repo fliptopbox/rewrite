@@ -115,7 +115,15 @@ class Storage {
 
   // rename
   // assigns a new filename to the given guid
-  rename(guid, filename) {}
+  rename(guid, filename) {
+    if (!guid) return;
+
+    const list = this.list();
+    let index = list.findIndex(r => r.guid === guid);
+    let articles = this.storage("articles");
+    list[index].name = filename;
+    articles.write(list);
+  }
 
   // delete
   // deletes the associated files by guid

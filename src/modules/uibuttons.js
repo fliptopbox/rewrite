@@ -187,11 +187,8 @@ buttons.push({
   title: "list of files!",
   fn: function() {
     const string = getList.call(this, false);
-    const msg = `
-LIST OF FILES:
--------------
-${string}
-      `;
+    const msg = ["LIST OF FILES:", "-------------", string].join("\n");
+
     window.alert(msg);
     //console.log(getList.call(this));
   }
@@ -203,7 +200,13 @@ buttons.push({
   type: "button",
   text: "rename",
   title: "Rename current file",
-  fn: function() {}
+  fn: function() {
+    const { guid, name } = this.store.current;
+    const msg = `RENAME FILE`;
+    const newname = window.prompt(msg, name) || name;
+    this.store.rename(guid, newname);
+    this.store.current.name = newname;
+  }
 });
 
 buttons.push({
