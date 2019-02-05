@@ -228,6 +228,9 @@ buttons.push({
   text: "download",
   title: "Download the current file as plainText",
   fn: function() {
+    //! this needs to parse the current file
+    //! using innerText causes double linebreaks :(
+
     const { innerText } = this.article.texteditor;
     const { current } = this.store;
     const { name, guid } = current;
