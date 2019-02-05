@@ -9,7 +9,6 @@ import dividerinit from "./modules/divider";
 // import PubSub from "pubsub-js";
 
 import buttons from "./modules/uibuttons";
-
 import "./styles.scss";
 
 let divider;
@@ -28,7 +27,8 @@ const articleText = store.initilize();
 article.init(articleText.data);
 
 window.RE = {
-  storage: store
+  storage: store,
+  article: article
 };
 
 const startup = (function() {

@@ -188,9 +188,7 @@ buttons.push({
   fn: function() {
     const string = getList.call(this, false);
     const msg = ["LIST OF FILES:", "-------------", string].join("\n");
-
     window.alert(msg);
-    //console.log(getList.call(this));
   }
 });
 
@@ -215,7 +213,10 @@ buttons.push({
   type: "button",
   text: "new",
   title: "Create a new file",
-  fn: function() {}
+  fn: function() {
+    console.log(111, this);
+    this.article.init([{}]);
+  }
 });
 
 buttons.push({
