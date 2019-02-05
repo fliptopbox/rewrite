@@ -1,3 +1,5 @@
+import download from "../utilities/download";
+
 const buttons = [
   {
     id: "menuItems",
@@ -214,7 +216,7 @@ buttons.push({
   text: "new",
   title: "Create a new file",
   fn: function() {
-    console.log(111, this);
+    const newarticle = this.store.create(null, "Untitled", [{}]);
     this.article.init([{}]);
   }
 });
@@ -224,8 +226,17 @@ buttons.push({
   groupId: "gfiles",
   type: "button",
   text: "download",
-  title: "Download the current file",
-  fn: function() {}
+  title: "Download the current file as plainText",
+  fn: function() {
+    const innerText = this.article.texteditor;
+
+    const { current } = this.store;
+    const { name, guid } = current;
+
+    console.log(222, name, guid, innerText, current);
+    const options = { id: guid, name, data: innerText, type: "text" };
+    return download(options);
+  }
 });
 
 buttons.push({
@@ -233,8 +244,13 @@ buttons.push({
   groupId: "gfiles",
   type: "button",
   text: "export",
-  title: "Export as text or JSON",
-  fn: function() {}
+  title: "Export current article as JSON",
+  fn: function() {
+    const { current } = this.store;
+    const { name, guid, data } = current;
+    const options = { name, data: current, id: guid, type: "json" };
+    return download(options);
+  }
 });
 
 export default buttons;
