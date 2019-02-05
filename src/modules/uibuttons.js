@@ -228,12 +228,9 @@ buttons.push({
   text: "download",
   title: "Download the current file as plainText",
   fn: function() {
-    const innerText = this.article.texteditor;
-
+    const { innerText } = this.article.texteditor;
     const { current } = this.store;
     const { name, guid } = current;
-
-    console.log(222, name, guid, innerText, current);
     const options = { id: guid, name, data: innerText, type: "text" };
     return download(options);
   }

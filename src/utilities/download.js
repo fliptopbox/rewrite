@@ -11,7 +11,7 @@ function download(object) {
   const { name, id, data, type = "json" } = object;
   const [mime, ext] = mimes[type];
   const filename = `${name}-${id}`;
-  const text = JSON.stringify(data);
+  const text = type === "json" ? JSON.stringify(data) : data;
 
   const element = document.createElement("a");
   const payload = encodeURIComponent(text);
