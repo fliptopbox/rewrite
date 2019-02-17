@@ -130,11 +130,23 @@ const buttons = [
 ];
 
 buttons.push({
+  id: "filesBlank",
+  groupId: "actions",
+  type: "li",
+  text: "New",
+  title: "Create a new file",
+  fn: function() {
+    const newarticle = this.store.create(null, "Untitled", [{}]);
+    this.article.init([{}]);
+  }
+});
+
+buttons.push({
   id: "uploadInput",
-  groupId: "gfiles",
+  groupId: "actions",
   type: "custom",
-  tag: "label",
-  innerHTML: `<span>upload</span><input id="uploadInput" class="hidden" type="file" accept="text/*" >`,
+  tag: "li",
+  innerHTML: `<label for="uploadInput"><span>Open</span><input id="uploadInput" class="hidden" type="file" accept="text/*" ></label>`,
   element: "#uploadInput",
   on: "change",
   fn: function() {}
@@ -145,80 +157,6 @@ function getList(asArray = false) {
   const string = list.map((row, n) => `${n + 1}) ${row.name} (${row.guid})`);
   return asArray ? list : string.join("\n");
 }
-
-buttons.push({
-  id: "filesLoad",
-  groupId: "gfiles",
-  type: "button",
-  text: "load",
-  title: "Load an existing file",
-  fn: function() {
-    const list = getList.call(this, true);
-    const string = getList.call(this, false);
-    const message = [
-      "SELECT INDEX OF FILE TO LOAD:",
-      "-----------------------------",
-      "0) Cancel",
-      string,
-      "",
-      "Select file index."
-    ].join("\n");
-
-    const index = window.prompt(message) || 0;
-    const value = Number(index) - 1;
-    const max = Math.min(list.length - 1, value);
-
-    if (value < 0) return;
-
-    console.log(value, max, index);
-    const guid = list[max].guid;
-    const { data } = this.store.read(guid);
-    if (!data) {
-      console.log("cant find document", index, value, guid, data);
-      return;
-    }
-    this.article.init(data);
-  }
-});
-buttons.push({
-  id: "filesList",
-  groupId: "gfiles",
-  type: "button",
-  text: "list",
-  title: "list of files!",
-  fn: function() {
-    const string = getList.call(this, false);
-    const msg = ["LIST OF FILES:", "-------------", string].join("\n");
-    window.alert(msg);
-  }
-});
-
-buttons.push({
-  id: "filesRenamer",
-  groupId: "gfiles",
-  type: "button",
-  text: "rename",
-  title: "Rename current file",
-  fn: function() {
-    const { guid, name } = this.store.current;
-    const msg = `RENAME FILE`;
-    const newname = window.prompt(msg, name) || name;
-    this.store.rename(guid, newname);
-    this.store.current.name = newname;
-  }
-});
-
-buttons.push({
-  id: "filesBlank",
-  groupId: "gfiles",
-  type: "button",
-  text: "new",
-  title: "Create a new file",
-  fn: function() {
-    const newarticle = this.store.create(null, "Untitled", [{}]);
-    this.article.init([{}]);
-  }
-});
 
 buttons.push({
   id: "filesDownload",

@@ -1,3 +1,4 @@
+import React from "react";
 import u from "../utilities/";
 const { read, write } = u.storage("settings");
 
@@ -64,7 +65,7 @@ class Controller {
 
     elm.id = id;
     elm.setAttribute("title", title);
-    elm.innerHTML = `<span>${text}</span>`;
+    elm.innerHTML = `<span >${text}</span>`;
     elm.onclick = fn.bind(this);
 
     group.appendChild(elm);
@@ -101,48 +102,6 @@ class Controller {
     g.id = id;
     g.className = "group group-" + groupId + " " + className;
     group.appendChild(g);
-  }
-
-  getFileRow(object) {
-    const { guid, name, words = 1234, modified = 123123123 } = object;
-    const row = `
-                <span class="file-name" data-guid="${guid}">
-                    <span>${name}</span>
-                    <a href="#">edit</a>
-                </span>
-                <div class="file-meta">
-                    <a href="#delete">del</a>
-                    <i class="file-words">${words} words </i>
-                    <i class="file-modified">${modified}</i> 
-                    <i class="file-exports">
-                        <a href="#">txt</a>
-                        <a href="#">json</a>
-                    </i>
-                </div>`;
-    return row;
-  }
-
-  getFileList() {
-    // load the articles from storage
-    let li = "";
-    const array = this.store.list().map((row, n) => {
-      li = this.getFileRow(row);
-      return `<li id="${row.guid}">${li}</li>`;
-    });
-    const files = document.querySelector("#files");
-    files.innerHTML = array.join("");
-    files.onclick = e => {
-      const { target, dataset, id, current } = e;
-      const { parentNode } = target;
-      const guid = parentNode.id;
-      console.log(target, parentNode.id);
-      const { data } = this.store.read(guid);
-      if (!data) {
-        console.log("cant find document", index, value, guid, data);
-        return;
-      }
-      this.article.init(data);
-    };
   }
 
   initialize(array, store, article) {

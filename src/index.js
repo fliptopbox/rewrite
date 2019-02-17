@@ -1,9 +1,12 @@
 import u from "./utilities/";
+import React from "react";
+import ReactDOM from "react-dom";
 import Article from "./modules/Article";
 import Sentences from "./modules/Sentences";
 import Controller from "./modules/Controller";
 import Storage from "./modules/Storage/";
 import Parse from "./utilities/Parse";
+import Sidebar from "./modules/Sidebar/";
 import dividerinit from "./modules/divider";
 
 // import PubSub from "pubsub-js";
@@ -41,6 +44,10 @@ const startup = (function() {
   return Function;
 })();
 
+// Sidebar is a React component
+const sidebar = document.querySelector("#sidebar");
+ReactDOM.render(<Sidebar store={store} article={article} />, sidebar);
+
 startup();
 
 /*
@@ -53,16 +60,17 @@ startup();
  * to assign the callbacks with instance references
  *
  */
-const callbackHash = {
-  typewriter: toggleTypewriterMode,
-  readSelected: readSelected,
-  uploadInput: importAndOpen
-};
 
-buttons.map(obj => (obj.fn = callbackHash[obj.id] || obj.fn));
+// const callbackHash = {
+//   typewriter: toggleTypewriterMode,
+//   readSelected: readSelected,
+//   uploadInput: importAndOpen
+// };
 
-ctrl.initialize(buttons, store, article);
-ctrl.getFileList();
+// buttons.map(obj => (obj.fn = callbackHash[obj.id] || obj.fn));
+
+// ctrl.initialize(buttons, store, article);
+// ctrl.getFileList();
 
 function toggleTypewriterMode() {
   const { typewriter = false } = this.state.modifiers;
@@ -80,6 +88,7 @@ function importAndOpen(e) {
     const p = new Parse(text);
     const current = store.create(null, name, p.toCollection());
     article.init(current.data);
+    ctrl.getFileList();
   });
 }
 
