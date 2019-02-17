@@ -125,7 +125,7 @@ class Storage {
     articles.write(list);
   }
 
-  // delete
+  // delete this is a test
   // deletes the associated files by guid
   delete(guid) {
     if (!guid) return false;

@@ -19,12 +19,7 @@
     }
 
     &:first-child {
-      //display: block;
     }
-
-    //.showfooter & {
-    //display: inline-block;
-    //}
 
     .hidden {
       display: none;
@@ -39,11 +34,14 @@
 #fontvalue {
   position: absolute;
   right: 0;
-  color: white;
   top: 0;
-  font-size: 1.6em;
-  margin: 0.5em;
+  font-size: 1em;
+  margin: 0.5em 1.5em;
+  &:after {
+    content: " px";
+  }
 }
+
 #fontsize {
   vertical-align: middle;
   padding: 0;

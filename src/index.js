@@ -62,6 +62,7 @@ const callbackHash = {
 buttons.map(obj => (obj.fn = callbackHash[obj.id] || obj.fn));
 
 ctrl.initialize(buttons, store, article);
+ctrl.getFileList();
 
 function toggleTypewriterMode() {
   const { typewriter = false } = this.state.modifiers;

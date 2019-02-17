@@ -101,6 +101,10 @@ function add(id) {
 }
 
 function initialize(options = {}) {
+  const body = document.querySelector("body");
+  let showsidebar = body.classList.contains("show-sidebar");
+  const zone = [3, 500]; // mouse trigger region
+
   vertical = document.querySelector("#vertical");
   A = document.querySelector(".paragraphs");
   B = document.querySelector(".sentences");
@@ -109,9 +113,27 @@ function initialize(options = {}) {
   vertical.ondblclick = e => resize(e, 50);
 
   window.onmouseup = () => (dragging = false);
-  window.onmousemove = resize;
+  window.onmousemove = e => {
+    const { pageX } = e;
+    resize(e);
 
-  //   save(options);
+    // sidebar stuff
+    showsidebar = body.classList.contains("show-sidebar");
+    if (pageX > zone[1]) {
+      return body.classList.remove("show-sidebar");
+    }
+
+    if (pageX < zone[0] || (showsidebar && pageX < zone[1])) {
+      body.classList.add("show-sidebar");
+      u.defer(
+        "sidebar",
+        () => (pageX > zone[1] ? body.classList.remove("show-sidebar") : null),
+        500
+      );
+    }
+  };
+
+  // save(options);
   resize(null, state.width);
 
   console.log("resizer initialized");

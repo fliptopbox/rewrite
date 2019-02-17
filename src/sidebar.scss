@@ -1,0 +1,65 @@
+.sidebar {
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  border: 1px solid #333;
+  background: #d2d2d2;
+  color: #333;
+  padding: 0;
+  margin: 0.21em;
+  font-size: 18px;
+  border-radius: 5px;
+  max-width: 400px;
+  width: 100%;
+  display: none;
+
+  .show-sidebar & {
+    display: block;
+  }
+
+  ul:first-child {
+    padding-top: 30px;
+  }
+
+  ul {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+  }
+
+  li {
+    cursor: pointer;
+    position: relative;
+    display: block;
+    list-style: none;
+    margin: 2px 0px;
+    padding: 12px 32px;
+  }
+}
+
+.file {
+  &-meta {
+    font-size: 0.6em;
+  }
+  &-name {
+    display: block;
+  }
+}
+
+#fontvalue {
+  position: absolute;
+  right: 0;
+  top: 0;
+  font-size: 1em;
+  margin: 0.5em 1.5em;
+  &:after {
+    content: " px";
+  }
+}
+
+#fontsize {
+  vertical-align: middle;
+  padding: 0;
+  margin: 0;
+}
