@@ -1,0 +1,49 @@
+#footer {
+  position: fixed;
+  bottom: 0;
+  z-index: 9;
+  font-size: 10px;
+  left: 0;
+  right: auto;
+  top: auto;
+  margin: 1em;
+
+  label {
+    & {
+      //display: none;
+      background: #000;
+      margin: 0 0.1em;
+      padding: 1em 2em;
+      color: white;
+      position: relative;
+    }
+
+    &:first-child {
+    }
+
+    .hidden {
+      display: none;
+    }
+    &.fontsize {
+      margin: 0;
+      padding: 0 4em 0 1.5em;
+    }
+  }
+}
+
+#fontvalue {
+  position: absolute;
+  right: 0;
+  top: 0;
+  font-size: 1em;
+  margin: 0.5em 1.5em;
+  &:after {
+    content: " px";
+  }
+}
+
+#fontsize {
+  vertical-align: middle;
+  padding: 0;
+  margin: 0;
+}

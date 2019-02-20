@@ -1,0 +1,26 @@
+.overlay {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-image: radial-gradient(#333, #111);
+  display: flex;
+}
+
+.brand {
+  flex: 1 0;
+  align-self: center;
+}
+
+.brand img {
+  width: 350px;
+  height: 114px;
+  padding: 0 10px 0 20px;
+  display: block;
+  background: white;
+  text-align: center;
+  margin: 0 auto;
+  border-radius: 2px;
+  box-shadow: 0 16px 50px 0 #000;
+}

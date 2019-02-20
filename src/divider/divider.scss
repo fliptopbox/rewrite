@@ -1,0 +1,62 @@
+$left: 65%;
+$scroll-bar-width: 22px;
+
+.document {
+  width: $left;
+}
+.sentences {
+  width: 100 - $left;
+}
+.action {
+  li {
+    cursor: pointer;
+  }
+}
+
+.divider {
+  width: 6px;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: auto;
+  left: $left;
+  background: transparent;
+  cursor: ew-resize;
+
+  &.hide-menu {
+    &-left .left,
+    &-right .right {
+      display: none;
+    }
+  }
+
+  &:hover {
+    background: #000;
+  }
+
+  .left,
+  .right {
+    list-style-type: none;
+    position: absolute;
+    margin: 0 10px;
+    padding: 0;
+
+    li {
+      text-align: center;
+      display: block;
+      border-top: 1px solid;
+      margin: 10px;
+      padding: 10px 0 0;
+      &:first-child {
+        margin: 0;
+        border: none;
+      }
+    }
+  }
+  .left {
+    right: $scroll-bar-width;
+  }
+  .right {
+    left: 0;
+  }
+}
