@@ -190,22 +190,23 @@ class Sidebar extends React.Component {
                 <span className="file-name" data-guid={guid}>
                     <ToggleToInput name={name} guid={guid} store={store} />
                 </span>
-                <div className="file-meta">
-                    <a
-                        href="#delete"
-                        onClick={e => {
-                            e.stopPropagation();
-                            this.handleDelete(guid);
-                        }}>
-                        del
-                    </a>
-                    <i className="file-words">{words} words </i>
-                    <i className="file-modified">{opened}</i>
-                    <i className="file-exports">
-                        <a href="#txt">txt</a>
-                        <a href="#json">json</a>
-                    </i>
-                </div>
+                <ul className="file-meta">
+                    <li>
+                        <a
+                            href="#delete"
+                            onClick={e => {
+                                e.stopPropagation();
+                                this.handleDelete(guid);
+                            }}>
+                            del
+                        </a>
+                    </li>
+                    <li className="file-words">{words} words </li>
+                    <li className="file-modified">{opened}</li>
+                    <li className="file-exports">
+                        <a href="#txt">txt</a> | <a href="#json">json</a>
+                    </li>
+                </ul>
             </div>
         );
     }
