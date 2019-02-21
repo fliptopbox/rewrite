@@ -113,8 +113,15 @@ class Sidebar extends React.Component {
     }
 
     getArticles() {
+        const current = 'a0123456789abcde';
         const files = this.state.articles.map(obj => {
-            return this.getFileRow(obj);
+            const row = this.getFileRow(obj);
+            const selected = obj.guid === current ? 'selected' : '';
+            return (
+                <li key={obj.guid} className={selected}>
+                    {row}
+                </li>
+            );
         });
 
         return <ul>{files}</ul>;
@@ -164,15 +171,15 @@ class Sidebar extends React.Component {
         const { guid, name, words = 1234, opened } = object;
         const { store, article } = this.props;
         return (
-            <li
-                key={guid}
+            <div
+                className="inner"
                 onClick={() => {
                     const fileObj = store.read(guid);
                     const { data } = fileObj;
 
                     return article.init(data);
                 }}>
-                <span className="file-name" data-guid="{guid}">
+                <span className="file-name" data-guid={guid}>
                     <ToggleToInput name={name} guid={guid} store={store} />
                 </span>
                 <div className="file-meta">
@@ -191,7 +198,7 @@ class Sidebar extends React.Component {
                         <a href="#json">json</a>
                     </i>
                 </div>
-            </li>
+            </div>
         );
     }
 
@@ -228,7 +235,11 @@ class Sidebar extends React.Component {
     getOnOff(name) {
         const { modifiers } = this.state;
         const bool = modifiers[name];
-        return bool ? '--o' : 'o--';
+        return bool ? (
+            <i className="icon-boolean-true" />
+        ) : (
+            <i className="icon-boolean-false" />
+        );
     }
 
     render() {
@@ -236,70 +247,98 @@ class Sidebar extends React.Component {
         return (
             <div>
                 <ul>
-                    <li
-                        onClick={() => {
-                            this.props.store.create(null, 'Untitled', [{}]);
-                            this.props.article.init([{}]);
-                            return;
-                        }}>
-                        New
+                    <li>
+                        <div
+                            className="inner"
+                            onClick={() => {
+                                this.props.store.create(null, 'Untitled', [{}]);
+                                this.props.article.init([{}]);
+                                return;
+                            }}>
+                            New
+                        </div>
                     </li>
                     <li>
-                        <label htmlFor="uploadInput">
-                            <span>Open</span>
-                            <input
-                                id="uploadInput"
-                                className="hidden"
-                                onChange={this.handleImport}
-                                type="file"
-                                accept="text/*"
-                            />
-                        </label>
+                        <div className="inner">
+                            <label htmlFor="uploadInput">
+                                <span>Open</span>
+                                <input
+                                    id="uploadInput"
+                                    className="hidden"
+                                    onChange={this.handleImport}
+                                    type="file"
+                                    accept="text/*"
+                                />
+                            </label>
+                        </div>
                     </li>
-                    <li>Save</li>
+                    <li>
+                        <div className="inner">Save</div>
+                    </li>
                 </ul>
                 <hr />
                 {articleList}
                 <hr />
-                <ul>
-                    <li
-                        onClick={() => {
-                            this.toggleClassName('dark');
-                        }}>
-                        Toggle dark theme ({this.getOnOff('dark')})
-                    </li>
-                    <li
-                        onClick={() => {
-                            this.toggleClassName('collapsed');
-                        }}>
-                        Collapse lines ({this.getOnOff('collapsed')})
-                    </li>
-                    <li
-                        onClick={() => {
-                            this.toggleClassName('strikethrough');
-                        }}>
-                        Strike through ({this.getOnOff('strikethrough')})
-                    </li>
-                    <li
-                        onClick={() => {
-                            const { article } = this.props;
-                            const bool = this.toggleClassName('typewriter');
-
-                            let forward = article.typewriter(bool);
-                            forward = bool === undefined ? !forward : forward;
-                            article.typewriter(forward);
-                        }}>
-                        Typewiter mode ({this.getOnOff('typewriter')})
+                <ul className="settings">
+                    <li>
+                        <div
+                            className="inner"
+                            onClick={() => {
+                                this.toggleClassName('dark');
+                            }}>
+                            <strong>Toggle dark theme</strong>
+                            <em>{this.getOnOff('dark')}</em>
+                        </div>
                     </li>
                     <li>
-                        <span>Font size</span>
-                        {[
-                            this.state.values.fontsize,
-                            'px',
-                            '/',
-                            u.points(this.state.values.fontsize),
-                            'pt',
-                        ].join('')}
+                        <div
+                            className="inner"
+                            onClick={() => {
+                                this.toggleClassName('collapsed');
+                            }}>
+                            <strong>Collapse lines</strong>
+                            <em>{this.getOnOff('collapsed')}</em>
+                        </div>
+                    </li>
+                    <li>
+                        <div
+                            className="inner"
+                            onClick={() => {
+                                this.toggleClassName('strikethrough');
+                            }}>
+                            <strong>Strike</strong>
+                            <em>{this.getOnOff('strikethrough')}</em>
+                        </div>
+                    </li>
+                    <li>
+                        <div
+                            className="inner"
+                            onClick={() => {
+                                const { article } = this.props;
+                                const bool = this.toggleClassName('typewriter');
+
+                                let forward = article.typewriter(bool);
+                                forward =
+                                    bool === undefined ? !forward : forward;
+                                article.typewriter(forward);
+                            }}>
+                            <strong>Typewriter mode</strong>
+                            <em>{this.getOnOff('typewriter')}</em>
+                        </div>
+                    </li>
+                    <li className="no-underline">
+                        <div className="inner">
+                            <strong>Font size</strong>
+                            <em>
+                                {[
+                                    this.state.values.fontsize,
+                                    'px',
+                                    '/',
+                                    u.points(this.state.values.fontsize),
+                                    'pt',
+                                ].join('')}
+                            </em>
+                        </div>
                         <input
                             type="range"
                             id="fontsize"
@@ -313,7 +352,9 @@ class Sidebar extends React.Component {
                             }}
                         />
                     </li>
-                    <li>Read paragraph</li>
+                    <li>
+                        <div className="inner">Read paragraph</div>
+                    </li>
                 </ul>
             </div>
         );

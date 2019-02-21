@@ -3,16 +3,17 @@
     left: 0;
     top: 0;
     bottom: 0;
-    border: 1px solid #333;
-    background: #d2d2d2;
-    color: #333;
+    border: 1px solid #8a8a8a;
+    background: #090909;
+    color: #9c9c9c;
     padding: 0;
-    margin: 0.21em;
+    margin: 0.5em;
     font-size: 18px;
-    border-radius: 5px;
+    border-radius: 4px;
     max-width: 340px;
     width: 100%;
     display: none;
+    box-shadow: 11px 0 20px 2px rgba(0, 0, 0, 0.6);
 
     .file-name input {
         width: 100%;
@@ -55,8 +56,64 @@
         position: relative;
         display: block;
         list-style: none;
-        margin: 2px 0px;
-        padding: 12px 32px;
+        margin: 2px 8px;
+        padding: 12px 0;
+
+        &.selected {
+            background: #e4e4e4;
+            color: #383838;
+            &::before {
+                display: none;
+            }
+        }
+
+        .inner {
+            padding: 0 1.2em;
+        }
+
+        strong,
+        em {
+            display: block;
+            font-style: normal;
+            font-weight: normal;
+        }
+        em {
+            margin: 0.5em 1.5em;
+            position: absolute;
+            color: #fff;
+            right: 0;
+            top: 0;
+        }
+    }
+}
+
+.icon {
+    &-boolean {
+        &-true,
+        &-false {
+            background: #fff;
+            border-radius: 1em;
+            position: relative;
+            display: inline-block;
+            margin: 0.025em;
+            padding: 0.025em;
+        }
+        &-true::before,
+        &-false::after {
+            content: ' ';
+            border-radius: 1em;
+            height: 1em;
+            width: 1em;
+            display: block;
+            background: #000;
+            margin: 0.12em;
+        }
+        &-true::before {
+            margin-left: 1.8em;
+        }
+        &-false::after {
+            margin-right: 1.8em;
+        }
     }
 }
 
@@ -84,4 +141,21 @@
     vertical-align: middle;
     padding: 0;
     margin: 0;
+}
+
+.settings {
+    li {
+        border-bottom: 2px solid #333;
+        &.no-underline {
+            border: none;
+            padding-bottom: 0;
+            margin-bottom: -6px;
+        }
+    }
+}
+
+hr {
+    display: block;
+    border: 1px solid #232323;
+    border-width: 1px 0 0 0;
 }
