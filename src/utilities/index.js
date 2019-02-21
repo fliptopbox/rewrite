@@ -16,6 +16,7 @@ import uuid from './uuid';
 import wordcount from './wordcount';
 import backupRestore from './backupRestore';
 import points from './points';
+import elapsed from './elapsed';
 
 export default {
     alert,
@@ -27,6 +28,7 @@ export default {
     collectionToHtml,
     deepEqual,
     defer,
+    elapsed,
     download,
     focusOn,
     htmlToCollection,

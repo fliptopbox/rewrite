@@ -1,5 +1,5 @@
 function interval(then, now = null) {
-    const parts = then.toString().split(/[\s\:]/g); //?
+    const parts = then.toString().split(/[\s:]/g); //?
 
     then = then.valueOf();
     now = now || new Date().valueOf();
@@ -56,10 +56,6 @@ function isDate(value) {
 }
 
 function elapsed(then, now = null) {
-    then = new Date(then); //?
-    now = now || new Date(); // ?
-    now - then; //?
-
     // integrity check dates, and if "then" date is in the future
     if (!isDate(then) || !isDate(now) || then > now) return null;
 
@@ -100,11 +96,7 @@ function elapsed(then, now = null) {
                 result = `${e.diff} hours ago`;
                 break;
             }
-            // the day changes after midnight
-            // const when =
-            //     now.getDay() - then.getDay() === 0 ? 'Today' : 'Yesterday';
-            // result = `${when} at ${e.time}`;
-            // break;
+
             result = `At ${e.time}`;
             break;
 
@@ -115,6 +107,7 @@ function elapsed(then, now = null) {
             }
             result = `${e.weekday} at ${e.time}`;
             break;
+
         case 'week':
             if (e.diff < 2) {
                 result = `Last ${e.weekday} at ${e.time}`;
@@ -122,19 +115,18 @@ function elapsed(then, now = null) {
             }
             result = `${e.weekday} ${e.day} ${e.month} at ${e.time}`;
             break;
+
         case 'month':
-            console.log(111111111111, e.year);
             if (Number(e.year) === now.getFullYear()) {
                 result = `${e.weekday} ${e.day} ${e.month} at ${e.time}`;
                 break;
             }
 
+        // eslint-disable-next-line
         default:
             result = `${e.day} ${e.month} ${e.year} ${e.time}`;
             break;
     }
-    e.diff; //?
-    e.name; //?
     return result;
 }
 

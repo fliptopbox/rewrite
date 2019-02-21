@@ -12,7 +12,6 @@ test('elapsed time expressed as phrases', () => {
     // Thu Jan 01 1970 01:00:00 GMT+0100 (Greenwich Mean Time)
     lastmodified = new Date(1970, 0, 1, 1, 0, 0);
     currentdate = new Date(1970, 0, 1, 1, 0, 0);
-    console.log(lastmodified.toString());
 
     currentdate = new Date(1000 * 5);
     expect(elapsed(lastmodified, currentdate)).toBe('Now');
