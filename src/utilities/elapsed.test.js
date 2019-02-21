@@ -9,6 +9,10 @@ test('elapsed time expressed as phrases', () => {
     expect(elapsed(0)).not.toBeNull();
     expect(elapsed(0, 'asdf')).toBeNull();
 
+    // alt date value
+    expect(elapsed(Number('1550522297418'))).not.toBeNull();
+    expect(elapsed('1550522297418')).not.toBeNull();
+
     // Thu Jan 01 1970 01:00:00 GMT+0100 (Greenwich Mean Time)
     lastmodified = new Date(1970, 0, 1, 1, 0, 0);
     currentdate = new Date(1970, 0, 1, 1, 0, 0);

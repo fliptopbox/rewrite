@@ -57,6 +57,8 @@ function isDate(value) {
 
 function elapsed(then, now = null) {
     // integrity check dates, and if "then" date is in the future
+    now = now || new Date();
+    then = typeof then === 'string' ? new Date(Number(then)) : new Date(then);
     if (!isDate(then) || !isDate(now) || then > now) return null;
 
     //   quick diff ...

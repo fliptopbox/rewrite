@@ -202,7 +202,7 @@ class Sidebar extends React.Component {
                         </a>
                     </li>
                     <li className="file-words">{words} words </li>
-                    <li className="file-modified">{opened}</li>
+                    <li className="file-modified">{u.elapsed(opened)}</li>
                     <li className="file-exports">
                         <a href="#txt">txt</a> | <a href="#json">json</a>
                     </li>
