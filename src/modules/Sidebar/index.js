@@ -26,17 +26,25 @@ class ToggleToInput extends React.Component {
         this.setState({ edit: false, name: value, original: value });
     };
 
+    toggleEditAndFocus = () => {
+        this.setState({ edit: true });
+        const { guid } = this.state;
+        setTimeout(() => document.querySelector(`#${guid}`).focus(), 150);
+    };
+
     render() {
-        const { name, edit } = this.state;
+        const { name, edit, guid } = this.state;
         return !edit ? (
             <span
                 className="file-toggle-input"
-                onClick={() => this.setState({ edit: true })}>
+                onClick={this.toggleEditAndFocus}>
                 {name}
             </span>
         ) : (
             <input
+                id={guid}
                 type="text"
+                tabIndex="0"
                 value={name}
                 onBlur={() => this.rename()}
                 onChange={e => {
