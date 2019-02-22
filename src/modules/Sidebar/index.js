@@ -1,7 +1,6 @@
 import React from 'react';
 import Parse from '../../utilities/Parse';
 import u from '../../utilities/';
-
 const { read, write } = u.storage('settings');
 
 class ToggleToInput extends React.Component {
@@ -26,7 +25,8 @@ class ToggleToInput extends React.Component {
         this.setState({ edit: false, name: value, original: value });
     };
 
-    toggleEditAndFocus = () => {
+    toggleEditAndFocus = e => {
+        e.stopPropagation();
         this.setState({ edit: true });
         const { guid } = this.state;
         setTimeout(() => document.querySelector(`#${guid}`).focus(), 150);
@@ -50,6 +50,7 @@ class ToggleToInput extends React.Component {
                 onChange={e => {
                     this.setState({ name: e.target.value });
                 }}
+                onClick={e => e.stopPropagation()}
                 onKeyDown={e => {
                     let { key } = e;
                     let reset = false;
@@ -73,6 +74,7 @@ class Sidebar extends React.Component {
         super();
         this.state = {
             articles: [],
+            current: null,
             modifiers: {
                 collapsed: true,
                 strikethrough: true,
@@ -87,13 +89,14 @@ class Sidebar extends React.Component {
 
     componentDidMount() {
         // update with persisted data
-        const { store } = this.props;
         const local = read();
-        const articles = store.list();
+        const articles = this.getUpdatedArticles();
+        const previous = u.storage('previous').read();
         const state = {
             ...this.state,
             articles,
             ...local,
+            previous: previous,
         };
 
         // remember setState can lag!
@@ -112,6 +115,53 @@ class Sidebar extends React.Component {
             const value = state.values[key];
             this[key] && this[key](value);
         }
+
+        this.registerMouseEvent();
+    }
+
+    getUpdatedArticles() {
+        const { store } = this.props;
+        const articles = store.list();
+        return articles;
+    }
+
+    registerMouseEvent() {
+        const body = document.querySelector('body');
+        const sidebar = document.querySelector('#sidebar');
+        const zone = [3, sidebar.offsetWidth + 50]; // mouse trigger region
+        let showsidebar = body.classList.contains('show-sidebar');
+
+        this.props.mouse(null, 'move', e => {
+            const { pageX } = e;
+            zone[1] = sidebar.offsetWidth + 50;
+
+            showsidebar = body.classList.contains('show-sidebar');
+            if (pageX > zone[1]) {
+                body.classList.add('sidebar-close');
+                u.defer(
+                    'animate',
+                    () => {
+                        body.classList.remove('sidebar-close');
+                        body.classList.remove('show-sidebar');
+                    },
+                    250
+                );
+            }
+
+            if (pageX < zone[0] || (showsidebar && pageX < zone[1])) {
+                // refresh the articles list
+                this.setState({ articles: this.getUpdatedArticles() });
+                body.classList.add('show-sidebar');
+                u.defer(
+                    'sidebar',
+                    () =>
+                        pageX > zone[1]
+                            ? body.classList.remove('show-sidebar')
+                            : null,
+                    500
+                );
+            }
+        });
     }
 
     fontsize(value) {
@@ -120,11 +170,27 @@ class Sidebar extends React.Component {
         setTimeout(this.save, 250);
     }
 
+    updatePrevious = previous => {
+        this.setState({ previous });
+        u.storage('previous').write(previous);
+
+        this.toggleClassName('sidebar-close', true);
+        u.defer(
+            'animate',
+            () => {
+                this.toggleClassName('sidebar-close', false);
+                this.toggleClassName('show-sidebar', false);
+            },
+            650
+        );
+    };
+
     getArticles() {
-        const current = 'a0123456789abcde';
+        const { previous } = this.state;
         const files = this.state.articles.map(obj => {
-            const row = this.getFileRow(obj);
-            const selected = obj.guid === current ? 'selected' : '';
+            const row = this.getFileRow(obj, this.updatePrevious);
+            const selected = obj.guid === previous ? 'selected' : '';
+
             return (
                 <li key={obj.guid} className={selected}>
                     {row}
@@ -175,7 +241,7 @@ class Sidebar extends React.Component {
         );
     };
 
-    getFileRow(object) {
+    getFileRow(object, updatePrevious) {
         const { guid, name, words = 1234, opened } = object;
         const { store, article } = this.props;
         return (
@@ -184,6 +250,7 @@ class Sidebar extends React.Component {
                 onClick={() => {
                     const fileObj = store.read(guid);
                     const { data } = fileObj;
+                    updatePrevious(guid);
 
                     return article.init(data);
                 }}>
@@ -212,7 +279,7 @@ class Sidebar extends React.Component {
     }
 
     toggleClassName(string, value = null, selector = 'body') {
-        const { modifiers } = this.state;
+        const { modifiers, values } = this.state;
         const element = document.querySelector(selector);
 
         let toggle = null;
@@ -221,11 +288,13 @@ class Sidebar extends React.Component {
 
         const method = toggle ? 'add' : 'remove';
 
-        modifiers[string] = toggle;
         element.classList[method](string);
 
-        this.setState({ modifiers });
-        this.save();
+        if (string in modifiers || string in values) {
+            modifiers[string] = toggle;
+            this.setState({ modifiers });
+            this.save();
+        }
 
         return toggle;
     }
@@ -315,7 +384,7 @@ class Sidebar extends React.Component {
                             onClick={() => {
                                 this.toggleClassName('strikethrough');
                             }}>
-                            <strong>Strike</strong>
+                            <strong>Strike through</strong>
                             <em>{this.getOnOff('strikethrough')}</em>
                         </div>
                     </li>

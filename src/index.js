@@ -14,6 +14,19 @@ import dividerinit from './modules/divider';
 // import buttons from "./modules/uibuttons";
 import './styles.scss';
 
+const mouseEvents = {
+    up: [],
+    move: [],
+};
+
+function mouse(e, method, fn) {
+    if (fn) return mouseEvents[method].push(fn);
+    mouseEvents[method].forEach(callback => callback(e));
+}
+
+window.onmouseup = e => mouse(e, 'up');
+window.onmousemove = e => mouse(e, 'move');
+
 let divider;
 const store = new Storage(u.storage.bind(window));
 const article = new Article('c1', { prefix: 'a' });
@@ -38,7 +51,7 @@ const startup = (function() {
     setTimeout(() => {
         document.querySelector('.container').classList.remove('hidden');
         document.querySelector('.overlay').classList.add('hidden');
-        divider = dividerinit();
+        divider = dividerinit(mouse);
         divider.add('wordcount');
     }, 950);
     return Function;
@@ -46,7 +59,10 @@ const startup = (function() {
 
 // Sidebar is a React component
 const sidebar = document.querySelector('#sidebar');
-ReactDOM.render(<Sidebar store={store} article={article} />, sidebar);
+ReactDOM.render(
+    <Sidebar store={store} article={article} mouse={mouse} />,
+    sidebar
+);
 
 // Use react to prevent start-up lag
 const overlay = document.querySelector('#overlay');
@@ -74,6 +90,8 @@ function saveToDisk() {
     const children = article.texteditor.children;
     const data = new Parse(children).toCollection();
     store.write(data);
+
+    console.log(article);
 
     // update wordcount
     updateWordCount(article.texteditor);

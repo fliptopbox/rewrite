@@ -22,6 +22,8 @@ let state = Object.assign(
 function save(obj = {}) {
     const prev = read(); // remember Controller also saves settings
     const data = { ...state, ...prev, ...obj };
+    delete obj.minWidth;
+    delete obj.threshold;
     write(data);
     return data;
 }
@@ -100,11 +102,7 @@ function add(id) {
     elements[id] = div;
 }
 
-function initialize(options = {}) {
-    const body = document.querySelector('body');
-    let showsidebar = body.classList.contains('show-sidebar');
-    const zone = [3, 500]; // mouse trigger region
-
+function initialize(mouse) {
     vertical = document.querySelector('#vertical');
     A = document.querySelector('.paragraphs');
     B = document.querySelector('.sentences');
@@ -112,29 +110,8 @@ function initialize(options = {}) {
     vertical.onmousedown = () => (dragging = true);
     vertical.ondblclick = e => resize(e, 50);
 
-    window.onmouseup = () => (dragging = false);
-    window.onmousemove = e => {
-        const { pageX } = e;
-        resize(e);
-
-        // sidebar stuff
-        showsidebar = body.classList.contains('show-sidebar');
-        if (pageX > zone[1]) {
-            return body.classList.remove('show-sidebar');
-        }
-
-        if (pageX < zone[0] || (showsidebar && pageX < zone[1])) {
-            body.classList.add('show-sidebar');
-            u.defer(
-                'sidebar',
-                () =>
-                    pageX > zone[1]
-                        ? body.classList.remove('show-sidebar')
-                        : null,
-                500
-            );
-        }
-    };
+    mouse(null, 'up', () => (dragging = false));
+    mouse(null, 'move', resize);
 
     // save(options);
     resize(null, state.width);

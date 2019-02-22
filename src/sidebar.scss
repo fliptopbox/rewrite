@@ -1,10 +1,13 @@
+$duration: 150ms;
+
 .sidebar {
     position: fixed;
-    left: 0;
+    left: -30em;
     top: 0;
     bottom: 0;
     border: 1px solid #8a8a8a;
-    background: #090909;
+    // background: #090909;
+    background: linear-gradient(90deg, #090909 70%, #111);
     color: #9c9c9c;
     padding: 0;
     margin: 0.5em;
@@ -12,8 +15,21 @@
     border-radius: 4px;
     max-width: 340px;
     width: 100%;
-    display: none;
+    display: block;
     box-shadow: 11px 0 20px 2px rgba(0, 0, 0, 0.6);
+    opacity: 0;
+
+    .sidebar-close.show-sidebar & {
+        opacity: 0;
+        left: -30em;
+        transition: opacity $duration, left $duration linear;
+    }
+    .show-sidebar & {
+        display: block;
+        opacity: 1;
+        left: 0;
+        transition: opacity $duration, left $duration linear;
+    }
 
     .file-name input {
         width: 100%;
@@ -38,9 +54,6 @@
             vertical-align: middle;
             display: none;
         }
-    }
-    .show-sidebar & {
-        display: block;
     }
 
     ul:first-child {
@@ -80,11 +93,12 @@
             font-weight: normal;
         }
         em {
-            margin: 0.5em 1.5em;
+            margin: 1em 1.5em;
             position: absolute;
             color: #fff;
             right: 0;
             top: 0;
+            font-size: 0.8em;
         }
     }
 }
@@ -93,12 +107,13 @@
     &-boolean {
         &-true,
         &-false {
-            background: #fff;
+            background: #303030;
             border-radius: 1em;
             position: relative;
             display: inline-block;
-            margin: 0.025em;
+            margin: -0.1em 0.025em 0;
             padding: 0.025em;
+            font-size: 16px;
         }
         &-true::before,
         &-false::after {
@@ -107,13 +122,15 @@
             height: 1em;
             width: 1em;
             display: block;
-            background: #000;
             margin: 0.12em;
         }
         &-true::before {
+            background: #fff;
             margin-left: 1.8em;
+            box-shadow: 0 0 12px 0 rgba(255, 255, 255, 0.5);
         }
         &-false::after {
+            background: #000;
             margin-right: 1.8em;
         }
     }
