@@ -67,6 +67,7 @@ function elapsed(then, now = null) {
     }
 
     const e = interval(then, now);
+    e.diff = parseInt(e.diff);
 
     let result;
     switch (e.name) {
