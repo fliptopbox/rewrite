@@ -152,40 +152,7 @@ class Texteditor {
             this.selected[innerText ? 'innerText' : 'innerHTML'] =
                 innerText || '(empty)';
         }
-
-        // // this MUST be the very last trigger event.
-        // console.log("UPDATE", this.id);
-        // this.defer("after", this.triggers.after.fn, this.timer.after);
     }
-
-    // export needs to take the current DOM, parse it into a collectio
-    // then it needs to add onther meta data so that it can be
-    // used as a definitive article-key
-    //
-
-    /*
-     {
-        uuid: "ace123ace123ace321",
-        filename: "finding the fold".
-        created: Timestamp,
-        opened: Timestamp
-        data: [..collection]
-     }
-    */
-    // export(n = 0) {
-    //   const format = ["innerText", "innerHTML"];
-    //   const value = this.texteditor[format[n]];
-    //   console.log("EXPORT [%s]", format[n], value);
-    //   return value;
-    // }
-
-    // toHtml() {
-    //   // parses the current dom candidates as markdown
-    //   return marked(this.export(0));
-    // }
-    // (prefix = "a", i = 0) {
-    //   return () => `${prefix}${i++}`;
-    // }
 }
 
 Texteditor.prototype.load = load;
