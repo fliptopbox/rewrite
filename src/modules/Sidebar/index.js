@@ -134,8 +134,12 @@ class Sidebar extends React.Component {
         this.props.mouse(null, 'move', e => {
             const { pageX } = e;
             zone[1] = sidebar.offsetWidth + 50;
-
             showsidebar = body.classList.contains('show-sidebar');
+
+            if (!showsidebar && pageX > zone[0]) {
+                return;
+            }
+
             if (pageX > zone[1]) {
                 body.classList.add('sidebar-close');
                 u.defer(
@@ -262,6 +266,7 @@ class Sidebar extends React.Component {
                         <a
                             href="#delete"
                             onClick={e => {
+                                e.preventDefault();
                                 e.stopPropagation();
                                 this.handleDelete(guid);
                             }}>
