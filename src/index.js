@@ -91,8 +91,6 @@ function saveToDisk() {
     const data = new Parse(children).toCollection();
     store.write(data);
 
-    console.log(article);
-
     // update wordcount
     updateWordCount(article.texteditor);
 }
@@ -104,7 +102,6 @@ function updateWordCount(el) {
             const text = el.innerText;
             const wordcount = u.wordcount(text);
             divider.update('wordcount', wordcount);
-            console.log('WORDCOUNT', wordcount);
         },
         500
     );

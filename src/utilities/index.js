@@ -105,20 +105,23 @@ function storage(sufix = null) {
                         const mean = total / backups.averages.length;
                         const insertRow = (ratio / mean) * 100 < threshold;
 
-                        console.log(
-                            'INSERT',
-                            insertRow,
-                            (ratio / mean) * 100,
-                            threshold
-                        );
+                        // console.log(
+                        //     'INSERT',
+                        //     insertRow,
+                        //     (ratio / mean) * 100,
+                        //     threshold
+                        // );
 
                         // if a dramatic difference is detected then add another row
-                        // asfasf asfasfdasfd asfasfasf asfasfasf asdfasfasf
                         if (insertRow) {
-                            console.log('insert');
+                            console.warn(
+                                'Insert backup. [%s] (%s)',
+                                insertRow,
+                                threshold
+                            );
                             backups.datas.push(row);
                         } else {
-                            console.log('update', index);
+                            // console.log('update', index);
                             backups.averages.push(ratio);
                             backups.datas[index] = row;
                         }
@@ -127,7 +130,6 @@ function storage(sufix = null) {
                         array = backups.datas;
                     }
 
-                    console.log('BACKUP [%s]', id);
                     backups = {
                         averages: percent,
                         datas: array,
