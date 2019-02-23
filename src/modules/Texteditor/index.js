@@ -7,6 +7,7 @@ import defer from '../../utilities/defer';
 import uuid from '../../utilities/uuid';
 import updateKeysPressed from './updateKeysPressed';
 import Parse from '../../utilities/Parse';
+import markdown from '../../utilities/markdown';
 
 document.execCommand('defaultParagraphSeparator', false, 'p');
 
@@ -44,10 +45,7 @@ class Texteditor {
         // import external config settings
         Object.assign(this, config, options);
 
-        let { defaultText, hidden } = this;
-        defaultText = (defaultText || '').trim();
-        defaultText = defaultText ? defaultText.split('\n') : [];
-        defaultText.push('');
+        let { hidden = false } = this;
 
         // external modules
         bindEvents.bind(this)();
@@ -57,7 +55,7 @@ class Texteditor {
         this.updateKeysPressed = updateKeysPressed.bind(this);
 
         // and lastly ... instanate
-        this.init(defaultText);
+        this.init();
         this.show(!hidden);
     }
 
@@ -93,9 +91,7 @@ class Texteditor {
 
     deselect(selector = 'selected') {
         const array = this.texteditor.querySelectorAll(`.${selector}`);
-        [...array].forEach(el => {
-            el.classList.remove(selector);
-        });
+        [...array].forEach(el => el.classList.remove(selector));
         this.selected = null;
     }
 
@@ -103,7 +99,7 @@ class Texteditor {
     setSelected(el = null) {
         let { id, innerText } = el;
 
-        // console.log("[%s]", el.innerText.trim(), el);
+        // console.log('[%s]', el.innerText.trim(), el);
         // if this element has text then set focus attributes
         if (innerText && innerText.trim()) {
             el.id = id || this.uuid();
@@ -113,11 +109,7 @@ class Texteditor {
     }
 
     /*
-
     init method is used to open or create an article.
-    - open: document id
-    - create: document string
-
     */
     init(array) {
         // console.log(array);
@@ -126,6 +118,18 @@ class Texteditor {
         const p = new Parse(array);
         this.texteditor.innerHTML = p.toHTML();
         this.show();
+    }
+
+    reset(data) {
+        // clear the text editor
+        // clear selected element
+        // clear related editors
+        this.parent.texteditor.innerText = '';
+        this.parent.selected = null;
+        this.texteditor.innerText = '';
+        this.selected = null;
+
+        this.init(data);
     }
 
     // updates the currently selected element

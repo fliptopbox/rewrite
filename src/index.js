@@ -29,7 +29,7 @@ window.onmousemove = e => mouse(e, 'move');
 
 let divider;
 const store = new Storage(u.storage.bind(window));
-const article = new Article('c1', { prefix: 'a' });
+const article = new Article('c1', { prefix: 'a', hidden: true });
 const sentences = new Sentences('c2', { prefix: 's', hidden: true });
 // const ctrl = new Controller();
 
