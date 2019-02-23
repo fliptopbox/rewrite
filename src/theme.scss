@@ -23,7 +23,7 @@
 }
 
 .inactive {
-    opacity: 0.2;
+    opacity: 0.4;
     color: #888888;
 }
 
@@ -85,5 +85,25 @@
             background: rgb(0, 0, 0);
             border-color: rgb(255, 255, 255);
         }
+    }
+    .typewriter &,
+    .typewriter.dark & {
+        background: #860000;
+        box-shadow: 0 0 60px 2px rgba(255, 0, 0, 0.5);
+    }
+}
+.container {
+}
+
+.sidebar {
+    & {
+        background: linear-gradient(90deg, #090909 70%, #111);
+        border: 1px solid #8a8a8a;
+        box-shadow: 10px 0 40px 2px rgba(0, 0, 0, 0.5);
+        color: #9c9c9c;
+    }
+    .dark & {
+        border: 1px solid #d7d7d7;
+        box-shadow: 10px 0 40px 2px rgba(0, 0, 0, 0.6);
     }
 }
