@@ -55,16 +55,18 @@ function handleKeyUp(e) {
     }
 
     // set "parent" DOM element
-    this.selected = el;
-    this.selected.classList.add('selected');
-    this.selected.id = this.selected.id || this.uuid();
+    this.setSelected(el);
+    // this.selected = el;
+    // this.selected.classList.add('selected');
+    // this.selected.id = this.selected.id || this.uuid();
 
     console.log('ONKEYUP [%s] <%s>', type, nodeName, key);
 
-    // after all triggers always emit the change event.
-    // ensure arrowkeys are processed immediately
+    // change the ms delay and ensure arrowkeys are processed immediately
     const ms = this.timer.after;
     this.timer.delay = passive ? 25 : this.timer.default;
+
+    // after all triggers always emit the change event.
     this.defer('change', () => this.triggers.change.fn.call(this, e));
 
     // this MUST be the very last trigger event.
