@@ -40,14 +40,16 @@ function v2(array, options) {
             if (exclude.test(key) || key in classnames) return;
 
             // seperate modifiers
-            if (/^md?-/.test(key)) {
+            if (/^md?-/i.test(key)) {
                 // Boolean values signify modifiers
                 if (/^(true)$/i.test(row[key])) {
                     return (modifiers[key] = true);
                 }
 
-                // String values are datasets
-                return (datasets[key] = row[key]);
+                // String values are datasets and
+                // need to be string JSON
+                console.log('dataset', key, row[key], /^md?-/.test(key));
+                return (datasets[key] = JSON.stringify(row[key]));
             }
 
             // append classnames
@@ -64,6 +66,11 @@ function v2(array, options) {
         // ensure the "selected" element is unique
         unique = selected ? false : unique;
 
+        // catenate datasets
+        datasets = Object.keys(datasets).map(k => `data-${k}='${datasets[k]}'`);
+        datasets = ` ${datasets.join(' ')}`;
+        datasets = datasets.trim() ? ` ${datasets}` : '';
+
         const el = {};
         el.id = id ? ` id="${id}"` : '';
         el.className = classnames ? ` class="${classnames}"` : '';
@@ -75,12 +82,7 @@ function v2(array, options) {
         modifiers = `${modifiers.join(' ')}`;
         modifiers = modifiers.trim() ? ` ${modifiers}` : '';
 
-        // catenate datasets
-        datasets = Object.keys(datasets).map(
-            k => `data-${k}="${JSON.stringify(datasets[k])}"`
-        );
-        datasets = ` ${datasets.join(' ')}`;
-        datasets = datasets.trim() ? ` ${datasets}` : '';
+        console.log(3, datasets);
 
         return `<${tag}${el.id}${el.className}${modifiers}${datasets}${
             el.dataset

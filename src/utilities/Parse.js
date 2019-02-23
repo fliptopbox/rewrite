@@ -102,7 +102,7 @@ function arrayToCollection(array, re = /.*/, md = true) {
                       inactive: re.test(row),
                   }
                 : row;
-        if (md) {
+        if (md && obj.text) {
             md = markdown(obj.text);
             mdText = md.length && md.splice(-1, 1)[0];
             md.forEach(val => {

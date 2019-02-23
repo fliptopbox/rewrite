@@ -6,6 +6,8 @@ const hr = /^[-]{3,}$/;
 function markdown(string, array = []) {
     let finished = null;
 
+    if (!string) return [];
+
     // headings ... H1-6
     if (h.test(string)) {
         array.push(`h${Math.min(6, string.match(h)[1].length)}`);

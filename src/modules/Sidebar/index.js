@@ -255,8 +255,7 @@ class Sidebar extends React.Component {
                     const fileObj = store.read(guid);
                     const { data } = fileObj;
                     updatePrevious(guid);
-
-                    return article.init(data);
+                    return article.reset(data);
                 }}>
                 <span className="file-name" data-guid={guid}>
                     <ToggleToInput name={name} guid={guid} store={store} />

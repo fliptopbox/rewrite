@@ -9,6 +9,7 @@ let options = {
     re: /^(\s+)?[>?!/]+(\s+)?/,
     tag: 'p',
     br: '<br/>',
+    markdown: true,
 };
 const timer = {
     // after: 2500, // the last event to fire, this is used to persist
