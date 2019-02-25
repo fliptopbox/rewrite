@@ -3,48 +3,48 @@ const em = /((^_(.*)_$)|(^\*(.*)\*$))/;
 const strong = /((^_{2}(.*)_{2}$)|(^\*{2}(.*)\*{2}$))/;
 const hr = /^[-]{3,}$/;
 
-function markdown(string, array = []) {
+function markdown(string, dict = {}) {
     let finished = null;
 
     if (!string) return [];
 
     // headings ... H1-6
     if (h.test(string)) {
-        array.push(`h${Math.min(6, string.match(h)[1].length)}`);
+        dict[`h${Math.min(6, string.match(h)[1].length)}`] = true;
         string = string.replace(h, '$2');
         finished = true;
     }
 
     // horizontal rule HR
     if (hr.test(string)) {
-        array.push('hr');
+        dict['hr'] = true;
         string = '';
         finished = true;
     }
 
     // recursive evaulations ... em, strong
     if (!finished && strong.test(string)) {
-        array.push('strong');
+        dict['strong'] = true;
         string = string.replace(strong, '$3$5'); //?
-        return markdown(string, array); //?
+        return markdown(string, dict); //?
     }
 
     if (!finished && em.test(string)) {
-        array.push('em');
+        dict['em'] = true;
         string = string.replace(em, '$3$5'); //?
-        return markdown(string, array); //?
+        return markdown(string, dict); //?
     }
 
     // if there are matched append the sanitized string
-    finished = [...array];
+    finished = Object.keys(dict);
     if (finished.length) finished.push(string);
 
-    // reset the recursive array
-    array = null;
+    // reset the recursive dict
+    dict = null;
 
     return finished;
 }
-/** quokka inline */
+/** quokka inline * /
 markdown('# heading'); //?
 markdown('------'); //?
 markdown('*em*'); //?

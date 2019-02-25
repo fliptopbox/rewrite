@@ -74,11 +74,13 @@ class Sidebar extends React.Component {
         super();
         this.state = {
             articles: [],
-            current: null,
+            // current: null,
+            previous: null,
             modifiers: {
                 collapsed: true,
                 strikethrough: true,
                 typewriter: false,
+                markdown: false,
                 dark: false,
             },
             values: {
@@ -89,15 +91,22 @@ class Sidebar extends React.Component {
 
     componentDidMount() {
         // update with persisted data
-        const local = read();
+        const settings = read();
         const articles = this.getUpdatedArticles();
         const previous = u.storage('previous').read();
-        const state = {
-            ...this.state,
-            articles,
-            ...local,
-            previous: previous,
-        };
+        // const state = {
+        //     ...this.state,
+        //     articles,
+        //     ...settings,
+        //     previous,
+        // };
+        const state = Object.assign(
+            {},
+            this.state,
+            { articles: articles },
+            settings,
+            { previous }
+        );
 
         // remember setState can lag!
         // don't rely on this.state === state
@@ -175,8 +184,8 @@ class Sidebar extends React.Component {
     }
 
     updatePrevious = previous => {
-        this.setState({ previous });
-        u.storage('previous').write(previous);
+        u.storage('previous').write(previous, true);
+        this.setState({ previous: String(previous) });
 
         this.toggleClassName('sidebar-close', true);
         u.defer(
@@ -185,10 +194,46 @@ class Sidebar extends React.Component {
                 this.toggleClassName('sidebar-close', false);
                 this.toggleClassName('show-sidebar', false);
             },
-            650
+            350
         );
     };
 
+    getFileRow(object, updatePrevious) {
+        const { guid, name, words = 1234, opened } = object;
+        const { store, article } = this.props;
+        return (
+            <div
+                className="inner"
+                onClick={() => {
+                    const fileObj = store.read(guid);
+                    const { data } = fileObj;
+                    updatePrevious(guid);
+                    return article.reset(data);
+                }}>
+                <span className="file-name" data-guid={guid}>
+                    <ToggleToInput name={name} guid={guid} store={store} />
+                </span>
+                <ul className="file-meta">
+                    <li>
+                        <a
+                            href="#delete"
+                            onClick={e => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                this.handleDelete(guid);
+                            }}>
+                            del
+                        </a>
+                    </li>
+                    <li className="file-words">{words} words </li>
+                    <li className="file-modified">{u.elapsed(opened)}</li>
+                    <li className="file-exports">
+                        <a href="#txt">txt</a> | <a href="#json">json</a>
+                    </li>
+                </ul>
+            </div>
+        );
+    }
     getArticles() {
         const { previous } = this.state;
         const files = this.state.articles.map(obj => {
@@ -245,43 +290,6 @@ class Sidebar extends React.Component {
         );
     };
 
-    getFileRow(object, updatePrevious) {
-        const { guid, name, words = 1234, opened } = object;
-        const { store, article } = this.props;
-        return (
-            <div
-                className="inner"
-                onClick={() => {
-                    const fileObj = store.read(guid);
-                    const { data } = fileObj;
-                    updatePrevious(guid);
-                    return article.reset(data);
-                }}>
-                <span className="file-name" data-guid={guid}>
-                    <ToggleToInput name={name} guid={guid} store={store} />
-                </span>
-                <ul className="file-meta">
-                    <li>
-                        <a
-                            href="#delete"
-                            onClick={e => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                this.handleDelete(guid);
-                            }}>
-                            del
-                        </a>
-                    </li>
-                    <li className="file-words">{words} words </li>
-                    <li className="file-modified">{u.elapsed(opened)}</li>
-                    <li className="file-exports">
-                        <a href="#txt">txt</a> | <a href="#json">json</a>
-                    </li>
-                </ul>
-            </div>
-        );
-    }
-
     toggleClassName(string, value = null, selector = 'body') {
         const { modifiers, values } = this.state;
         const element = document.querySelector(selector);
@@ -300,7 +308,7 @@ class Sidebar extends React.Component {
             this.save();
         }
 
-        return toggle;
+        return toggle === true;
     }
 
     handleImport = e => {
@@ -408,6 +416,22 @@ class Sidebar extends React.Component {
                             <em>{this.getOnOff('typewriter')}</em>
                         </div>
                     </li>
+                    {/* <li>
+                        <div
+                            className="inner"
+                            onClick={() => {
+                                const { article } = this.props;
+                                const { previous } = this.state;
+                                const bool = this.toggleClassName('markdown');
+                                const data = u.storage(previous).read();
+
+                                article.toggleMarkdown(bool);
+                                article.reset(data);
+                            }}>
+                            <strong>Markdown</strong>
+                            <em>{this.getOnOff('markdown')}</em>
+                        </div>
+                    </li> */}
                     <li className="no-underline">
                         <div className="inner">
                             <strong>Font size</strong>

@@ -46,6 +46,7 @@ function handleKeyUp(e) {
 
     const el = focusNode.parentNode;
     const { innerText } = el;
+    console.log(123456);
 
     // ignore empty lines.
     if (!innerText || !innerText.trim()) {
@@ -56,9 +57,6 @@ function handleKeyUp(e) {
 
     // set "parent" DOM element
     this.setSelected(el);
-    // this.selected = el;
-    // this.selected.classList.add('selected');
-    // this.selected.id = this.selected.id || this.uuid();
 
     console.log('ONKEYUP [%s] <%s>', type, nodeName, key);
 

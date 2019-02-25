@@ -19,8 +19,8 @@ test('markdown formating EM', () => {
     expect(markdown('_text_')).toEqual(['em', 'text']);
     expect(markdown('*text*')).toEqual(['em', 'text']);
 
-    expect(markdown('_*text*_')).toEqual(['em', 'em', 'text']);
-    expect(markdown('*_text_*')).toEqual(['em', 'em', 'text']);
+    expect(markdown('_*text*_')).toEqual(['em', 'text']);
+    expect(markdown('*_text_*')).toEqual(['em', 'text']);
 });
 
 test('markdown formating STRONG', () => {
@@ -35,8 +35,8 @@ test('markdown formating STRONG', () => {
 });
 
 test('markdown formating STRONG EM', () => {
-    expect(markdown('_*text*_')).toEqual(['em', 'em', 'text']);
-    expect(markdown('_*text*_')).toEqual(['em', 'em', 'text']);
+    expect(markdown('_*text*_')).toEqual(['em', 'text']);
+    expect(markdown('_*text*_')).toEqual(['em', 'text']);
     expect(markdown('*__text__*')).toEqual(['em', 'strong', 'text']);
     expect(markdown('**_text_**')).toEqual(['strong', 'em', 'text']);
 });

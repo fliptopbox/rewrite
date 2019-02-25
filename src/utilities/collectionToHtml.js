@@ -19,7 +19,7 @@ function v2(array, options) {
         let modifiers = {};
         let datasets = {};
 
-        const exclude = /^(text|versions|locked|selected)/i;
+        const exclude = /^(text|versions|locked|selected|html|classnames)/i;
         const { text = '', versions = '', selected = '' } = row;
         const id = versions ? uuid() : '';
         const candidate = versions && getCandidateString(versions);
@@ -40,21 +40,26 @@ function v2(array, options) {
             if (exclude.test(key) || key in classnames) return;
 
             // seperate modifiers
-            if (/^md?-/i.test(key)) {
+            if (/^m-/i.test(key)) {
                 // Boolean values signify modifiers
                 if (/^(true)$/i.test(row[key])) {
                     return (modifiers[key] = true);
                 }
 
-                // String values are datasets and
-                // need to be string JSON
-                console.log('dataset', key, row[key], /^md?-/.test(key));
+                // String values are datasets and need to be string JSON
                 return (datasets[key] = JSON.stringify(row[key]));
             }
 
             // append classnames
             classnames[key] = true;
         });
+
+        // append classnames array
+        if (row && row.classnames) {
+            row.classnames.forEach(name => {
+                classnames[name] = true;
+            });
+        }
 
         // flattern keys into string
         classnames =
@@ -81,8 +86,6 @@ function v2(array, options) {
         modifiers = Object.keys(modifiers).map(k => `${k}=""`);
         modifiers = `${modifiers.join(' ')}`;
         modifiers = modifiers.trim() ? ` ${modifiers}` : '';
-
-        console.log(3, datasets);
 
         return `<${tag}${el.id}${el.className}${modifiers}${datasets}${
             el.dataset

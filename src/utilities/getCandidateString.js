@@ -8,6 +8,8 @@ function getCandidateString(value, autoTerminate = false) {
     // returns string
     // parse the DOM elements to simple Array
 
+    if (!value) return '';
+
     const is_array = value && value.constructor === Array;
     const array = is_array ? value : textToArray(value);
     return [...array]

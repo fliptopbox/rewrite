@@ -1,7 +1,7 @@
 import collectionToHtml from '../utilities/collectionToHtml';
 import htmlToCollection from '../utilities/htmlToCollection';
 import unwrapColumns from '../utilities/unwrap';
-import markdown from '../utilities/markdown';
+import arrayToCollection from '../utilities/arrayToCollection';
 
 let _collection;
 
@@ -13,7 +13,7 @@ class Parse {
             unwrap: true, // unwrap hard breaks
             tag: 'p',
             br: '<br/>',
-            markdown: true,
+            markdown: false,
             ...options,
         };
 
@@ -21,6 +21,7 @@ class Parse {
         if (!value) value = '';
 
         const { re, unwrap, markdown } = this.options;
+
         const constructor = value.constructor;
         const type =
             (constructor === String && 'string') ||
@@ -90,28 +91,4 @@ function linebreaks(plaintext = '') {
     // remove carridge returns (aka CrLf => Lf)
     if (/\r/.test(plaintext)) plaintext = plaintext.replace(/\r/gm, '');
     return plaintext;
-}
-
-function arrayToCollection(array, re = /.*/, md = true) {
-    let mdText;
-    return array.map(row => {
-        const obj =
-            typeof row === 'string'
-                ? {
-                      text: `${row}`.trim(),
-                      inactive: re.test(row),
-                  }
-                : row;
-        if (md && obj.text) {
-            md = markdown(obj.text);
-            mdText = md.length && md.splice(-1, 1)[0];
-            md.forEach(val => {
-                if (mdText) {
-                    obj[`md-text`] = mdText;
-                    obj[`md-${val}`] = true;
-                }
-            });
-        }
-        return obj;
-    });
 }

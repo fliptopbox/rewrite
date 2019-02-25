@@ -1,28 +1,28 @@
 .panel {
     p {
-        &[md-h1] {
+        &.md-h1 {
             font-size: 1.8em;
             line-height: 1;
             padding-left: 0.5em;
         }
-        &[md-h2] {
+        &.md-h2 {
             font-size: 1.6em;
         }
-        &[md-h3] {
+        &.md-h3 {
             font-size: 1.4em;
         }
-        &[md-h4] {
+        &.md-h4 {
             font-size: 1.2em;
         }
-        &[md-h5],
-        &[md-h6] {
+        &.md-h5,
+        &.md-h6 {
             font-size: 1.1em;
             border-bottom: 1px solid black;
         }
-        &[md-strong] {
+        &.md-strong {
             font-weight: bold;
         }
-        &[md-em] {
+        &.md-em {
             font-style: italic;
         }
     }

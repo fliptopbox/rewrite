@@ -3,15 +3,11 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import Article from './modules/Article';
 import Sentences from './modules/Sentences';
-// import Controller from "./modules/Controller";
 import Storage from './modules/Storage/';
 import Parse from './utilities/Parse';
 import Sidebar from './modules/Sidebar/';
 import dividerinit from './modules/divider';
 
-// import PubSub from "pubsub-js";
-
-// import buttons from "./modules/uibuttons";
 import './styles.scss';
 
 const mouseEvents = {
@@ -39,6 +35,11 @@ sentences.on('after', null, saveToDisk);
 article.bindTo(sentences);
 sentences.bindTo(article);
 
+//! remove markdown rendering ... for now
+//! const settings = u.storage('settings').read();
+//! const { markdown = true } = (settings && settings.modifiers) || {};
+//! article.toggleMarkdown(markdown);
+
 const articleText = store.initilize();
 article.init(articleText.data);
 
@@ -53,6 +54,7 @@ const startup = (function() {
         document.querySelector('.overlay').classList.add('hidden');
         divider = dividerinit(mouse);
         divider.add('wordcount');
+        updateWordCount(article.texteditor);
     }, 950);
     return Function;
 })();
@@ -75,17 +77,6 @@ ReactDOM.render(
 
 startup();
 
-/*
- * some UI buttons need links to objects defined
- * outside the loader script, for example:
- * the Article instance or the store Object
- *
- * These late bindings are handled here ...
- * the default UI buttons (array) is updated
- * to assign the callbacks with instance references
- *
- */
-
 function saveToDisk() {
     const children = article.texteditor.children;
     const data = new Parse(children).toCollection();
@@ -103,6 +94,6 @@ function updateWordCount(el) {
             const wordcount = u.wordcount(text);
             divider.update('wordcount', wordcount);
         },
-        500
+        150
     );
 }
