@@ -27,6 +27,7 @@ class Texteditor {
         this.keytime = null;
         this.selected = null;
         this.markdown = null;
+        this.scrollToSelected = true;
 
         this.container = container;
         this.texteditor = texteditor;
@@ -45,7 +46,6 @@ class Texteditor {
 
         // import external config settings
         Object.assign(this, config, options);
-        console.log('Texteditor', this);
 
         let { hidden = false } = this;
 
@@ -128,6 +128,14 @@ class Texteditor {
         this.selected = el;
     }
 
+    focus() {
+        // if there is a selected element ...
+        // scroll to that element and ensure it
+        // also appears in the sentence editor
+        const el = document.querySelector('p.selected');
+        if (el) el.scrollIntoViewIfNeeded();
+    }
+
     toggleMarkdown() {
         this.markdown = false;
     }
@@ -142,6 +150,7 @@ class Texteditor {
         const p = new Parse(array, { markdown: this.markdown });
         this.texteditor.innerHTML = p.toHTML();
         this.show();
+        this.focus();
     }
 
     reset(data) {

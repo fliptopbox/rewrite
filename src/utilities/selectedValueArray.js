@@ -1,4 +1,5 @@
 import sbd from 'sbd';
+import jsonSafeParse from './jsonParseSafe';
 
 function selectedValueArray(selected) {
     if (!selected) return;
@@ -14,7 +15,7 @@ function selectedValueArray(selected) {
     }
 
     innerText = innerText ? sbd.sentences(innerText) : [''];
-    const array = dataset.versions ? JSON.parse(versions) : innerText;
+    const array = dataset.versions ? jsonSafeParse(versions) : innerText;
 
     return array;
 }

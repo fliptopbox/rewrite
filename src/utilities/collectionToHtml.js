@@ -1,7 +1,7 @@
 import uuid from './uuid';
 import getCandidateString from './getCandidateString';
-
 import config from '../config';
+
 export default v2;
 
 function v2(array, options) {
@@ -86,6 +86,10 @@ function v2(array, options) {
         modifiers = Object.keys(modifiers).map(k => `${k}=""`);
         modifiers = `${modifiers.join(' ')}`;
         modifiers = modifiers.trim() ? ` ${modifiers}` : '';
+
+        const p = document.createElement(tag);
+        p.id = id;
+        p.dataset.versions = JSON.stringify(candidate);
 
         return `<${tag}${el.id}${el.className}${modifiers}${datasets}${
             el.dataset

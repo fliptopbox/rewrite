@@ -1,3 +1,5 @@
+import jsonSafeParse from './jsonParseSafe';
+
 function htmlToCollection(children) {
     const reHtmlTags = /<[^<]+>/gi;
     const array = [...children].map(el => {
@@ -10,7 +12,8 @@ function htmlToCollection(children) {
 
         // const inactive = classList.contains("inactive");
         // const selected = (classList && classList.contains("selected")) || undefined;
-        const versions = dataset.versions && JSON.parse(dataset.versions);
+        const versions =
+            dataset.versions && jsonSafeParse(dataset.versions, string);
         const obj = {};
 
         obj.text = string || '';

@@ -46,7 +46,6 @@ function handleKeyUp(e) {
 
     const el = focusNode.parentNode;
     const { innerText } = el;
-    console.log(123456);
 
     // ignore empty lines.
     if (!innerText || !innerText.trim()) {

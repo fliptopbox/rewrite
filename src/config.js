@@ -10,6 +10,7 @@ let options = {
     tag: 'p',
     br: '<br/>',
     markdown: false,
+    scrollToSelected: true,
 };
 const timer = {
     // after: 2500, // the last event to fire, this is used to persist
