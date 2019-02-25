@@ -38,13 +38,22 @@ function handleKeyUp(e) {
     const { type, key } = e;
     const { focusNode } = window.getSelection();
     const { nodeName } = focusNode.parentNode;
+    let el = focusNode.parentNode;
 
-    if (nodeName !== 'P') {
-        console.log('not P tag');
+    if (/^enter/i.test(key)) {
+        // Enter will copy the id attribute to an empty node
+        // the id MUST stay unique
+        console.log('Carridge return', focusNode);
+        focusNode.id = '';
+        el = focusNode;
         return;
     }
 
-    const el = focusNode.parentNode;
+    if (nodeName !== 'P') {
+        console.log('not P tag', type);
+        return;
+    }
+
     const { innerText } = el;
 
     // ignore empty lines.
