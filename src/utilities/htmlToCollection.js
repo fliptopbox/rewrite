@@ -1,4 +1,4 @@
-import jsonSafeParse from './jsonParseSafe';
+import jsonParseSafe from './jsonParseSafe';
 
 function htmlToCollection(children) {
     const reHtmlTags = /<[^<]+>/gi;
@@ -13,7 +13,7 @@ function htmlToCollection(children) {
         // const inactive = classList.contains("inactive");
         // const selected = (classList && classList.contains("selected")) || undefined;
         const versions =
-            dataset.versions && jsonSafeParse(dataset.versions, string);
+            dataset.versions && jsonParseSafe(dataset.versions, string);
         const obj = {};
 
         obj.text = string || '';

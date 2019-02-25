@@ -17,6 +17,7 @@ import wordcount from './wordcount';
 import backupRestore from './backupRestore';
 import points from './points';
 import elapsed from './elapsed';
+import jsonParseSafe from './jsonParseSafe';
 
 export default {
     alert,
@@ -33,6 +34,7 @@ export default {
     focusOn,
     htmlToCollection,
     inflate,
+    jsonParseSafe,
     message,
     points,
     readTextFile,
