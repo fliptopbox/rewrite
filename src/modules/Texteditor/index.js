@@ -7,6 +7,7 @@ import defer from '../../utilities/defer';
 import uuid from '../../utilities/uuid';
 import updateKeysPressed from './updateKeysPressed';
 import Parse from '../../utilities/Parse';
+import wordcount from '../../utilities/wordcount';
 import arrayToCollection from '../../utilities/arrayToCollection';
 import scrollIntoViewIfNeeded from '../../utilities/scrollIntoViewIfNeeded';
 
@@ -29,6 +30,7 @@ class Texteditor {
         this.selected = null;
         this.markdown = null;
         this.scrollToSelected = true;
+        this.words = 0;
 
         this.container = container;
         this.texteditor = texteditor;
@@ -43,6 +45,11 @@ class Texteditor {
             },
             after: {
                 fn: s => console.warn('Default event. AFTER [%s]', s),
+            },
+            wordcounter: {
+                fn: function(s) {
+                    console.log('words', s);
+                },
             },
         };
 
@@ -131,27 +138,7 @@ class Texteditor {
         //     console.log('restore RAW text data');
         // }
 
-        this.updateData(el);
-
         this.selected = el;
-    }
-
-    updateData(el) {
-        const keys = Object.keys(el);
-        const row = {
-            id: null,
-            innerText: null,
-            dataset: null,
-            classList: null,
-        };
-        row.id = el.id;
-        row.versions = el.dataset.versions;
-        row.classList = [...el.classList];
-        row.text = el.innerText || '';
-
-        this.data[row.id] = { ...row };
-        console.log({ ...row }, el);
-        console.log(this.data);
     }
 
     focus() {
@@ -164,6 +151,20 @@ class Texteditor {
 
     toggleMarkdown() {
         this.markdown = false;
+    }
+
+    wordcounter(fn) {
+        fn = fn || this.triggers.wordcounter.fn;
+        let { texteditor } = this;
+        defer(
+            'wordcounter',
+            () => {
+                const { innerText } = texteditor;
+                this.words = wordcount(innerText);
+                return fn(this.words);
+            },
+            550
+        );
     }
 
     /*
@@ -179,6 +180,7 @@ class Texteditor {
 
         this.show();
         this.focus();
+        this.wordcounter();
     }
 
     reset(data) {
@@ -189,6 +191,7 @@ class Texteditor {
         this.texteditor.innerText = '';
         this.parent.selected = null;
         this.selected = null;
+        this.wordcounter = 0;
         this.data = {};
 
         this.init(data);
@@ -238,11 +241,11 @@ class Texteditor {
 
         // if there is no text, then mark the row & inject (empty)
         selected.classList[text ? 'remove' : 'add']('empty');
-
-        selected.classList.add('locked'); // this is being removed somewhere ???
-
+        selected.classList.add('locked');
         selected.classList.add('selected');
         selected.innerHTML = text || `(empty)`;
+
+        this.wordcounter();
 
         return selected;
     }

@@ -40,12 +40,10 @@ function handleKeyUp(e) {
     const { nodeName } = focusNode.parentNode;
     let el = focusNode.parentNode;
 
+    // Enter will copy the id attribute to an empty node
+    // the id MUST stay unique
     if (/^enter/i.test(key)) {
-        // Enter will copy the id attribute to an empty node
-        // the id MUST stay unique
-        console.log('Carridge return', focusNode);
         focusNode.id = '';
-        el = focusNode;
         this.deselect();
         return;
     }
@@ -75,6 +73,9 @@ function handleKeyUp(e) {
 
     // after all triggers always emit the change event.
     this.defer('change', () => this.triggers.change.fn.call(this, e));
+
+    // refresh the wordcounter
+    this.wordcounter();
 
     // this MUST be the very last trigger event.
     this.defer('after', () => this.triggers.after.fn.call(this), ms);

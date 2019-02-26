@@ -27,18 +27,17 @@ let divider;
 const store = new Storage(u.storage.bind(window));
 const article = new Article('c1', { prefix: 'a', hidden: true });
 const sentences = new Sentences('c2', { prefix: 's', hidden: true });
-// const ctrl = new Controller();
 
 article.on('after', null, saveToDisk);
 sentences.on('after', null, saveToDisk);
 
+article.on('wordcounter', null, updateWordCount);
+
 article.bindTo(sentences);
 sentences.bindTo(article);
 
-//! remove markdown rendering ... for now
-//! const settings = u.storage('settings').read();
-//! const { markdown = true } = (settings && settings.modifiers) || {};
-//! article.toggleMarkdown(markdown);
+divider = dividerinit(mouse);
+divider.add('wordcount');
 
 const articleText = store.initilize();
 article.init(articleText.data);
@@ -52,9 +51,6 @@ const startup = (function() {
     setTimeout(() => {
         document.querySelector('.container').classList.remove('hidden');
         document.querySelector('.overlay').classList.add('hidden');
-        divider = dividerinit(mouse);
-        divider.add('wordcount');
-        updateWordCount(article.texteditor);
     }, 950);
     return Function;
 })();
@@ -81,19 +77,8 @@ function saveToDisk() {
     const children = article.texteditor.children;
     const data = new Parse(children).toCollection();
     store.write(data);
-
-    // update wordcount
-    updateWordCount(article.texteditor);
 }
 
-function updateWordCount(el) {
-    return u.defer(
-        'wordcount',
-        () => {
-            const text = el.innerText;
-            const wordcount = u.wordcount(text);
-            divider.update('wordcount', wordcount);
-        },
-        150
-    );
+function updateWordCount(words) {
+    divider.update('wordcount', words);
 }
