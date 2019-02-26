@@ -4,9 +4,26 @@
 
 -   !! sentence looses focus on the Paragraph
 -   backspace sometimes does not trigger change
+-   the spell corrector can edit on a locked paragraph.
+-   pasting causes un formatted article. shift paste is okay
+-   Holding shift down causes rapid sentence toggling.
 
 # TODO
-
+-   floating menu on the divider
+    -   re-focus selected paragraph
+    -   read selected paragrapg
+    -   maximise/minimize workspace?
+    -   next/previous paragraph
+    -   flatten/unlock current paragraph
+-   SHIFT Basckspace = delete line
+-   SHIFT Enter = new line without line break
+-   color comments 
+    - eg //? //! //# /// red, green. blue & white
+    - these color the line in the sentence editor
+    - and mark the paragraph with an icon/bookmark
+-   wordcount target that alerts when the taget is met
+-   locked paragraph needs an icon to be more obvious
+-   visual prompt signalling an edit on a locked paragraph
 -   ? move DOM dataset to Javascript state tree
 -   word count should ignore inactive lines
 -   save current article
@@ -24,6 +41,7 @@
     -   refactor TTS controller ie. syncronous stack
     -   voice/picth/rate settings
     -   pause/resume blank delay for blank lines
+    -   read a text selection
 
 ## CHANGELOG/BUG FIXES
 
