@@ -10,5 +10,5 @@ export default function(string, alt = '') {
         console.log(e);
         result = alt;
     }
-    return String(result);
+    return result;
 }
