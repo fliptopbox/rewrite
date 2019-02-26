@@ -46,7 +46,7 @@ window.RE = {
     article: article,
 };
 
-const startup = (function() {
+(function() {
     setTimeout(() => {
         document.querySelector('.container').classList.remove('hidden');
         document.querySelector('.sidebar').classList.remove('hidden');
@@ -55,7 +55,6 @@ const startup = (function() {
         // init delay required for scrollIntoViewIfNeeded()
         article.init((articleText && articleText.data) || ['']);
     }, 950);
-    return Function;
 })();
 
 // Sidebar is a React component
@@ -73,8 +72,6 @@ ReactDOM.render(
     </div>,
     overlay
 );
-
-startup();
 
 function saveToDisk() {
     const children = article.texteditor.children;
