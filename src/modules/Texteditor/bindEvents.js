@@ -46,6 +46,7 @@ function handleKeyUp(e) {
         console.log('Carridge return', focusNode);
         focusNode.id = '';
         el = focusNode;
+        this.deselect();
         return;
     }
 
@@ -59,7 +60,7 @@ function handleKeyUp(e) {
     // ignore empty lines.
     if (!innerText || !innerText.trim()) {
         console.log('no inner text');
-        this.selected = null;
+        this.deselect();
         return;
     }
 
