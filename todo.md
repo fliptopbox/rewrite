@@ -7,7 +7,7 @@
 ## BUGS/REFACTOR
 
 -   ? move DOM dataset to Javascript state tree
--   !! sentence loosed focus on the Paragraph
+-   !! sentence looses focus on the Paragraph
 
 # TODO for MVC
 
