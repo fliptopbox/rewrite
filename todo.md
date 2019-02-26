@@ -1,16 +1,13 @@
 # DEVELOPMENT NOTES
 
-## FEATURES
+## BUGS
 
--   let word count ignore inactive lines
-
-## BUGS/REFACTOR
-
--   ? move DOM dataset to Javascript state tree
 -   !! sentence looses focus on the Paragraph
 
-# TODO for MVC
+# TODO
 
+-   ? move DOM dataset to Javascript state tree
+-   let word count ignore inactive lines
 -   read selected paragraph
 -   read entire article
 -   save current article
