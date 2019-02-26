@@ -143,13 +143,7 @@ class Texteditor {
         // scroll to that element and ensure it
         // also appears in the sentence editor
         let el = document.querySelector('p.selected');
-        console.log('focus', el);
-        if (el) {
-            setTimeout(() => {
-                el = document.querySelector('p.selected');
-                el.scrollIntoViewIfNeeded();
-            });
-        }
+        if (this.scrollToSelected && el) el.scrollIntoViewIfNeeded();
     }
 
     toggleMarkdown() {
