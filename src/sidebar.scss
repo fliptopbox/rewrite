@@ -8,11 +8,12 @@ $duration: 150ms;
     padding: 0;
     margin: 0.5em;
     font-size: 18px;
-    border-radius: 4px;
+    // border-radius: 4px;
     max-width: 340px;
     width: 100%;
     display: block;
     opacity: 0;
+    border: 4px double;
 
     .sidebar-close.show-sidebar & {
         opacity: 0;
@@ -118,6 +119,7 @@ $duration: 150ms;
             width: 1em;
             display: block;
             margin: 0.12em;
+            border: 0.1em solid #525252;
         }
         &-true::before {
             background: #fff;
@@ -170,8 +172,14 @@ $duration: 150ms;
 }
 
 .settings {
+    & {
+        position: absolute;
+        bottom: 3em;
+        left: 0;
+        right: 0;
+    }
     li {
-        border-bottom: 2px solid #333;
+        border-bottom: 1px solid #1b1b1b;
         &.no-underline {
             border: none;
             padding-bottom: 0;

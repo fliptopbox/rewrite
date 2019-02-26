@@ -40,7 +40,7 @@ divider = dividerinit(mouse);
 divider.add('wordcount');
 
 const articleText = store.initilize();
-article.init(articleText.data);
+article.init((articleText && articleText.data) || ['']);
 
 window.RE = {
     storage: store,

@@ -247,7 +247,12 @@ class Sidebar extends React.Component {
             );
         });
 
-        return <ul>{files}</ul>;
+        return (
+            <div id="files">
+                <hr />
+                <ul>{files}</ul>
+            </div>
+        );
     }
 
     save = () => {
@@ -366,9 +371,7 @@ class Sidebar extends React.Component {
                         <div className="inner">Save</div>
                     </li>
                 </ul>
-                <hr />
                 {articleList}
-                <hr />
                 <ul className="settings">
                     <li>
                         <div
