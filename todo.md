@@ -3,6 +3,7 @@
 ## BUGS
 
 -   !! sentence looses focus on the Paragraph
+-   backspace sometimes does not trigger change
 
 # TODO
 
@@ -18,3 +19,12 @@
 -   key trigger shortcuts
 -   chrome extension to backup/sync localstorage
 -   refactor file/settings flexbox vertical
+-   allow for markdown and fountain inline rendering
+-   create UI for TTS. play/pause/cont/loop/
+-   refactor TTS controller.
+    -   voice/pith/rate and
+    -   pause/resume blank lines
+
+## CHANGELOG/BUG FIXES
+
+-   wordcounter not working on init.

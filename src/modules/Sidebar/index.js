@@ -337,6 +337,17 @@ class Sidebar extends React.Component {
         );
     }
 
+    readSelected = e => {
+        e.stopPropagation();
+
+        const { selected = null, texteditor = null } = this.props.article;
+        const el =
+            selected && selected.innerText.trim() ? selected : texteditor;
+        if (!el || !el.innerText) return;
+
+        window.TTS.read(el.innerText);
+    };
+
     render() {
         const articleList = this.getArticles();
         return (
@@ -419,22 +430,6 @@ class Sidebar extends React.Component {
                             <em>{this.getOnOff('typewriter')}</em>
                         </div>
                     </li>
-                    {/* <li>
-                        <div
-                            className="inner"
-                            onClick={() => {
-                                const { article } = this.props;
-                                const { previous } = this.state;
-                                const bool = this.toggleClassName('markdown');
-                                const data = u.storage(previous).read();
-
-                                article.toggleMarkdown(bool);
-                                article.reset(data);
-                            }}>
-                            <strong>Markdown</strong>
-                            <em>{this.getOnOff('markdown')}</em>
-                        </div>
-                    </li> */}
                     <li className="no-underline">
                         <div className="inner">
                             <strong>Font size</strong>
@@ -462,7 +457,10 @@ class Sidebar extends React.Component {
                         />
                     </li>
                     <li>
-                        <div className="inner">Read paragraph</div>
+                        <div className="inner" onClick={this.readSelected}>
+                            <strong>Read aloud (BETA)</strong>
+                            <em>stop|start</em>
+                        </div>
                     </li>
                 </ul>
             </div>

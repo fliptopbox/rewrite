@@ -27,20 +27,19 @@ let divider;
 const store = new Storage(u.storage.bind(window));
 const article = new Article('c1', { prefix: 'a', hidden: true });
 const sentences = new Sentences('c2', { prefix: 's', hidden: true });
+const articleText = store.initilize();
 
 article.on('after', null, saveToDisk);
 sentences.on('after', null, saveToDisk);
 
-article.on('wordcounter', null, updateWordCount);
-
 article.bindTo(sentences);
 sentences.bindTo(article);
 
+article.on('wordcounter', null, d => updateWordCount(d));
+sentences.on('wordcounter', null, () => article.wordcounter());
+
 divider = dividerinit(mouse);
 divider.add('wordcount');
-
-const articleText = store.initilize();
-article.init((articleText && articleText.data) || ['']);
 
 window.RE = {
     storage: store,
@@ -50,7 +49,11 @@ window.RE = {
 const startup = (function() {
     setTimeout(() => {
         document.querySelector('.container').classList.remove('hidden');
+        document.querySelector('.sidebar').classList.remove('hidden');
         document.querySelector('.overlay').classList.add('hidden');
+
+        // init delay required for scrollIntoViewIfNeeded()
+        article.init((articleText && articleText.data) || ['']);
     }, 950);
     return Function;
 })();

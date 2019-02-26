@@ -46,11 +46,7 @@ class Texteditor {
             after: {
                 fn: s => console.warn('Default event. AFTER [%s]', s),
             },
-            wordcounter: {
-                fn: function(s) {
-                    console.log('words', s);
-                },
-            },
+            wordcounter: { fn: function() {} },
         };
 
         // import external config settings
@@ -66,8 +62,9 @@ class Texteditor {
         this.updateKeysPressed = updateKeysPressed.bind(this);
 
         // extends Mozilla with polyfill methods
-        if (Element && !Element.scrollIntoViewIfNeeded)
+        if (Element && !Element.scrollIntoViewIfNeeded) {
             scrollIntoViewIfNeeded();
+        }
 
         // and lastly ... instanate
         this.init();
@@ -145,43 +142,47 @@ class Texteditor {
         // if there is a selected element ...
         // scroll to that element and ensure it
         // also appears in the sentence editor
-        const el = document.querySelector('p.selected');
-        if (el) el.scrollIntoViewIfNeeded();
+        let el = document.querySelector('p.selected');
+        console.log('focus', el);
+        if (el) {
+            setTimeout(() => {
+                el = document.querySelector('p.selected');
+                el.scrollIntoViewIfNeeded();
+            });
+        }
     }
 
     toggleMarkdown() {
         this.markdown = false;
     }
 
-    wordcounter(fn) {
-        fn = fn || this.triggers.wordcounter.fn;
-        let { texteditor } = this;
-        defer(
+    wordcounter = fn => {
+        this.defer.call(
+            this,
             'wordcounter',
             () => {
-                const { innerText } = texteditor;
+                fn = fn || this.triggers.wordcounter.fn;
+                const { innerText } = this.texteditor;
                 this.words = wordcount(innerText);
                 return fn(this.words);
             },
-            550
+            150
         );
-    }
-
+    };
     /*
     init method is used to open or create an article.
     */
-    init(array) {
+    init = array => {
         // console.log(array);
         if (!array) return;
 
         const p = new Parse(array, { markdown: this.markdown });
         this.texteditor.innerHTML = p.toHTML();
-        this.data = p.toCollection();
 
         this.show();
         this.focus();
         this.wordcounter();
-    }
+    };
 
     reset(data) {
         // clear the text editor
@@ -191,7 +192,7 @@ class Texteditor {
         this.texteditor.innerText = '';
         this.parent.selected = null;
         this.selected = null;
-        this.wordcounter = 0;
+        this.words = 0;
         this.data = {};
 
         this.init(data);
@@ -245,7 +246,7 @@ class Texteditor {
         selected.classList.add('selected');
         selected.innerHTML = text || `(empty)`;
 
-        this.wordcounter();
+        // this.parent.wordcount();
 
         return selected;
     }
