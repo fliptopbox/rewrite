@@ -9,6 +9,9 @@
 -   Holding shift down causes rapid sentence toggling.
 
 # TODO
+-   rename is triggered but cta EDIT
+-   Underline toggle (on/off)
+-   dark theme selected & locked highlighting is too subtle
 -   floating menu on the divider
     -   re-focus selected paragraph
     -   read selected paragrapg
@@ -21,7 +24,7 @@
     - eg //? //! //# /// red, green. blue & white
     - these color the line in the sentence editor
     - and mark the paragraph with an icon/bookmark
--   wordcount target that alerts when the taget is met
+-   wordcount target that alerts when the target is met
 -   locked paragraph needs an icon to be more obvious
 -   visual prompt signalling an edit on a locked paragraph
 -   ? move DOM dataset to Javascript state tree

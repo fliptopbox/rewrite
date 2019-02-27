@@ -348,6 +348,40 @@ class Sidebar extends React.Component {
         window.TTS.read(el.innerText);
     };
 
+    download = (mime = "text") => {
+        const method = {
+            text: "toText",
+            markdown: "toMarkdown",
+            json: "toCollection"
+        }[mime] || "text";
+
+        return  (e) => {
+
+            const { previous } = this.state;
+            const { store } = this.props;
+
+            let {data, name, guid} = store.read(previous);
+
+            // pressing SHIFT presents the save-as prompt
+            name = e.shiftKey ? u.prompt(`Enter filename`, `${name}-${guid}`) : name;
+            if (!name || !name.trim()) return;
+
+            const p = new Parse(data);
+            const object = {
+                name,
+                id: guid,
+                data: p[method](),
+                type: mime,
+                appendId: false,
+            }
+            console.log(previous, method, p[method](), p.toText());
+            //console.log(object);
+            //console.log(e.shiftKey);
+            return u.download(object);
+        }
+
+    }
+
     render() {
         const articleList = this.getArticles();
         return (
@@ -379,7 +413,10 @@ class Sidebar extends React.Component {
                         </div>
                     </li>
                     <li>
-                        <div className="inner">Save</div>
+                        <div className="inner"
+                            onClick={this.download("text")}> 
+                            <span>Save</span>
+                        </div>
                     </li>
                 </ul>
                 {articleList}
