@@ -38,10 +38,7 @@ $duration: 150ms;
     }
 
     .file-toggle-input {
-        &:hover:after {
-            display: inline-block;
-        }
-        &:after {
+        a {
             content: 'edit';
             font-size: 0.6em;
             color: red;
@@ -49,6 +46,11 @@ $duration: 150ms;
             margin: 0 0 0 5px;
             vertical-align: middle;
             display: none;
+        }
+        &:hover {
+            a {
+                display: inline-block;
+            }
         }
     }
 
@@ -67,8 +69,12 @@ $duration: 150ms;
         position: relative;
         display: block;
         list-style: none;
-        margin: 2px 8px;
-        padding: 12px 0;
+        margin: 2px 0;
+        padding: 0;
+
+        label {
+            cursor: pointer;
+        }
 
         &.selected {
             background: #e4e4e4;
@@ -79,7 +85,8 @@ $duration: 150ms;
         }
 
         .inner {
-            padding: 0 1.2em;
+            padding: 0.6em 1.2em;
+            display: block;
         }
 
         strong,
@@ -103,11 +110,11 @@ $duration: 150ms;
     &-boolean {
         &-true,
         &-false {
-            background: #303030;
+            background: #000;
             border-radius: 1em;
             position: relative;
             display: inline-block;
-            margin: -0.1em 0.025em 0;
+            margin: -0.35em 0.025em 0;
             padding: 0.025em;
             font-size: 16px;
         }
@@ -184,6 +191,9 @@ $duration: 150ms;
             border: none;
             padding-bottom: 0;
             margin-bottom: -6px;
+            .inner {
+                padding-bottom: 0;
+            }
         }
     }
 }

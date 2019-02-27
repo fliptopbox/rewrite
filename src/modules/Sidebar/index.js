@@ -3,6 +3,16 @@ import Parse from '../../utilities/Parse';
 import u from '../../utilities/';
 const { read, write } = u.storage('settings');
 
+const html = document.querySelector("html");
+
+window.addEventListener("keyup", e => {
+    if(!e.shiftKey) html.classList.remove("show-shift");
+});
+
+window.addEventListener("keydown", e => {
+    if(e.shiftKey) html.classList.add("show-shift");
+});
+
 class ToggleToInput extends React.Component {
     constructor(props) {
         super();
@@ -35,10 +45,9 @@ class ToggleToInput extends React.Component {
     render() {
         const { name, edit, guid } = this.state;
         return !edit ? (
-            <span
-                className="file-toggle-input"
-                onClick={this.toggleEditAndFocus}>
+            <span className="file-toggle-input">
                 {name}
+                <a href="#edit"onClick={this.toggleEditAndFocus}>edit</a>
             </span>
         ) : (
             <input
@@ -228,7 +237,8 @@ class Sidebar extends React.Component {
                     <li className="file-words">{words} words </li>
                     <li className="file-modified">{u.elapsed(opened)}</li>
                     <li className="file-exports">
-                        <a href="#txt">txt</a> | <a href="#json">json</a>
+                        <a href="#txt" onClick={this.download("text")}>txt</a> |
+                        <a href="#json" onClick={this.download("json")}>json</a>
                     </li>
                 </ul>
             </div>
@@ -356,14 +366,20 @@ class Sidebar extends React.Component {
         }[mime] || "text";
 
         return  (e) => {
+            e.preventDefault();
+            e.stopPropagation();
 
             const { previous } = this.state;
             const { store } = this.props;
 
             let {data, name, guid} = store.read(previous);
+            const date = new Date()
+                .toISOString()
+                .replace(/:\d+.\d+.$/, "")
+                .replace("T", " ");
 
             // pressing SHIFT presents the save-as prompt
-            name = e.shiftKey ? u.prompt(`Enter filename`, `${name}-${guid}`) : name;
+            name = e.shiftKey ? u.prompt(`Enter filename`, `${name}-${date}`) : name;
             if (!name || !name.trim()) return;
 
             const p = new Parse(data);
@@ -374,9 +390,6 @@ class Sidebar extends React.Component {
                 type: mime,
                 appendId: false,
             }
-            console.log(previous, method, p[method](), p.toText());
-            //console.log(object);
-            //console.log(e.shiftKey);
             return u.download(object);
         }
 
@@ -399,8 +412,7 @@ class Sidebar extends React.Component {
                         </div>
                     </li>
                     <li>
-                        <div className="inner">
-                            <label htmlFor="uploadInput">
+                            <label htmlFor="uploadInput" className="inner">
                                 <span>Open</span>
                                 <input
                                     id="uploadInput"
@@ -410,12 +422,11 @@ class Sidebar extends React.Component {
                                     accept="text/*"
                                 />
                             </label>
-                        </div>
                     </li>
                     <li>
                         <div className="inner"
-                            onClick={this.download("text")}> 
-                            <span>Save</span>
+                            onClick={this.download("text")}>
+                            <span>Save <i className="on-shift">As</i></span>
                         </div>
                     </li>
                 </ul>
