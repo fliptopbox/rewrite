@@ -47,7 +47,6 @@ function setVoice(i = 0) {
 }
 
 function saythis(text, n = '') {
-    // const text = monologue.slice(0,1);
     const tts = new SpeechSynthesisUtterance();
     const voice = selectedVoice || null;
 
@@ -67,7 +66,7 @@ function saythis(text, n = '') {
         text,
     });
 
-    console.log('say [%s]', tts.text, tts.text.length);
+    // console.log('say [%s]', tts.text, tts.text.length);
     return synth.speak(tts);
 }
 
