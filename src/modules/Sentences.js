@@ -12,11 +12,19 @@ class Senetences extends Texteditor {
     this.on("change", null, updateSelectedParagraph);
     this.on("toggle", /(shiftshift)$/i, toggleInactiveFlag);
     this.on("capitalize", /(altenter)$/i, toggleStringCase);
+      this.on("deleteline", /(altbackspace)$/i, deleteCurrentLine);
     this.on("click", null, () => {});
   }
 }
 
 export default Senetences;
+
+function deleteCurrentLine (e) {
+    e.preventDefault();
+    e.stopPropagation();
+    console.log(e.target)
+    this.selected.remove();
+}
 
 function toggleStringCase() {
   const { innerText } = this.selected;
