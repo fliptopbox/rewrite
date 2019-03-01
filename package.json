@@ -1,9 +1,10 @@
 {
-  "name": "prototype",
-  "version": "1.0.0",
-  "description": "",
-  "keywords": [],
+  "name": "re-writing",
+  "version": "0.3.0",
+  "description": "rewriting is writing - a simple tool to turn paragraphs into layered sentences.",
+  "keywords": ["writing", "layered senetences", "rewrite", "TTS", "typewriter", "creative writing"],
   "main": "src/index.js",
+  "homepage": ".",
   "dependencies": {
     "babel-preset-env": "^1.7.0",
     "marked": "^0.6.0",

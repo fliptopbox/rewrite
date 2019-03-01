@@ -8,11 +8,11 @@
 
 $empty: 'empty';
 html {
-    .on-shift {
+    .on-alternative {
         display: none;
     }
-    &.show-shift {
-        .on-shift { display: inline-block; }
+    &.show-alternative {
+        .on-alternative { display: inline-block; }
     }
 }
 

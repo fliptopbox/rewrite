@@ -6,11 +6,11 @@ const { read, write } = u.storage('settings');
 const html = document.querySelector("html");
 
 window.addEventListener("keyup", e => {
-    if(!e.shiftKey) html.classList.remove("show-shift");
+    if(!e.altKey) html.classList.remove("show-alternative");
 });
 
 window.addEventListener("keydown", e => {
-    if(e.shiftKey) html.classList.add("show-shift");
+    if(e.altKey) html.classList.add("show-alternative");
 });
 
 class ToggleToInput extends React.Component {
@@ -165,6 +165,7 @@ class Sidebar extends React.Component {
                     () => {
                         body.classList.remove('sidebar-close');
                         body.classList.remove('show-sidebar');
+                        html.classList.remove("show-alternative");
                     },
                     250
                 );
@@ -337,6 +338,32 @@ class Sidebar extends React.Component {
         });
     };
 
+    handleDataRestore = (e) => {
+        const {restore} = u.backupRestore;
+        const {readTextFile} = u;
+        const ns = "rewrite";
+
+        return readTextFile(e, (name, plaintext) => {
+            const data = JSON.parse(plaintext);
+            const keys = Object.keys(data);
+            const valid = keys.filter(k => /(articles|previous|settings)$/i.test(k))
+
+            console.log(valid);
+            // restore if there is data integrity
+            if (!valid.length === 3) {
+                console.error("Restore failed integrity check", data);
+                return;
+            }
+
+            const contd = u.confirm("You are about to overwrite existing data.\nAre you sure?");
+            if(!contd) return;
+
+            Object.keys(localStorage).forEach(k => (k.indexOf() + 1 ? (delete localStorage[k]) : null));
+            return restore(ns, data);
+        });
+
+    }
+
     getOnOff(name) {
         const { modifiers } = this.state;
         const bool = modifiers[name];
@@ -371,6 +398,7 @@ class Sidebar extends React.Component {
 
             const { previous } = this.state;
             const { store } = this.props;
+            const saveAs = e.altKey ? true : false;
 
             let {data, name, guid} = store.read(previous);
             const date = new Date()
@@ -378,8 +406,8 @@ class Sidebar extends React.Component {
                 .replace(/:\d+.\d+.$/, "")
                 .replace("T", " ");
 
-            // pressing SHIFT presents the save-as prompt
-            name = e.shiftKey ? u.prompt(`Enter filename`, `${name}-${date}`) : name;
+            // pressing a ket modifier presents the save-as prompt
+            name = saveAs ? u.prompt(`Enter filename`, `${name}-${date}`) : name;
             if (!name || !name.trim()) return;
 
             const p = new Parse(data);
@@ -412,23 +440,55 @@ class Sidebar extends React.Component {
                         </div>
                     </li>
                     <li>
-                            <label htmlFor="uploadInput" className="inner">
-                                <span>Open</span>
-                                <input
-                                    id="uploadInput"
-                                    className="hidden"
-                                    onChange={this.handleImport}
-                                    type="file"
-                                    accept="text/*"
-                                />
-                            </label>
+                        <label htmlFor="uploadInput" className="inner">
+                            <span>Open</span>
+                            <input
+                                id="uploadInput"
+                                className="hidden"
+                                onChange={this.handleImport}
+                                type="file"
+                                accept="text/*"
+                            />
+                        </label>
                     </li>
                     <li>
                         <div className="inner"
                             onClick={this.download("text")}>
-                            <span>Save <i className="on-shift">As</i></span>
+                            <span>Save <i className="on-alternative">As</i></span>
                         </div>
                     </li>
+                    <div className="on-alternative">
+                    <li>
+                        <div className="inner"
+                            onClick={() => {
+                                const {download, backupRestore} = u;
+                                const {backup} = backupRestore;
+
+                                const data = backup("rewrite");
+                                const meta = {
+                                    name: "rewriting-backup",
+                                    id: new Date().toISOString(),
+                                    data
+                                }
+                                return download(meta);
+                            }}>
+                            <span>Backup</span>
+                        </div>
+                    </li>
+                    <li>
+                        <label htmlFor="restoreData" className="inner">
+                            <span>Restore</span>
+                            <input
+                                id="restoreData"
+                                className="hidden"
+                                onChange={this.handleDataRestore}
+                                type="file"
+                                accept="text/json"
+                            />
+                        </label>
+                    </li>
+                    </div>
+
                 </ul>
                 {articleList}
                 <ul className="settings">

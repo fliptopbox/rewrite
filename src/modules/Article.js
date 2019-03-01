@@ -51,7 +51,7 @@ function articleToggleActive(e) {
   let { versions } = this.selected.dataset;
   const locked = versions && versions.trim();
 
-  // only double shift (keyboard) allows unlock
+  // only double alt (on keyboard) allows unlock
   if (/^key/.test(e.type) && locked && window.confirm("Are you sure")) {
     classList.remove("locked");
     dataset.versions = "";

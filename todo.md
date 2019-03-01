@@ -7,13 +7,13 @@
 -   the spell corrector can edit on a locked paragraph.
 -   pasting causes un formatted article. shift paste is okay
 -   Holding shift down causes rapid sentence toggling.
+-   onLoad: selected para should populate sentence editor
 
 # TODO
--   chrome extension to backup/sync localstorage
+-   backup/restore localstorage
 -   Underline toggle (on/off)
 -   dark theme selected & locked highlighting is too subtle
 -   ESC obscured workspace
--   SHIFT Basckspace = delete line
 -   SHIFT Enter = new line without line break
 -   wordcount target that alerts when the target is met
 -   locked paragraph needs an icon to be more obvious
@@ -56,3 +56,5 @@
 -   read selected paragraph
 -   read entire article
 -   rename is triggered by cta EDIT
+-   QUOTA LIMIT RESTRICTION chrome extension to backup/sync localstorage
+-   SHIFT Basckspace = delete line
