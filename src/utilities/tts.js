@@ -1,13 +1,16 @@
-const isenglish = /^en-(gb|us)/i;
+var british = /^en-(uk|gb)/i;
 
-let english;
-let retry;
-let synth, voices;
-let selectedVoice = null;
+var english;
+var languages;
+var retry;
+var synth, voices;
+var selectedVoice = null;
+
 
 function initialize() {
     synth = window.speechSynthesis;
     voices = synth.getVoices();
+    languages = languages || navigator.languages;
 
     if (!voices) {
         // console.warn("Voices not loaded. Reloading");
@@ -18,26 +21,20 @@ function initialize() {
 
     let i = 0;
     let index = null;
+  
+    // filter for browser language
+	console.log(voices.length, languages);
 
-    voices.forEach((item, n) => {
-        if (isenglish.test(item.lang)) {
-            if (index === null && /female/i.test(item.name)) {
-                index = i;
-            }
-            english = english || [];
-            english.push(item);
-            i++;
-        }
-    });
+    voices = voices.filter(o => o.lang.indexOf(languages[1]) + 1);
+    english = voices.filter(o => british.test(o.lang));
+    
+	index = english.length && english.findIndex(o => /female/ig.test(o.name));
+	index = Math.max(index, 0);
 
-    // console.log("TTS initialized", english && english.length, index);
-    selectedVoice = english && english[index || 0];
+    console.log("TTS initialized", english.length, index);
 
-    window.speechSynthesis.onvoiceschanged = function(e) {
-        console.log('voice has chagned', e.timeStamp);
-    };
-
-    return methods;
+    selectedVoice = english.length ? english[index] : voices[0];
+	console.log("selectedVoice", selectedVoice);
 }
 
 function setVoice(i = 0) {
