@@ -19,6 +19,12 @@ This is a simple tool that allows the writer to systematically breakdown each pa
 
 ## keyboard shortcuts
 
+**Sidebar (open)**
+| Key combination | Description
+|||
+| ALT (hold down) | Shows alternative actions and reveals Backup & Resore actions
+
+
 **Paragraphs**
 
 | Key combination | Description
