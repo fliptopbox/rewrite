@@ -5,12 +5,19 @@ const { read, write } = u.storage('settings');
 
 const html = document.querySelector("html");
 
-window.addEventListener("keyup", e => {
-    if(!e.altKey) html.classList.remove("show-alternative");
-});
+// window.addEventListener("keyup", e => {
+//     if(!e.altKey) html.classList.remove("show-alternative");
+// });
 
+// a keypress toggle. 1st press = on, 2nd press = off
+// different platforms have strange quirks with holding down keys + clicking
 window.addEventListener("keydown", e => {
-    if(e.altKey) html.classList.add("show-alternative");
+    let method, className;
+    if(e.altKey) {
+        className = "show-alternative";
+        method = html.classList.contains(className) ? "remove" : "add";
+        html.classList[method](className);
+    }
 });
 
 class ToggleToInput extends React.Component {

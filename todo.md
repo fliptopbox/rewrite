@@ -10,7 +10,7 @@
 -   onLoad: selected para should populate sentence editor
 
 # TODO
--   backup/restore localstorage
+
 -   Underline toggle (on/off)
 -   dark theme selected & locked highlighting is too subtle
 -   ESC obscured workspace
@@ -49,6 +49,7 @@
 
 ## CHANGELOG/BUG FIXES
 
+-   backup/restore localstorage
 -   global SHIFT key css modifier (SHIFT = Save As)
 -   file txt/json export
 -   save current article

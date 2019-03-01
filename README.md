@@ -22,7 +22,7 @@ This is a simple tool that allows the writer to systematically breakdown each pa
 **Sidebar (open)**
 | Key combination | Description
 |||
-| ALT (hold down) | Shows alternative actions and reveals Backup & Resore actions
+| ALT (tap)       | Toggle that shows alternative actions and reveals Backup & Resore actions
 
 
 **Paragraphs**

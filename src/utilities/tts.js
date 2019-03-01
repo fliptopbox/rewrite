@@ -19,22 +19,22 @@ function initialize() {
         return retry;
     }
 
-    let i = 0;
+
     let index = null;
-  
+
     // filter for browser language
-	console.log(voices.length, languages);
+    console.log(voices.length, languages);
 
     voices = voices.filter(o => o.lang.indexOf(languages[1]) + 1);
     english = voices.filter(o => british.test(o.lang));
-    
-	index = english.length && english.findIndex(o => /female/ig.test(o.name));
-	index = Math.max(index, 0);
+
+    index = english.length && english.findIndex(o => /female/ig.test(o.name));
+    index = Math.max(index, 0);
 
     console.log("TTS initialized", english.length, index);
 
     selectedVoice = english.length ? english[index] : voices[0];
-	console.log("selectedVoice", selectedVoice);
+    console.log("selectedVoice", selectedVoice);
 }
 
 function setVoice(i = 0) {
