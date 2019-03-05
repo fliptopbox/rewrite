@@ -31,6 +31,7 @@ class Texteditor {
         this.markdown = null;
         this.scrollToSelected = true;
         this.words = 0;
+        this.wordtarget = 0;
 
         this.container = container;
         this.texteditor = texteditor;
@@ -156,9 +157,20 @@ class Texteditor {
             'wordcounter',
             () => {
                 fn = fn || this.triggers.wordcounter.fn;
+                let innerHTML, diff;
                 const { innerText } = this.texteditor;
+
                 this.words = wordcount(innerText);
-                return fn(this.words);
+                innerHTML = `<span class="value">${this.words}</span>`;
+
+                if (this.wordtarget) {
+                    diff = this.wordtarget - this.words;
+                    let warn = diff < 0 ? '-warn' : '';
+                    innerHTML = `<span class="value value${warn}">${
+                        this.words
+                    }/${this.wordtarget}</span>`;
+                }
+                return fn(innerHTML);
             },
             150
         );
@@ -178,6 +190,10 @@ class Texteditor {
         this.wordcounter();
     };
 
+    setWordTarget(n = 0) {
+        this.wordtarget = n;
+    }
+
     reset(data) {
         // clear the text editor
         // clear selected element
@@ -187,6 +203,7 @@ class Texteditor {
         this.parent.selected = null;
         this.selected = null;
         this.words = 0;
+        // this.wordtarget = 0;
         this.data = {};
 
         this.init(data);

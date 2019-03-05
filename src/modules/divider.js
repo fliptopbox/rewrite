@@ -92,9 +92,8 @@ function resize(e, value) {
 }
 
 const elements = {};
-function update(id, text) {
-    elements[id].innerText = text;
-    // console.log('divider update [%s]', text, id);
+function update(id, html) {
+    elements[id].innerHTML = html;
 }
 
 function onResize(fn) {

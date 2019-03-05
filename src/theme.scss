@@ -61,7 +61,7 @@
     }
     .dark & {
         &.paragraphs p {
-            border-bottom: 1px solid rgba(45,45,45, 0.13);
+            border-bottom: 1px solid rgba(45, 45, 45, 0.13);
         }
         &.sentences p {
             border-bottom: 1px solid rgba(0, 0, 0, 0.07);
@@ -80,13 +80,25 @@
         background: rgb(44, 44, 44);
         border-color: rgb(255, 255, 255);
         &-wordcount {
-            color: #d3d3d3;
+            .value {
+                color: #d3d3d3;
+                &-warn {
+                    color: #ffffff;
+                    background: red;
+                }
+            }
         }
         .dark & {
             background: rgb(0, 0, 0);
             border-color: #111;
             &-wordcount {
-                color: #2a2a2a;
+                .value {
+                    color: #2a2a2a;
+                    &-warn {
+                        color: #000000;
+                        background: #540000;
+                    }
+                }
             }
         }
     }

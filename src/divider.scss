@@ -14,10 +14,15 @@
     &-wordcount {
         position: absolute;
         bottom: 0;
-        margin: 1em;
         text-align: center;
-        padding: 0.3em;
         right: 0em;
         border-radius: 3px;
+        margin: 1.2em 0.2em;
+
+        .value {
+            margin: 1em;
+            padding: 0.3em;
+            border-radius: 2px;
+        }
     }
 }

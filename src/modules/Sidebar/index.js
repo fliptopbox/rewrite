@@ -264,12 +264,15 @@ class Sidebar extends React.Component {
         const { store, article } = this.props;
         const fileObj = store.read(guid);
         const { data } = fileObj;
+        console.log(267, fileObj);
+        article.setWordTarget(fileObj.wordtarget);
         return article.reset(data);
     };
 
     getFileRow(object, updatePrevious) {
-        const { guid, name, words = 1234, opened } = object;
+        const { guid, name, wordtarget, opened } = object;
         const { store } = this.props;
+        const target = wordtarget ? `${wordtarget} words` : `add`;
         return (
             <div
                 className="inner"
@@ -292,7 +295,7 @@ class Sidebar extends React.Component {
                             del
                         </a>
                     </li>
-                    <li className="file-words">{words} words </li>
+                    <li className="file-words">Target: {target}</li>
                     <li className="file-modified">{u.elapsed(opened)}</li>
                     <li className="file-exports">
                         <a href="#txt" onClick={this.download('text')}>
