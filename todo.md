@@ -6,7 +6,6 @@
 -   backspace sometimes does not trigger change
 -   the spell corrector can edit on a locked paragraph.
 -   pasting causes un formatted article. shift paste is okay
--   Holding shift down causes rapid sentence toggling.
 -   onLoad: selected para should populate sentence editor
 
 # TODO
@@ -26,13 +25,13 @@
 -   show list of key trigger shortcuts
 -   refactor file/settings flexbox vertical
 
-## NEW FEATURES or MAJOR REFACTOR 
+## NEW FEATURES or MAJOR REFACTOR
 
 -   allow for markdown and fountain inline rendering
--   color comments 
-    - eg //? //! //# /// red, green. blue & white
-    - these color the line in the sentence editor
-    - and mark the paragraph with an icon/bookmark
+-   color comments
+    -   eg //? //! //# /// red, green. blue & white
+    -   these color the line in the sentence editor
+    -   and mark the paragraph with an icon/bookmark
 -   Improve TTS UI/UX
     -   design TTS playback HUD widget
     -   play/pause/cont/loop/
@@ -49,6 +48,7 @@
 
 ## CHANGELOG/BUG FIXES
 
+-   remote server sync
 -   backup/restore localstorage
 -   global SHIFT key css modifier (SHIFT = Save As)
 -   file txt/json export
@@ -57,5 +57,6 @@
 -   read selected paragraph
 -   read entire article
 -   rename is triggered by cta EDIT
--   QUOTA LIMIT RESTRICTION chrome extension to backup/sync localstorage
+-   chrome extension to backup/sync localstorage **QUOTA LIMIT**
 -   SHIFT Basckspace = delete line
+-   Holding shift down causes rapid sentence toggling.
