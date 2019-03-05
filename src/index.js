@@ -60,7 +60,7 @@ window.RE = {
 // Sidebar is a React component
 const sidebar = document.querySelector('#sidebar');
 ReactDOM.render(
-    <Sidebar store={store} article={article} mouse={mouse} />,
+    <Sidebar store={store} article={article} mouse={mouse} divider={divider} />,
     sidebar
 );
 

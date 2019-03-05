@@ -92,7 +92,6 @@ class Sidebar extends React.Component {
         super();
         this.state = {
             articles: [],
-            // current: null,
             guid: null,
             previous: null,
             modifiers: {
@@ -106,8 +105,9 @@ class Sidebar extends React.Component {
                 fontsize: 24,
             },
         };
-        window.RE = window.RE || {};
-        window.RE.sync = this.syncWithServer;
+
+        // update the divider changes
+        props.divider.onResize(this.save);
     }
 
     componentDidMount() {
@@ -115,12 +115,6 @@ class Sidebar extends React.Component {
         const settings = read();
         const articles = this.getUpdatedArticles();
         const previous = u.storage('previous').read();
-        // const state = {
-        //     ...this.state,
-        //     articles,
-        //     ...settings,
-        //     previous,
-        // };
         const state = Object.assign(
             {},
             this.state,
@@ -134,12 +128,11 @@ class Sidebar extends React.Component {
         this.setState(state);
         this.applySettings(state);
         this.registerMouseEvent();
-        console.log('mounting...', state.settings);
         this.syncWithServer(state.guid);
     }
 
     applySettings = state => {
-        const { modifiers, values } = state || this.state;
+        const { modifiers, values } = state;
 
         // apply the current/persisted modifiers
         for (let key in modifiers) {
@@ -153,6 +146,8 @@ class Sidebar extends React.Component {
             const value = values[key];
             this[key] && this[key](value);
         }
+
+        if (state.width) this.props.divider.resize(null, state.width);
     };
 
     syncWithServer = guid => {
@@ -173,22 +168,21 @@ class Sidebar extends React.Component {
 
             purge('rewrite');
             restore('rewrite', data);
+            let { articles, settings, previous } = data;
+            settings = JSON.parse(settings);
+            articles = JSON.parse(articles);
+            previous = JSON.parse(previous);
+
             let state = {
-                articles: data.articles,
-                settings: data.settings,
-                previous: data.previous,
-                guid: `"${guid}"`,
+                articles,
+                previous,
+                ...settings,
+                guid,
             };
 
-            Object.keys(state).forEach(k => {
-                state[k] = JSON.parse(state[k]);
-            });
-
-            state.guid = guid;
-
-            this.applySettings(state.settings);
+            this.applySettings(settings);
             this.setState(state);
-            this.getArticleByGuid(state.previous);
+            this.getArticleByGuid(previous);
             this.props.store.sync(guid);
         };
 
@@ -337,9 +331,11 @@ class Sidebar extends React.Component {
     save = () => {
         const prev = read() || {}; // remember divider.js also saves settings
         const data = { ...prev, ...this.state };
+        const { guid } = data;
+
         delete data.articles;
         write(data);
-        setTimeout(() => push(data.guid, 5000), 0);
+        setTimeout(() => push(guid, 5000), 0);
         return data;
     };
 

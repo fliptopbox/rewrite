@@ -104,7 +104,7 @@ function storage(sufix = null) {
                         body: formData,
                     })
                         .then(r => r.json())
-                        .then(json => console.log('repy', json));
+                        .then(json => console.log('relpy', json));
                 },
                 priority || apiPushDelay
             );

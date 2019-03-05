@@ -13,7 +13,6 @@
 -   Underline toggle (on/off)
 -   dark theme selected & locked highlighting is too subtle
 -   ESC obscured workspace
--   SHIFT Enter = new line without line break
 -   wordcount target that alerts when the target is met
 -   locked paragraph needs an icon to be more obvious
 -   visual prompt to signal an edit on a locked paragraph
@@ -60,3 +59,5 @@
 -   chrome extension to backup/sync localstorage **QUOTA LIMIT**
 -   SHIFT Basckspace = delete line
 -   Holding shift down causes rapid sentence toggling.
+-   SHIFT Enter = new line without line break
+-   resize divider after server sync

@@ -5,6 +5,7 @@ let B;
 // let action;
 let vertical;
 let dragging = false;
+let notifySizeChange;
 const { read, write } = u.storage('settings');
 
 let state = Object.assign(
@@ -85,13 +86,19 @@ function resize(e, value) {
     B.style.width = `${100 - percent}%`;
     vertical.style.left = `${percent}%`;
 
-    save({ width: Number(percent) });
+    const newWidth = { width: Number(percent) };
+    if (notifySizeChange) notifySizeChange(newWidth);
+    save(newWidth);
 }
 
 const elements = {};
 function update(id, text) {
     elements[id].innerText = text;
     // console.log('divider update [%s]', text, id);
+}
+
+function onResize(fn) {
+    notifySizeChange = fn;
 }
 
 function add(id) {
@@ -118,7 +125,7 @@ function initialize(mouse) {
 
     console.log('resizer initialized');
 
-    return { resize, settings, add, update };
+    return { resize, settings, add, update, onResize };
 }
 
 export default initialize;
