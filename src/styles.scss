@@ -12,7 +12,13 @@ html {
         display: none;
     }
     &.show-alternative {
-        .on-alternative { display: inline-block; }
+        .on-alternative {
+            width: 100%;
+            display: block;
+            &-inline {
+                display: inline-block;
+            }
+        }
     }
 }
 

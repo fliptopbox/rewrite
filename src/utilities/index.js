@@ -55,6 +55,8 @@ function time() {
 function storage(sufix = null) {
     let delay = 250;
     const ns = ['rewrite', sufix].filter(val => val).join('-');
+    const apiServerUrl = 'https://fliptopbox.com/cgi-bin/getuser.py';
+    const apiPushDelay = 60 * 1000; // 1minute
 
     // this looks strange. leave it! it's for JEST testing.
     const localStorage = this.localStorage || window.localStorage;
@@ -66,6 +68,46 @@ function storage(sufix = null) {
 
         delete: () => {
             delete localStorage[ns];
+        },
+
+        pull: (guid, fn) => {
+            const formData = new FormData();
+            formData.append('guid', guid);
+
+            fetch(`${apiServerUrl}`, {
+                method: 'POST',
+                body: formData,
+            })
+                .then(rx => rx.json())
+                .then(json => fn(json));
+        },
+
+        push: (guid = null, priority = 0) => {
+            if (!guid) return;
+            return defer(
+                'push',
+                function() {
+                    let data = {};
+
+                    Object.keys(localStorage).map(name => {
+                        const key = name.replace(/^([^-]+-+)/, '');
+                        data[key] = localStorage[name];
+                        return name;
+                    });
+
+                    const formData = new FormData();
+                    formData.append('guid', guid);
+                    formData.append('data', JSON.stringify(data));
+
+                    fetch(`${apiServerUrl}`, {
+                        method: 'POST',
+                        body: formData,
+                    })
+                        .then(r => r.json())
+                        .then(json => console.log('repy', json));
+                },
+                priority || apiPushDelay
+            );
         },
 
         backup: (label = null) => {

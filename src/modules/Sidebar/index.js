@@ -1,9 +1,9 @@
 import React from 'react';
 import Parse from '../../utilities/Parse';
 import u from '../../utilities/';
-const { read, write } = u.storage('settings');
+const { read, write, push } = u.storage('settings');
 
-const html = document.querySelector("html");
+const html = document.querySelector('html');
 
 // window.addEventListener("keyup", e => {
 //     if(!e.altKey) html.classList.remove("show-alternative");
@@ -11,11 +11,11 @@ const html = document.querySelector("html");
 
 // a keypress toggle. 1st press = on, 2nd press = off
 // different platforms have strange quirks with holding down keys + clicking
-window.addEventListener("keydown", e => {
+window.addEventListener('keydown', e => {
     let method, className;
-    if(e.altKey) {
-        className = "show-alternative";
-        method = html.classList.contains(className) ? "remove" : "add";
+    if (e.altKey) {
+        className = 'show-alternative';
+        method = html.classList.contains(className) ? 'remove' : 'add';
         html.classList[method](className);
     }
 });
@@ -54,7 +54,9 @@ class ToggleToInput extends React.Component {
         return !edit ? (
             <span className="file-toggle-input">
                 {name}
-                <a href="#edit"onClick={this.toggleEditAndFocus}>edit</a>
+                <a href="#edit" onClick={this.toggleEditAndFocus}>
+                    edit
+                </a>
             </span>
         ) : (
             <input
@@ -91,6 +93,7 @@ class Sidebar extends React.Component {
         this.state = {
             articles: [],
             // current: null,
+            guid: null,
             previous: null,
             modifiers: {
                 collapsed: true,
@@ -103,6 +106,8 @@ class Sidebar extends React.Component {
                 fontsize: 24,
             },
         };
+        window.RE = window.RE || {};
+        window.RE.sync = this.syncWithServer;
     }
 
     componentDidMount() {
@@ -127,22 +132,68 @@ class Sidebar extends React.Component {
         // remember setState can lag!
         // don't rely on this.state === state
         this.setState(state);
+        this.applySettings(state);
+        this.registerMouseEvent();
+        console.log('mounting...', state.settings);
+        this.syncWithServer(state.guid);
+    }
+
+    applySettings = state => {
+        const { modifiers, values } = state || this.state;
 
         // apply the current/persisted modifiers
-        for (let key in state.modifiers) {
-            this.toggleClassName(key, state.modifiers[key]);
+        for (let key in modifiers) {
+            this.toggleClassName(key, modifiers[key]);
         }
 
         // apply the variable values
         // these require a callback eg. this.fontsize()
         // that matches state key eg. value.fontsize
-        for (let key in state.values) {
-            const value = state.values[key];
+        for (let key in values) {
+            const value = values[key];
             this[key] && this[key](value);
         }
+    };
 
-        this.registerMouseEvent();
-    }
+    syncWithServer = guid => {
+        if (!guid) {
+            console.warn('Require sync profile id');
+            return;
+        }
+
+        const { purge, restore } = u.backupRestore;
+        const fn = json => {
+            const { status, data } = json;
+            if (status !== 200) {
+                console.error('Nothing to restore', json);
+                return;
+            }
+
+            console.warn('Restoring remote data');
+
+            purge('rewrite');
+            restore('rewrite', data);
+            let state = {
+                articles: data.articles,
+                settings: data.settings,
+                previous: data.previous,
+                guid: `"${guid}"`,
+            };
+
+            Object.keys(state).forEach(k => {
+                state[k] = JSON.parse(state[k]);
+            });
+
+            state.guid = guid;
+
+            this.applySettings(state.settings);
+            this.setState(state);
+            this.getArticleByGuid(state.previous);
+            this.props.store.sync(guid);
+        };
+
+        return u.storage().pull(guid, fn);
+    };
 
     getUpdatedArticles() {
         const { store } = this.props;
@@ -172,7 +223,7 @@ class Sidebar extends React.Component {
                     () => {
                         body.classList.remove('sidebar-close');
                         body.classList.remove('show-sidebar');
-                        html.classList.remove("show-alternative");
+                        html.classList.remove('show-alternative');
                     },
                     250
                 );
@@ -215,17 +266,22 @@ class Sidebar extends React.Component {
         );
     };
 
+    getArticleByGuid = guid => {
+        const { store, article } = this.props;
+        const fileObj = store.read(guid);
+        const { data } = fileObj;
+        return article.reset(data);
+    };
+
     getFileRow(object, updatePrevious) {
         const { guid, name, words = 1234, opened } = object;
-        const { store, article } = this.props;
+        const { store } = this.props;
         return (
             <div
                 className="inner"
                 onClick={() => {
-                    const fileObj = store.read(guid);
-                    const { data } = fileObj;
+                    this.getArticleByGuid(guid);
                     updatePrevious(guid);
-                    return article.reset(data);
                 }}>
                 <span className="file-name" data-guid={guid}>
                     <ToggleToInput name={name} guid={guid} store={store} />
@@ -245,8 +301,13 @@ class Sidebar extends React.Component {
                     <li className="file-words">{words} words </li>
                     <li className="file-modified">{u.elapsed(opened)}</li>
                     <li className="file-exports">
-                        <a href="#txt" onClick={this.download("text")}>txt</a> |
-                        <a href="#json" onClick={this.download("json")}>json</a>
+                        <a href="#txt" onClick={this.download('text')}>
+                            txt
+                        </a>{' '}
+                        |
+                        <a href="#json" onClick={this.download('json')}>
+                            json
+                        </a>
                     </li>
                 </ul>
             </div>
@@ -278,6 +339,7 @@ class Sidebar extends React.Component {
         const data = { ...prev, ...this.state };
         delete data.articles;
         write(data);
+        setTimeout(() => push(data.guid, 5000), 0);
         return data;
     };
 
@@ -345,31 +407,36 @@ class Sidebar extends React.Component {
         });
     };
 
-    handleDataRestore = (e) => {
-        const {restore} = u.backupRestore;
-        const {readTextFile} = u;
-        const ns = "rewrite";
+    handleDataRestore = e => {
+        const { restore } = u.backupRestore;
+        const { readTextFile } = u;
+        const ns = 'rewrite';
 
         return readTextFile(e, (name, plaintext) => {
             const data = JSON.parse(plaintext);
             const keys = Object.keys(data);
-            const valid = keys.filter(k => /(articles|previous|settings)$/i.test(k))
+            const valid = keys.filter(k =>
+                /(articles|previous|settings)$/i.test(k)
+            );
 
             console.log(valid);
             // restore if there is data integrity
             if (!valid.length === 3) {
-                console.error("Restore failed integrity check", data);
+                console.error('Restore failed integrity check', data);
                 return;
             }
 
-            const contd = u.confirm("You are about to overwrite existing data.\nAre you sure?");
-            if(!contd) return;
+            const contd = u.confirm(
+                'You are about to overwrite existing data.\nAre you sure?'
+            );
+            if (!contd) return;
 
-            Object.keys(localStorage).forEach(k => (k.indexOf() + 1 ? (delete localStorage[k]) : null));
+            Object.keys(localStorage).forEach(k =>
+                k.indexOf() + 1 ? delete localStorage[k] : null
+            );
             return restore(ns, data);
         });
-
-    }
+    };
 
     getOnOff(name) {
         const { modifiers } = this.state;
@@ -392,14 +459,15 @@ class Sidebar extends React.Component {
         window.TTS.read(el.innerText);
     };
 
-    download = (mime = "text") => {
-        const method = {
-            text: "toText",
-            markdown: "toMarkdown",
-            json: "toCollection"
-        }[mime] || "text";
+    download = (mime = 'text') => {
+        const method =
+            {
+                text: 'toText',
+                markdown: 'toMarkdown',
+                json: 'toCollection',
+            }[mime] || 'text';
 
-        return  (e) => {
+        return e => {
             e.preventDefault();
             e.stopPropagation();
 
@@ -407,14 +475,16 @@ class Sidebar extends React.Component {
             const { store } = this.props;
             const saveAs = e.altKey ? true : false;
 
-            let {data, name, guid} = store.read(previous);
+            let { data, name, guid } = store.read(previous);
             const date = new Date()
                 .toISOString()
-                .replace(/:\d+.\d+.$/, "")
-                .replace("T", " ");
+                .replace(/:\d+.\d+.$/, '')
+                .replace('T', ' ');
 
             // pressing a ket modifier presents the save-as prompt
-            name = saveAs ? u.prompt(`Enter filename`, `${name}-${date}`) : name;
+            name = saveAs
+                ? u.prompt(`Enter filename`, `${name}-${date}`)
+                : name;
             if (!name || !name.trim()) return;
 
             const p = new Parse(data);
@@ -424,17 +494,16 @@ class Sidebar extends React.Component {
                 data: p[method](),
                 type: mime,
                 appendId: false,
-            }
+            };
             return u.download(object);
-        }
-
-    }
+        };
+    };
 
     render() {
         const articleList = this.getArticles();
         return (
             <div>
-                <ul>
+                <ul className="actions">
                     <li>
                         <div
                             className="inner"
@@ -459,43 +528,57 @@ class Sidebar extends React.Component {
                         </label>
                     </li>
                     <li>
-                        <div className="inner"
-                            onClick={this.download("text")}>
-                            <span>Save <i className="on-alternative">As</i></span>
+                        <div className="inner" onClick={this.download('text')}>
+                            <span>
+                                Save <i className="on-alternative-inline">As</i>
+                            </span>
                         </div>
                     </li>
                     <div className="on-alternative">
-                    <li>
-                        <div className="inner"
-                            onClick={() => {
-                                const {download, backupRestore} = u;
-                                const {backup} = backupRestore;
+                        <li>
+                            <div
+                                className="inner"
+                                onClick={() => {
+                                    const { download, backupRestore } = u;
+                                    const { backup } = backupRestore;
 
-                                const data = backup("rewrite");
-                                const meta = {
-                                    name: "rewriting-backup",
-                                    id: new Date().toISOString(),
-                                    data
-                                }
-                                return download(meta);
-                            }}>
-                            <span>Backup</span>
-                        </div>
-                    </li>
-                    <li>
-                        <label htmlFor="restoreData" className="inner">
-                            <span>Restore</span>
-                            <input
-                                id="restoreData"
-                                className="hidden"
-                                onChange={this.handleDataRestore}
-                                type="file"
-                                accept="text/json"
-                            />
-                        </label>
-                    </li>
+                                    const data = backup('rewrite');
+                                    const meta = {
+                                        name: 'rewriting-backup',
+                                        id: new Date().toISOString(),
+                                        data,
+                                    };
+                                    return download(meta);
+                                }}>
+                                <span>Backup</span>
+                            </div>
+                        </li>
+                        <li>
+                            <label htmlFor="restoreData" className="inner">
+                                <span>Restore</span>
+                                <input
+                                    id="restoreData"
+                                    className="hidden"
+                                    onChange={this.handleDataRestore}
+                                    type="file"
+                                    accept="text/json"
+                                />
+                            </label>
+                        </li>
+                        <li>
+                            <div
+                                className="inner"
+                                onClick={() => {
+                                    const guid = u.prompt(
+                                        'Enter your sync id:'
+                                    );
+                                    return this.syncWithServer(guid);
+                                }}>
+                                <span>Sync Profile</span>
+                                <em>{this.state.guid || 'Not syncing'}</em>
+                            </div>
+                        </li>
                     </div>
-
                 </ul>
                 {articleList}
                 <ul className="settings">

@@ -10,6 +10,8 @@ class Storage {
         this.storage = storage;
         this.uuid = uuid;
         this.current = null; // currently open article
+        this.syncId = null;
+        this.timestamp = null;
 
         this.create = createArticle.bind(this);
     }
@@ -17,6 +19,14 @@ class Storage {
     filename(guid, path) {
         if (!guid) return;
         return [path, guid].filter(s => s).join('-');
+    }
+
+    // sets the users syncID to not null
+    // this will cause the write method to
+    // push updates after the localstroage save
+    sync(guid = null) {
+        this.syncId = guid;
+        this.timestamp = new Date().valueOf();
     }
 
     // reads from localStorage
@@ -57,6 +67,7 @@ class Storage {
 
         local.write(object, true);
         local.backup();
+        local.push(this.syncId);
 
         // update last modified date
         const articles = storage('articles');
