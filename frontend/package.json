@@ -1,31 +1,38 @@
 {
-  "name": "re-writing",
-  "version": "0.4.0",
-  "description": "rewriting is writing - a simple tool to turn paragraphs into layered sentences.",
-  "keywords": ["writing", "layered senetences", "rewrite", "TTS", "typewriter", "creative writing"],
-  "main": "src/index.js",
-  "homepage": ".",
-  "dependencies": {
-    "babel-preset-env": "^1.7.0",
-    "marked": "^0.6.0",
-    "node-sass": "4.11.0",
-    "react": "16.5.2",
-    "react-dom": "16.5.2",
-    "react-scripts": "^2.1.5",
-    "sbd": "^1.0.14",
-    "styled-components": "4.1.3"
-  },
-  "devDependencies": {},
-  "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test --env=jsdom",
-    "eject": "react-scripts eject"
-  },
-  "browserslist": [
-    ">0.2%",
-    "not dead",
-    "not ie <= 11",
-    "not op_mini all"
-  ]
+    "name": "re-writing",
+    "version": "0.4.0",
+    "description": "rewriting is writing - a simple tool to turn paragraphs into layered sentences.",
+    "keywords": [
+        "writing",
+        "layered senetences",
+        "rewrite",
+        "TTS",
+        "typewriter",
+        "creative writing"
+    ],
+    "main": "src/index.js",
+    "homepage": ".",
+    "dependencies": {
+        "babel-preset-env": "^1.7.0",
+        "marked": "^0.6.0",
+        "node-sass": "4.11.0",
+        "react": "16.5.2",
+        "react-dom": "16.5.2",
+        "react-scripts": "^2.1.5",
+        "sbd": "^1.0.14",
+        "styled-components": "4.1.3"
+    },
+    "devDependencies": {},
+    "scripts": {
+        "start": "react-scripts start",
+        "build": "react-scripts build",
+        "test": "react-scripts test --env=jsdom",
+        "eject": "react-scripts eject"
+    },
+    "browserslist": [
+        ">0.2%",
+        "not dead",
+        "not ie <= 11",
+        "not op_mini all"
+    ]
 }

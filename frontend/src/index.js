@@ -68,7 +68,7 @@ ReactDOM.render(
 const overlay = document.querySelector('#overlay');
 ReactDOM.render(
     <div className="brand">
-        <img src="./rewriting.svg" alt="writing is rewriting" />
+        <img src="./static/images/rewriting.svg" alt="writing is rewriting" />
     </div>,
     overlay
 );
