@@ -1,9 +1,12 @@
 #!/bin/bash
 
 # docker cheatsheet
+# -------------------------------------
 # docker container ls --all
-# docker build -t <YOUR_USE:RNAME>/myfirstapp .
-# docker run --name=nginx -d -v ~/nginxlogs:/var/log/nginx -p 5000:80 nginx
+# docker build -t <YOUR_USER_NAME>/myfirstapp .
+# docker run --name=<IMAGE-NAME> -d -v <ABS-PATH>:<VIRTUAL-PATH> -p 5000:80 <IMAGE-NAME>
+# docker restart <CONTAINER-NAME>
+# docker stop <CONTAINER-NAME>
 
 cd frontend
 

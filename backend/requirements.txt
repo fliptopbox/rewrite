@@ -1,2 +1,7 @@
 Flask
-Redis
+SQLAlchemy
+Flask-SQLAlchemy
+Flask-Migrate
+python-dotenv
+shortuuid
+
