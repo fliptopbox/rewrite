@@ -7,6 +7,7 @@ import Storage from './modules/Storage/';
 import Parse from './utilities/Parse';
 import Sidebar from './modules/Sidebar/';
 import dividerinit from './modules/divider';
+import serviceworker from './serviceworker';
 
 import './styles.scss';
 
@@ -28,6 +29,7 @@ const store = new Storage(u.storage.bind(window));
 const article = new Article('c1', { prefix: 'a', hidden: true });
 const sentences = new Sentences('c2', { prefix: 's', hidden: true });
 const articleText = store.initilize();
+serviceworker();
 
 article.on('after', null, saveToDisk);
 sentences.on('after', null, saveToDisk);
