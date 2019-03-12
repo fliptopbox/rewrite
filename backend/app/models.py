@@ -23,8 +23,8 @@ class Article(db.Model):
     id = db.Column(db.Integer, primary_key=True)
 
     uuid = db.Column(db.String(16), unique=True, index=True, default=guid)
-    data = db.Column(db.Text())
-    meta = db.Column(db.Text())
+    data = db.Column(db.JSON())
+    meta = db.Column(db.JSON())
     status =db.Column(db.Integer(), default=0, index=True)
 
     created = db.Column(db.DateTime, default=datetime.utcnow)
@@ -33,7 +33,7 @@ class Article(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
     def __repr__(self):
-        return '<Article {}>'.format(self.data)
+        return '<Article {}>'.format(self.uuid)
 
 class Setting(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -43,4 +43,4 @@ class Setting(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
 
     def __repr__(self):
-        return '<Setting {}>'.format(self.modified)
+        return '<Setting {}>'.format(self.user_id)
