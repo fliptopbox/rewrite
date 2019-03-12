@@ -3,7 +3,7 @@ import time
 
 from flask import render_template, jsonify, abort, make_response, request, url_for
 from app import app, db
-from app.models import User, Article
+from app.models import User, Article, Setting
 from datetime import datetime
 
 API_URI = app.config['API_BASE_URI']
@@ -147,22 +147,23 @@ def update_article(uuid):
     return jsonify({'article updated': True}), 201
 
 
-
-
-
-
 @app.route("%s/user/<username>" % API_URI, methods=['GET'])
 def get_user(username):
     '''get catenated assets that belong to user @username'''
     print(username)
     user = User.query.filter_by(username=username).first_or_404()
     articles = Article.query.filter_by(user_id=user.id, status=0)
+    settings = Setting.query.filter_by(user_id=user.id)
 
 
+    if settings.count() == 0:
+        print("\n\nNo settings found for ...", username)
+        settings = UI_SETTINGS
+    else:
+        settings = settings[0].data
+        print("\n\nSettings found for ...", username, settings)
 
-    payload = {
-        "settings": json.dumps(UI_SETTINGS)
-    }
+    payload = { "settings": settings }
 
     for article in articles:
         print ("\n\n", article.id, article.uuid, STATUS[article.status])
@@ -228,3 +229,56 @@ def delete_user(username):
     db.session.commit()
 
     return jsonify({'user deleted': username}), 201
+
+
+@app.route("%s/settings/<username>" % API_URI, methods=['POST'])
+def update_settings(username):
+    if not username:
+        abort(404)
+
+    u = User.query.filter_by(username=username).first_or_404()
+    s = Setting.query.filter_by(user_id=u.id)
+
+    modified=datetime.utcnow()
+    data = request.json
+
+    if s.count() == 0:
+        print("------------- creating settings", username)
+        s = Setting(user_id=u.id, data=data, modified=modified)
+        db.session.add(s)
+    else:
+        print("------------- updating settings", username)
+        s = s[0]
+        print(s.data)
+        s.modified=modified
+        s.data=data
+
+    print(data)
+    db.session.commit()
+
+    return jsonify({'settings update': True}), 201
+
+
+@app.route("%s/settings/<username>" % API_URI, methods=['GET'])
+def get_settings(username):
+    if not username:
+        abort(404)
+
+    u = User.query.filter_by(username=username).first_or_404()
+    s = Setting.query.filter_by(user_id=u.id)
+
+
+    if s.count() == 0:
+        print("------------- creating settings", username)
+        data = UI_SETTINGS
+        s = Setting(user_id=u.id, data=data)
+        db.session.add(s)
+        db.session.commit()
+
+    else:
+        print("------------- retreiving settings", username)
+        data = s[0].data
+
+    print(data)
+
+    return jsonify(data), 201
