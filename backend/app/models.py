@@ -37,10 +37,10 @@ class Article(db.Model):
 
 class Setting(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    body = db.Column(db.Text())
+    data = db.Column(db.JSON())
     modified = db.Column(db.DateTime, default=datetime.utcnow)
 
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
 
     def __repr__(self):
-        return '<Setting {}>'.format(self.body)
+        return '<Setting {}>'.format(self.data)

@@ -88,12 +88,12 @@ def create_article(username):
     if not request.json or not 'data' in request.json:
         abort(400)
 
-    data=request.json["data"]
+    data = request.json["data"]
+    meta = '{"name":"Untitled"}'
+    status = 0
 
-    if not "meta" in request.json:
-        meta = '{"name":"Untitled"}'
-    else:
-        status=request.json['meta']
+    if "meta" in request.json:
+        meta = request.json["meta"]
 
     article = Article(author=user, data=data, status=status, meta=meta)
 
@@ -102,21 +102,39 @@ def create_article(username):
     return jsonify({'article created': True}), 201
 
 
+@app.route("%s/article/<uuid>" % API_URI, methods=['DELETE'])
+def delete_article(uuid):
+    if not uuid:
+        abort(404)
+
+    a = Article.query.filter_by(uuid=uuid).first_or_404()
+
+    db.session.delete(a)
+    db.session.commit()
+
+    return jsonify({'article deleted': True}), 201
+
 
 @app.route("%s/article/<uuid>" % API_URI, methods=['PUT'])
 def update_article(uuid):
     if not uuid:
         abort(404)
 
-    if not request.json or not 'data' in request.json or not 'meta' in request.json:
+    if not request.json:
         abort(400)
 
     article = Article.query.filter_by(uuid=uuid).first_or_404()
     user = User.query.filter_by(id=article.user_id).first_or_404()
 
+    data = article.data
+    meta = article.meta
 
-    data=request.json["data"]
-    meta=request.json["meta"]
+    if "data" in request.json:
+        data=request.json["data"]
+
+    if "meta" in request.json:
+        meta=request.json["meta"]
+
     modified=datetime.utcnow()
 
     print(article.uuid, user.username, data, meta)
@@ -167,11 +185,21 @@ def get_user(username):
 
 @app.route("%s/user" % API_URI, methods=['POST'])
 def create_user():
-    if not request.json or not 'username' in request.json:
+    if not request.json or not 'username' in request.json or not 'email' in request.json:
         abort(400)
+
+    username = request.json['username']
+    email = request.json["email"]
+
+    u = User.query.filter(User.username==username).count()
+    e = User.query.filter(User.email==email).count()
+
+    if u > 0 or e > 0:
+        abort(400)
+
     new_user = User(
-            username=request.json['username'],
-            email=request.json['email']
+            username=username,
+            email=email
     )
     db.session.add(new_user)
     db.session.commit()

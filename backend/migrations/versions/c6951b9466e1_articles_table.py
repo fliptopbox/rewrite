@@ -1,8 +1,8 @@
-"""users table
+"""articles table
 
-Revision ID: d59bf16064be
+Revision ID: c6951b9466e1
 Revises: 
-Create Date: 2019-03-11 18:44:31.798148
+Create Date: 2019-03-12 12:23:12.334904
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'd59bf16064be'
+revision = 'c6951b9466e1'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -29,13 +29,13 @@ def upgrade():
     op.create_index(op.f('ix_user_username'), 'user', ['username'], unique=True)
     op.create_table('article',
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('user_id', sa.Integer(), nullable=True),
     sa.Column('uuid', sa.String(length=16), nullable=True),
     sa.Column('data', sa.Text(), nullable=True),
     sa.Column('meta', sa.Text(), nullable=True),
     sa.Column('status', sa.Integer(), nullable=True),
     sa.Column('created', sa.DateTime(), nullable=True),
     sa.Column('modified', sa.DateTime(), nullable=True),
+    sa.Column('user_id', sa.Integer(), nullable=True),
     sa.ForeignKeyConstraint(['user_id'], ['user.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
@@ -43,7 +43,7 @@ def upgrade():
     op.create_index(op.f('ix_article_uuid'), 'article', ['uuid'], unique=True)
     op.create_table('setting',
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('body', sa.Text(), nullable=True),
+    sa.Column('data', sa.JSON(), nullable=True),
     sa.Column('modified', sa.DateTime(), nullable=True),
     sa.Column('user_id', sa.Integer(), nullable=True),
     sa.ForeignKeyConstraint(['user_id'], ['user.id'], ),
