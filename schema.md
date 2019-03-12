@@ -1,4 +1,8 @@
-# settings
+# database
+
+# front-end
+
+## settings
 
     articles            Collection (derived from data items)
     current String
@@ -14,7 +18,7 @@
             fontsize    Number
             dividerwidth Float
 
-# article
+## article
 
     guid
         guid            String
@@ -27,7 +31,7 @@
             data        Collection
             label       String or Timestamp
 
-# article schema
+## article schema
 
     [
         {

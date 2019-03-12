@@ -2,12 +2,9 @@ import json
 import random
 from datetime import datetime
 from app import db
+from .utils import guid
 
 
-def guid():
-    hex_str = (hex(int(datetime.now().strftime('%Y%m%d%H%M%S%f')))[4:])
-    alpha = hex(random.randint(10,15))[2:]
-    return "%s%s" % (alpha, hex_str)
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -24,15 +21,19 @@ class User(db.Model):
 
 class Article(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    body = db.Column(db.Text())
+
     uuid = db.Column(db.String(16), unique=True, index=True, default=guid)
+    data = db.Column(db.Text())
+    meta = db.Column(db.Text())
+    status =db.Column(db.Integer(), default=0, index=True)
+
     created = db.Column(db.DateTime, default=datetime.utcnow)
     modified = db.Column(db.DateTime, default=datetime.utcnow)
 
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
     def __repr__(self):
-        return '<Article {}>'.format(self.body)
+        return '<Article {}>'.format(self.data)
 
 class Setting(db.Model):
     id = db.Column(db.Integer, primary_key=True)
