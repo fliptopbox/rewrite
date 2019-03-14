@@ -2,9 +2,13 @@ import json
 import time
 
 from flask import render_template, jsonify, abort, make_response, request, url_for
+from flask_cors import CORS
 from app import app, db
 from app.models import User, Article, Setting
 from datetime import datetime
+
+# CORS(app, resources={r"/api/*": {"origins": "*"}})
+CORS(app)
 
 API_URI = app.config['API_BASE_URI']
 STATUS = app.config['ARTICLE_STATUS']
@@ -71,31 +75,63 @@ def get_article(uuid):
     a = Article.query.filter_by(uuid=uuid).first_or_404()
     u = User.query.filter_by(id=a.user_id).first()
 
-    article = {}
-    article["uuid"] = a.uuid
-    article["username"] = u.username
-    article["data"] = a.data
-    article["meta"] = a.meta
-    article["created"] = int(a.created.timestamp() * 1000)
-    article["modified"] = int(a.modified.timestamp() * 1000)
+    print("data --------------------------------------------\n\n", a.data)
+    print("meta --------------------------------------------\n\n", a.meta)
+
+    meta = {} if not a.meta else a.meta
+    article = {
+        "data": a.data,
+        "meta": meta
+    }
+
+    # augment the metadata with fixed values
+    article["meta"]["created"] = int(a.created.timestamp() * 1000)
+    article["meta"]["modified"] = int(a.modified.timestamp() * 1000)
+    article["meta"]["uuid"] = a.uuid
+    article["meta"]["username"] = u.username
 
     return jsonify(article), 201
 
 @app.route("%s/article/<username>" % API_URI, methods=['POST'])
-def create_article(username):
-    print(username)
+@app.route("%s/article/<username>/<uuid>" % API_URI, methods=['POST'])
+def create_article(username, uuid = None):
     user = User.query.filter_by(username=username).first_or_404()
     if not request.json or not 'data' in request.json:
+        print("no data or no JSON")
         abort(400)
 
-    data = request.json["data"]
-    meta = '{"name":"Untitled"}'
-    status = 0
+    payload = request.get_json()
 
-    if "meta" in request.json:
-        meta = request.json["meta"]
+    data=payload['data']
+    meta=payload['meta']
 
-    article = Article(author=user, data=data, status=status, meta=meta)
+    print("\n\n", data, "\n\n")
+    print("\n\n", meta, "\n\n")
+
+    if uuid:
+        # is this an insert or update?
+        article = Article.query.filter_by(uuid=uuid)
+
+        if article.count() > 0:
+            print("Update existing article with uuid %s" % uuid)
+            article.data = data
+            article.meta = meta
+            article.modified = datetime.utcnow()
+            db.session.commit()
+
+            print("\n\n", article.data)
+            print("\n\n", article.meta)
+
+            return jsonify({'article update': True}), 201
+
+
+        # update (using existing UUID)
+        print("Insert NEW article with UUID %s" % uuid)
+        article = Article(author=user, uuid=uuid, data=data, meta=meta)
+
+    else:
+        print("Insert NEW article without UUID")
+        article = Article(author=user, data=data, meta=meta)
 
     db.session.add(article)
     db.session.commit()
@@ -240,7 +276,8 @@ def update_settings(username):
     s = Setting.query.filter_by(user_id=u.id)
 
     modified=datetime.utcnow()
-    data = request.json
+    data = request.get_json(force = True)
+
 
     if s.count() == 0:
         print("------------- creating settings", username)

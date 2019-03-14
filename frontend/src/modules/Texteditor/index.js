@@ -206,6 +206,12 @@ class Texteditor {
         // this.wordtarget = 0;
         this.data = {};
 
+        // backward compatability
+        if (data.meta) {
+            console.warn('Reduce article to data', data);
+            data = data.data;
+        }
+
         this.init(data);
     }
 

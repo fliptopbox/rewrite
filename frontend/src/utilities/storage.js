@@ -1,10 +1,17 @@
 import defer from './defer';
 
+const API = {
+    settings: 'http://localhost:5000/api/v1.0/settings/',
+    article: 'http://localhost:5000/api/v1.0/article/',
+    user: 'http://localhost:5000/api/v1.0/user/',
+};
+
 function storage(sufix = null) {
     let delay = 250;
     const ns = ['rewrite', sufix].filter(val => val).join('-');
     const apiServerUrl = 'https://fliptopbox.com/cgi-bin/getuser.py';
-    const apiPushDelay = 60 * 1000; // 1minute
+    const apiPushDelay = 10 * 1000; // 1minute
+    const { onLine } = window.navigator;
 
     // this looks strange. leave it! it's for JEST testing.
     const localStorage = this.localStorage || window.localStorage;
@@ -19,40 +26,115 @@ function storage(sufix = null) {
         },
 
         pull: (guid, fn) => {
-            const formData = new FormData();
-            formData.append('guid', guid);
+            if (!onLine) fn(null);
 
-            fetch(`${apiServerUrl}`, {
-                method: 'POST',
-                body: formData,
+            console.log('pull from api %s (%s)', guid, API.user);
+
+            fetch(`${API.user}${guid}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
             })
-                .then(rx => rx.json())
-                .then(json => fn(json));
+                .then(r => r.json())
+                .then(json => {
+                    const status = 200;
+                    const settings = { ...json.settings };
+                    let previous =
+                        settings.previous || settings.current || null;
+
+                    // articles is a contrived index of metadata
+                    let articles = Object.keys(json)
+                        .filter(k => /^[a-z0-9]{16}/.test(k))
+                        .map(r => {
+                            return json[r].meta;
+                        });
+
+                    // deleting "settings" leaves the raw article rows
+                    delete json.settings;
+
+                    const data = {
+                        ...json,
+                        settings,
+                        articles,
+                        previous,
+                    };
+                    fn({
+                        status,
+                        data,
+                    });
+                });
         },
 
         push: (guid = null, priority = 0) => {
+            if (!onLine) return;
             if (!guid) return;
+            console.log('push to api %s', guid, API.settings, API.article);
             return defer(
                 'push',
                 function() {
                     let data = {};
 
-                    Object.keys(localStorage).map(name => {
-                        const key = name.replace(/^([^-]+-+)/, '');
-                        data[key] = localStorage[name];
-                        return name;
-                    });
+                    Object.keys(localStorage)
+                        .filter(k => /^rewrite/i.test(k))
+                        .map(name => {
+                            const key = name.replace(/^([^-]+-+)/, '');
+                            data[key] = localStorage[name];
+                            return name;
+                        });
 
-                    const formData = new FormData();
-                    formData.append('guid', guid);
-                    formData.append('data', JSON.stringify(data));
+                    // settings is a seperate API call
+                    // it needs to include previous (aka current)
+                    // and ensure the key names are kosher
 
-                    fetch(`${apiServerUrl}`, {
+                    let settings = {};
+                    data.settings = JSON.parse(data.settings);
+                    Object.keys(data.settings)
+                        .filter(k => /^([a-z]+)$/i.test(k))
+                        .forEach(k => {
+                            if (/^settings/i.test(k)) return;
+                            settings[k] = data.settings[k];
+                        });
+
+                    fetch(`${API.settings}${guid}`, {
                         method: 'POST',
-                        body: formData,
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(settings),
                     })
                         .then(r => r.json())
-                        .then(json => console.log('relpy', json));
+                        .then(d => console.log(d));
+
+                    // articles have a new schema it is a
+                    // catentation of data and article meta data
+                    // the API will insert or update articles
+
+                    console.log(data.articles);
+                    JSON.parse(data.articles).forEach(r => {
+                        const key = r.guid || r.uuid;
+                        const article = {
+                            meta: {
+                                uuid: key,
+                                username: guid,
+                                created: r.created,
+                                modified: r.modified || r.opened,
+                                name: r.name,
+                                wordtarget: r.wordtarget,
+                            },
+                            data: JSON.parse(data[key]),
+                        };
+
+                        fetch(`${API['article']}${guid}/${key}`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify(article),
+                        })
+                            .then(r => r.json())
+                            .then(d => console.log(d));
+                    });
                 },
                 priority || apiPushDelay
             );

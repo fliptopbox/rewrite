@@ -99,9 +99,9 @@ class Sidebar extends React.Component {
             purge('rewrite');
             restore('rewrite', data);
             let { articles, settings, previous } = data;
-            settings = JSON.parse(settings);
-            articles = JSON.parse(articles);
-            previous = JSON.parse(previous);
+            // settings = JSON.parse(settings);
+            // articles = JSON.parse(articles);
+            // previous = JSON.parse(previous);
 
             let state = {
                 articles,
@@ -194,20 +194,19 @@ class Sidebar extends React.Component {
         const { store, article } = this.props;
         const fileObj = store.read(guid);
         const { data } = fileObj;
-        console.log(267, fileObj);
         article.setWordTarget(fileObj.wordtarget);
         return article.reset(data);
     };
 
     getFileRow(object, updatePrevious) {
-        const { guid, name, wordtarget, opened } = object;
+        const { guid, uuid, name, wordtarget, opened } = object;
         const { store } = this.props;
         const target = wordtarget ? `${wordtarget} words` : `add`;
         return (
             <div
                 className="inner"
                 onClick={() => {
-                    this.getArticleByGuid(guid);
+                    this.getArticleByGuid(guid || uuid);
                     updatePrevious(guid);
                 }}>
                 <span className="file-name" data-guid={guid}>
@@ -244,10 +243,11 @@ class Sidebar extends React.Component {
         const { previous } = this.state;
         const files = this.state.articles.map(obj => {
             const row = this.getFileRow(obj, this.updatePrevious);
-            const selected = obj.guid === previous ? 'selected' : '';
+            const key = obj.guid || obj.uuid;
+            const selected = key === previous ? 'selected' : '';
 
             return (
-                <li key={obj.guid} className={selected}>
+                <li key={key} className={selected}>
                     {row}
                 </li>
             );

@@ -18,7 +18,11 @@ function restore(ns = '', obj) {
 
     Object.keys(obj).forEach((k, i) => {
         const key = k.replace(/^(BAK-+)?/, `${ns}-`);
-        localStorage[key] = obj[k];
+        const string =
+            typeof obj[k] === 'string' ? obj[k] : JSON.stringify(obj[k]);
+
+        // localStorage[key] = obj[k];
+        localStorage[key] = string;
     });
 }
 

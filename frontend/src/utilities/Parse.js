@@ -20,14 +20,26 @@ class Parse {
         // cast the value as Object literal
         if (!value) value = '';
 
+        if (value.data) {
+            console.warn('Coersing data from Object');
+            value = value.data;
+        }
+
         const { re, unwrap, markdown } = this.options;
 
         const constructor = value.constructor;
-        const type =
+        let type =
+            (constructor === Object && 'object') ||
             (constructor === String && 'string') ||
             (constructor === Array && 'array') ||
             (constructor === HTMLCollection && 'html') ||
             'unknown';
+
+        if (type === 'object' && value.data) {
+            console.warn('Coerse data array');
+            type = 'array';
+            value = value.data;
+        }
 
         // determine input value and parse as
         // collection schema
@@ -53,6 +65,12 @@ class Parse {
                 break;
 
             default:
+                console.error(
+                    'WARNING! switch fallthrough for',
+                    type,
+                    constructor,
+                    value
+                );
                 break;
         }
         // assign to private value
