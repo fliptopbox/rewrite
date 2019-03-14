@@ -19,7 +19,7 @@ class ToggleToInput extends React.Component {
             this.props.store.rename(guid, value);
         }
 
-        this.seGutState({ edit: false, name: value, original: value });
+        this.setState({ edit: false, name: value, original: value });
     };
 
     toggleEditAndFocus = e => {
