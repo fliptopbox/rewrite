@@ -10,6 +10,7 @@ class ToggleToInput extends React.Component {
             guid: props.guid,
         };
     }
+
     rename = (reset = false) => {
         const { guid, name, original } = this.state;
         let value = original;

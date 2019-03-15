@@ -1,9 +1,11 @@
 import React from 'react';
 import Parse from '../../utilities/Parse';
 import u from '../../utilities/';
-import ToggleToInput from './ToggleToInput';
+import FileRow from './FileRow';
+import Settings from './Settings';
+import divider from '../divider';
 
-const { read, write, push } = u.storage('settings');
+const { read } = u.storage('settings');
 const html = document.querySelector('html');
 
 // a keypress toggle. 1st press = on, 2nd press = off
@@ -21,63 +23,84 @@ class Sidebar extends React.Component {
     constructor(props) {
         super();
         this.state = {
-            articles: [],
             guid: null,
-            previous: null,
-            modifiers: {
-                collapsed: true,
-                strikethrough: true,
-                typewriter: false,
-                markdown: false,
-                dark: false,
-            },
-            values: {
-                fontsize: 24,
-            },
+            current: null,
+            splitwidth: 50,
+            articles: [],
         };
 
-        // update the divider changes
-        props.divider.onResize(this.save);
+        // bind the onAfter event to persit the data
+        props.article.on('after', null, this.saveToDisk.bind(this));
+        props.sentences.on('after', null, this.saveToDisk.bind(this));
     }
+    saveToDisk() {
+        u.defer(
+            'savearticle',
+            () => {
+                const { article } = this.props;
+                const { current, guid, articles } = this.state;
+                const fs = u.storage(current);
 
+                const children = article.texteditor.children;
+                const data = new Parse(children).toCollection();
+
+                const meta = articles.find(r => r.uuid === current);
+                const payload = { data, meta };
+
+                console.log(
+                    'persit article',
+                    this.state.guid,
+                    this.state.current
+                );
+                console.log('payload', payload);
+
+                //store.write(data);
+                fs.write(payload);
+                fs.updateArticle(guid, current, payload);
+            },
+            1500
+        );
+    }
     componentDidMount() {
         // update with persisted data
-        const settings = read();
         const articles = this.getUpdatedArticles();
-        const previous = u.storage('previous').read();
-        const state = Object.assign(
-            {},
-            this.state,
-            { articles: articles },
-            settings,
-            { previous }
-        );
-
-        // remember setState can lag!
-        // don't rely on this.state === state
+        const { guid = null, current = null, values = null } =
+            read() || this.state;
+        const { splitwidth = 50 } = values || {};
+        const state = { articles, guid, current, splitwidth };
         this.setState(state);
-        this.applySettings(state);
+
+        // instanate the divider
+        this.mouse = this.props.mouse;
+        this.divider = divider(splitwidth, this.mouse);
+        this.divider.add('wordcount');
+        this.divider.onResize(this.saveDividerWidth);
+
+        // bind the wordcounter events
+        this.props.article.on('wordcounter', null, d =>
+            this.updateWordCount(d)
+        );
+        this.props.sentences.on('wordcounter', null, () =>
+            this.props.article.wordcounter()
+        );
+        this.props.store.setSyncProfile(guid);
+
         this.registerMouseEvent();
-        this.syncWithServer(state.guid);
     }
 
-    applySettings = state => {
-        const { modifiers, values } = state;
+    updateWordCount(words) {
+        this.divider.update('wordcount', words);
+    }
 
-        // apply the current/persisted modifiers
-        for (let key in modifiers) {
-            this.toggleClassName(key, modifiers[key]);
-        }
-
-        // apply the variable values
-        // these require a callback eg. this.fontsize()
-        // that matches state key eg. value.fontsize
-        for (let key in values) {
-            const value = values[key];
-            this[key] && this[key](value);
-        }
-
-        if (state.width) this.props.divider.resize(null, state.width);
+    saveDividerWidth = value => {
+        u.defer(
+            'splitwidth',
+            () => {
+                console.log('save divider width', value);
+                this.setState({ splitwidth: value });
+            },
+            750
+        );
     };
 
     syncWithServer = guid => {
@@ -98,22 +121,15 @@ class Sidebar extends React.Component {
 
             purge('rewrite');
             restore('rewrite', data);
-            let { articles, settings, previous } = data;
-            // settings = JSON.parse(settings);
-            // articles = JSON.parse(articles);
-            // previous = JSON.parse(previous);
+            let { articles, settings } = data;
+            const current = settings.current || null;
+            const { splitwidth = 50 } = settings.values || {};
 
-            let state = {
-                articles,
-                previous,
-                ...settings,
-                guid,
-            };
+            let state = { current, splitwidth, articles, guid };
 
-            this.applySettings(settings);
             this.setState(state);
-            this.getArticleByGuid(previous);
-            this.props.store.sync(guid);
+            this.getArticleByGuid(current);
+            this.props.store.setSyncProfile(guid);
         };
 
         return u.storage().pull(guid, fn);
@@ -169,22 +185,20 @@ class Sidebar extends React.Component {
         });
     }
 
-    fontsize(value) {
-        document.querySelector('body').style.fontSize = `${value}px`;
-        this.setState({ values: { fontsize: Number(value) } });
-        setTimeout(this.save, 250);
-    }
+    updateCurrent = current => {
+        let settings = this.state;
+        settings.current = current;
 
-    updatePrevious = previous => {
-        u.storage('previous').write(previous, true);
-        this.setState({ previous: String(previous) });
+        this.setState(settings);
 
-        this.toggleClassName('sidebar-close', true);
+        const body = document.querySelector('body');
+        body.classList.add('sidebar-close');
+
         u.defer(
             'animate',
             () => {
-                this.toggleClassName('sidebar-close', false);
-                this.toggleClassName('show-sidebar', false);
+                body.classList.remove('sidebar-close');
+                body.classList.remove('show-sidebar');
             },
             350
         );
@@ -198,57 +212,42 @@ class Sidebar extends React.Component {
         return article.reset(data);
     };
 
-    getFileRow(object, updatePrevious) {
-        const { guid, uuid, name, wordtarget, opened } = object;
-        const { store } = this.props;
-        const target = wordtarget ? `${wordtarget} words` : `add`;
-        return (
-            <div
-                className="inner"
-                onClick={() => {
-                    this.getArticleByGuid(guid || uuid);
-                    updatePrevious(guid);
-                }}>
-                <span className="file-name" data-guid={guid}>
-                    <ToggleToInput name={name} guid={guid} store={store} />
-                </span>
-                <ul className="file-meta">
-                    <li>
-                        <a
-                            href="#delete"
-                            onClick={e => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                this.handleDelete(guid);
-                            }}>
-                            del
-                        </a>
-                    </li>
-                    <li className="file-words">Target: {target}</li>
-                    <li className="file-modified">{u.elapsed(opened)}</li>
-                    <li className="file-exports">
-                        <a href="#txt" onClick={this.download('text')}>
-                            txt
-                        </a>{' '}
-                        |
-                        <a href="#json" onClick={this.download('json')}>
-                            json
-                        </a>
-                    </li>
-                </ul>
-            </div>
+    handleWordTarget(e, wordtarget = 0, article_id) {
+        e.preventDefault();
+        e.stopPropagation();
+        const el = e.target;
+        const data = u.storage(article_id);
+        const article = data.read();
+        const value = u.prompt(
+            'Enter a word count target for this document.',
+            wordtarget
         );
+
+        article.meta.wordtarget = Number(value) || 0;
+        data.write(article);
+        data.update(article);
+        el.innerHTML = `Target ${value || ': add'}`;
     }
     getArticles() {
-        const { previous } = this.state;
-        const files = this.state.articles.map(obj => {
-            const row = this.getFileRow(obj, this.updatePrevious);
+        const { current = null, articles = [] } = this.state;
+        const { store } = this.props;
+        let callbacks = {
+            getArticleByGuid: this.getArticleByGuid,
+            updateCurrent: this.updateCurrent,
+            handleDelete: this.handleDelete,
+            handleWordTarget: this.handleWordTarget,
+            store,
+            downloadText: this.download('text'),
+            downloadJson: this.download('json'),
+        };
+
+        const files = articles.map(obj => {
             const key = obj.guid || obj.uuid;
-            const selected = key === previous ? 'selected' : '';
+            const selected = key === current ? 'selected' : '';
 
             return (
                 <li key={key} className={selected}>
-                    {row}
+                    <FileRow object={obj} callbacks={callbacks} />
                 </li>
             );
         });
@@ -260,17 +259,6 @@ class Sidebar extends React.Component {
             </div>
         );
     }
-
-    save = () => {
-        const prev = read() || {}; // remember divider.js also saves settings
-        const data = { ...prev, ...this.state };
-        const { guid } = data;
-
-        delete data.articles;
-        write(data);
-        setTimeout(() => push(guid, 5000), 0);
-        return data;
-    };
 
     handleDelete(guid) {
         const { store } = this.props;
@@ -303,27 +291,6 @@ class Sidebar extends React.Component {
             />
         );
     };
-
-    toggleClassName(string, value = null, selector = 'body') {
-        const { modifiers, values } = this.state;
-        const element = document.querySelector(selector);
-
-        let toggle = null;
-        toggle = typeof value === 'boolean' ? value : !modifiers[string];
-        toggle = Boolean(toggle);
-
-        const method = toggle ? 'add' : 'remove';
-
-        element.classList[method](string);
-
-        if (string in modifiers || string in values) {
-            modifiers[string] = toggle;
-            this.setState({ modifiers });
-            this.save();
-        }
-
-        return toggle === true;
-    }
 
     handleImport = e => {
         const { store, article } = this.props;
@@ -367,27 +334,6 @@ class Sidebar extends React.Component {
         });
     };
 
-    getOnOff(name) {
-        const { modifiers } = this.state;
-        const bool = modifiers[name];
-        return bool ? (
-            <i className="icon-boolean-true" />
-        ) : (
-            <i className="icon-boolean-false" />
-        );
-    }
-
-    readSelected = e => {
-        e.stopPropagation();
-
-        const { selected = null, texteditor = null } = this.props.article;
-        const el =
-            selected && selected.innerText.trim() ? selected : texteditor;
-        if (!el || !el.innerText) return;
-
-        window.TTS.read(el.innerText);
-    };
-
     download = (mime = 'text') => {
         const method =
             {
@@ -395,31 +341,37 @@ class Sidebar extends React.Component {
                 markdown: 'toMarkdown',
                 json: 'toCollection',
             }[mime] || 'text';
+        const { state } = this;
+        const { props } = this;
 
         return e => {
             e.preventDefault();
             e.stopPropagation();
 
-            const { previous } = this.state;
-            const { store } = this.props;
             const saveAs = e.altKey ? true : false;
+            const { current } = state;
+            const fs = u.storage(current);
 
-            let { data, name, guid } = store.read(previous);
+            let { data, meta } = fs.read(current);
+            let { name, uuid } = meta;
             const date = new Date()
                 .toISOString()
                 .replace(/:\d+.\d+.$/, '')
                 .replace('T', ' ');
 
             // pressing a ket modifier presents the save-as prompt
-            name = saveAs
+            const filename = saveAs
                 ? u.prompt(`Enter filename`, `${name}-${date}`)
                 : name;
-            if (!name || !name.trim()) return;
+            if (!name || !name.trim()) {
+                console.log('No file name', current, uuid, name, data);
+                return;
+            }
 
             const p = new Parse(data);
             const object = {
-                name,
-                id: guid,
+                name: filename,
+                id: uuid,
                 data: p[method](),
                 type: mime,
                 appendId: false,
@@ -510,86 +462,12 @@ class Sidebar extends React.Component {
                     </div>
                 </ul>
                 {articleList}
-                <ul className="settings">
-                    <li>
-                        <div
-                            className="inner"
-                            onClick={() => {
-                                this.toggleClassName('dark');
-                            }}>
-                            <strong>Toggle dark theme</strong>
-                            <em>{this.getOnOff('dark')}</em>
-                        </div>
-                    </li>
-                    <li>
-                        <div
-                            className="inner"
-                            onClick={() => {
-                                this.toggleClassName('collapsed');
-                            }}>
-                            <strong>Collapse lines</strong>
-                            <em>{this.getOnOff('collapsed')}</em>
-                        </div>
-                    </li>
-                    <li>
-                        <div
-                            className="inner"
-                            onClick={() => {
-                                this.toggleClassName('strikethrough');
-                            }}>
-                            <strong>Strike through</strong>
-                            <em>{this.getOnOff('strikethrough')}</em>
-                        </div>
-                    </li>
-                    <li>
-                        <div
-                            className="inner"
-                            onClick={() => {
-                                const { article } = this.props;
-                                const bool = this.toggleClassName('typewriter');
-
-                                let forward = article.typewriter(bool);
-                                forward =
-                                    bool === undefined ? !forward : forward;
-                                article.typewriter(forward);
-                            }}>
-                            <strong>Typewriter mode</strong>
-                            <em>{this.getOnOff('typewriter')}</em>
-                        </div>
-                    </li>
-                    <li className="no-underline">
-                        <div className="inner">
-                            <strong>Font size</strong>
-                            <em>
-                                {[
-                                    this.state.values.fontsize,
-                                    'px',
-                                    '/',
-                                    u.points(this.state.values.fontsize),
-                                    'pt',
-                                ].join('')}
-                            </em>
-                        </div>
-                        <input
-                            type="range"
-                            id="fontsize"
-                            name="fontsize"
-                            min="12"
-                            max="48"
-                            value={this.state.values.fontsize}
-                            onChange={e => {
-                                const { value } = e.target;
-                                this.fontsize(value);
-                            }}
-                        />
-                    </li>
-                    <li>
-                        <div className="inner" onClick={this.readSelected}>
-                            <strong>Read aloud (BETA)</strong>
-                            <em>stop|start</em>
-                        </div>
-                    </li>
-                </ul>
+                <Settings
+                    article={this.props.article}
+                    guid={this.state.guid}
+                    current={this.state.current}
+                    splitwidth={this.state.splitwidth}
+                />
             </div>
         );
     }

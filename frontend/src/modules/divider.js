@@ -1,33 +1,14 @@
-import u from '../utilities';
-
 let A;
 let B;
-// let action;
 let vertical;
 let dragging = false;
 let notifySizeChange;
-const { read, write } = u.storage('settings');
 
-let state = Object.assign(
-    {},
-    {
-        width: 50, // initial ratio (percentage)
-        minWidth: 10, // min pixel width
-        threshold: 15, // screen width percentage
-
-        // DOM fixtures
-    },
-    read()
-);
-
-function save(obj = {}) {
-    const prev = read(); // remember Controller also saves settings
-    const data = { ...state, ...prev, ...obj };
-    delete obj.minWidth;
-    delete obj.threshold;
-    write(data);
-    return data;
-}
+let state = {
+    width: 50, // initial ratio (percentage)
+    minWidth: 10, // min pixel width
+    threshold: 15, // screen width percentage
+};
 
 function settings(key, value) {
     if (!key) return state;
@@ -40,7 +21,6 @@ function settings(key, value) {
     }
 
     state = { ...state, key };
-    return save(state);
 }
 
 function resize(e, value) {
@@ -86,9 +66,7 @@ function resize(e, value) {
     B.style.width = `${100 - percent}%`;
     vertical.style.left = `${percent}%`;
 
-    const newWidth = { width: Number(percent) };
-    if (notifySizeChange) notifySizeChange(newWidth);
-    save(newWidth);
+    if (notifySizeChange) notifySizeChange(Number(percent));
 }
 
 const elements = {};
@@ -101,6 +79,8 @@ function onResize(fn) {
 }
 
 function add(id) {
+    // add a div element container to the sidebar
+    // eg. the wordcounter
     const div = document.createElement('div'); // Create a text node
     div.id = id;
     div.className = `divider-${id}`;
@@ -108,7 +88,7 @@ function add(id) {
     elements[id] = div;
 }
 
-function initialize(mouse) {
+function initialize(width, mouse) {
     vertical = document.querySelector('#vertical');
     A = document.querySelector('.paragraphs');
     B = document.querySelector('.sentences');
@@ -120,6 +100,7 @@ function initialize(mouse) {
     mouse(null, 'move', resize);
 
     // save(options);
+    state.width = width || 50;
     resize(null, state.width);
 
     console.log('resizer initialized');

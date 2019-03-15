@@ -209,6 +209,10 @@ class Texteditor {
         // backward compatability
         if (data.meta) {
             console.warn('Reduce article to data', data);
+
+            const { wordtarget = null } = data.meta;
+            this.wordtarget = wordtarget;
+
             data = data.data;
         }
 

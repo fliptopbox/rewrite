@@ -9,8 +9,7 @@ const API = {
 function storage(sufix = null) {
     let delay = 250;
     const ns = ['rewrite', sufix].filter(val => val).join('-');
-    const apiServerUrl = 'https://fliptopbox.com/cgi-bin/getuser.py';
-    const apiPushDelay = 10 * 1000; // 1minute
+    const apiPushDelay = 10 * 1000; // 10 seconds
     const { onLine } = window.navigator;
 
     // this looks strange. leave it! it's for JEST testing.
@@ -65,10 +64,60 @@ function storage(sufix = null) {
                     });
                 });
         },
+        updateArticle: (username, article_id, payload) => {
+            if (!onLine) {
+                console.log('not online');
+                return;
+            }
+            fetch(`${API.article}${username}/${article_id}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(payload),
+            })
+                .then(r => r.json())
+                .then(d => console.log(d));
+        },
+        updateSettings: body => {
+            const username = body.guid;
+            if (!username) {
+                console.warn('Cant push settings. No username', body);
+                return;
+            }
+            fetch(`${API.settings}${username}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(body),
+            })
+                .then(r => r.json())
+                .then(d => console.log(d));
+        },
+        update: article_object => {
+            const { uuid } = article_object;
+            fetch(`${API.article}${uuid}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(article_object),
+            })
+                .then(r => r.json())
+                .then(d => console.log(d));
+        },
 
         push: (guid = null, priority = 0) => {
-            if (!onLine) return;
-            if (!guid) return;
+            if (!onLine) {
+                console.log('not online');
+                return;
+            }
+            if (!guid) {
+                console.log('no guid');
+                return;
+            }
+
             console.log('push to api %s', guid, API.settings, API.article);
             return defer(
                 'push',

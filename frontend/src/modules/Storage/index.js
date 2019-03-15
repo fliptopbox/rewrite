@@ -24,7 +24,8 @@ class Storage {
     // sets the users syncID to not null
     // this will cause the write method to
     // push updates after the localstroage save
-    sync(guid = null) {
+    setSyncProfile(guid = null) {
+        console.log('Profile Sync', guid);
         this.syncId = guid;
         this.timestamp = new Date().valueOf();
     }
@@ -56,18 +57,22 @@ class Storage {
     // persists to localStorage
     write(object) {
         if (!object) return null;
+        console.log('write to filesystem', this.syncId);
 
         const { current, filename, storage } = this;
         const guid = current && current.guid;
 
-        if (!guid) return null;
+        if (!guid) {
+            console.log('no current guid');
+            return null;
+        }
 
         const localkey = filename(guid);
         const local = storage(localkey);
 
         local.write(object, true);
         local.backup();
-        local.push(this.syncId);
+        // local.push(this.syncId);
 
         // update last modified date
         const articles = storage('articles');
@@ -143,11 +148,11 @@ class Storage {
 
     // rename
     // assigns a new filename to the given guid
-    rename(guid, filename) {
-        if (!guid) return;
+    rename(uuid, filename) {
+        if (!uuid) return;
 
         const list = this.list();
-        let index = list.findIndex(r => r.guid === guid);
+        let index = list.findIndex(r => r.uuid === uuid);
         let articles = this.storage('articles');
         list[index].name = filename;
         articles.write(list);
@@ -180,12 +185,13 @@ class Storage {
     // attempts to load previous article,
     // or first article or blank or welcome page
     initilize() {
-        const previous = this.storage('previous').read();
+        const settings = this.storage('settings').read();
+        const { current = null } = settings || {};
         if (!this.list()) {
             this.create('a0123456789abcde', 'Startup example', startup);
         }
-        if (previous) {
-            this.read(previous);
+        if (current) {
+            this.read(current);
         }
         return this.current;
     }
