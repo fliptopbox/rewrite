@@ -1,4 +1,4 @@
-build/
+frontend/build/
 node_modules/
 **/__pycache__/**
 tmp
