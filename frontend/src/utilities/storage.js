@@ -1,9 +1,13 @@
 import defer from './defer';
 
+let origin = document.location.origin;
+origin = /localhost/i.test(origin) ? origin.replace(/[0-9]+$/, '5000') : origin;
+console.log('API origin', origin);
+
 const API = {
-    settings: 'http://localhost:5000/api/v1.0/settings/',
-    article: 'http://localhost:5000/api/v1.0/article/',
-    user: 'http://localhost:5000/api/v1.0/user/',
+    settings: `${origin}/api/v1.0/settings/`,
+    article: `${origin}/api/v1.0/article/`,
+    user: `${origin}/api/v1.0/user/`,
 };
 
 function storage(sufix = null) {
