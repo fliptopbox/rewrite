@@ -2,3 +2,4 @@ frontend/build/
 node_modules/
 **/__pycache__/**
 tmp
+rewriting_sqlite.db

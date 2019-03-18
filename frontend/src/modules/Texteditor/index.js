@@ -5,6 +5,7 @@ import config from '../../config';
 import arrayToHtml from './arrayToHtml';
 import defer from '../../utilities/defer';
 import uuid from '../../utilities/uuid';
+import inflate from '../../utilities/inflate';
 import updateKeysPressed from './updateKeysPressed';
 import Parse from '../../utilities/Parse';
 import wordcount from '../../utilities/wordcount';
@@ -177,6 +178,8 @@ class Texteditor {
     };
     /*
     init method is used to open or create an article.
+    this method will also try to populate the related
+    Sentence instanate with content.content
     */
     init = array => {
         // console.log(array);
@@ -188,6 +191,21 @@ class Texteditor {
         this.show();
         this.focus();
         this.wordcounter();
+
+        const selected = this.texteditor.querySelector('.selected');
+        let sentence = null;
+
+        if (!selected) return;
+
+        // activate current element and inject sentence data
+        this.setSelected(selected);
+
+        // it might be locked or not .... get an Array
+        sentence = selected.dataset.versions
+            ? JSON.parse(selected.dataset.versions)
+            : inflate(selected.innerText);
+
+        this.parent.init(sentence);
     };
 
     setWordTarget(n = 0) {

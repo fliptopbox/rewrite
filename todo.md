@@ -6,14 +6,12 @@
 -   backspace sometimes does not trigger change
 -   the spell corrector can edit on a locked paragraph.
 -   pasting causes un formatted article. shift paste is okay
--   onLoad: selected para should populate sentence editor
 
 # TODO
 
 -   Underline toggle (on/off)
 -   dark theme selected & locked highlighting is too subtle
 -   ESC obscured workspace
--   wordcount target that alerts when the target is met
 -   locked paragraph needs an icon to be more obvious
 -   visual prompt to signal an edit on a locked paragraph
 -   ? move DOM dataset to Javascript state tree
@@ -61,3 +59,5 @@
 -   Holding shift down causes rapid sentence toggling.
 -   SHIFT Enter = new line without line break
 -   resize divider after server sync
+-   wordcount target that alerts when the target is met
+-   onLoad: selected para should populate sentence editor

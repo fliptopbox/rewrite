@@ -346,7 +346,6 @@ class Sidebar extends React.Component {
                 json: 'toCollection',
             }[mime] || 'text';
         const { state } = this;
-        const { props } = this;
 
         return e => {
             e.preventDefault();

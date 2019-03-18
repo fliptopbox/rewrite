@@ -36,10 +36,12 @@ function sentencesUpdateContent() {
 }
 
 function articleToggleActive(e) {
-    e.preventDefault();
-    e.stopPropagation();
+    if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        console.log(e.code);
+    }
 
-    console.log(e.code);
     if (!this.selected) {
         console.log('no selected element');
         return;

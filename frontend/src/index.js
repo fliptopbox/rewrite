@@ -4,7 +4,6 @@ import ReactDOM from 'react-dom';
 import Article from './modules/Article';
 import Sentences from './modules/Sentences';
 import Storage from './modules/Storage/';
-import Parse from './utilities/Parse';
 import Sidebar from './modules/Sidebar/';
 
 import './styles.scss';
