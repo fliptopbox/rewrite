@@ -88,10 +88,6 @@ class Sidebar extends React.Component {
         this.registerMouseEvent();
     }
 
-    updateWordCount(words) {
-        this.divider.update('wordcount', words);
-    }
-
     saveDividerWidth = value => {
         u.defer(
             'splitwidth',
@@ -212,7 +208,10 @@ class Sidebar extends React.Component {
         return article.reset(data);
     };
 
-    handleWordTarget(e, wordtarget = 0, article_id) {
+    updateWordCount(words) {
+        this.divider.update('wordcount', words);
+    }
+    handleWordTarget = (e, wordtarget = 0, article_id) => {
         e.preventDefault();
         e.stopPropagation();
         const el = e.target;
@@ -227,7 +226,12 @@ class Sidebar extends React.Component {
         data.write(article);
         data.update(article);
         el.innerHTML = `Target ${value || ': add'}`;
-    }
+        console.log('set word targetr', this.state.current, article_id);
+        if (this.state.current !== article_id) return;
+        // update the wordcounter
+        this.props.article.setWordTarget(value);
+        this.props.article.wordcounter();
+    };
     getArticles() {
         const { current = null, articles = [] } = this.state;
         const { store } = this.props;
