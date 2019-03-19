@@ -179,7 +179,7 @@ class Texteditor {
     /*
     init method is used to open or create an article.
     this method will also try to populate the related
-    Sentence instanate with content.content
+    Sentence instanate with content.
     */
     init = array => {
         // console.log(array);
