@@ -68,6 +68,19 @@ function storage(sufix = null) {
                     });
                 });
         },
+        getUser: username => {
+            if (!onLine) {
+                console.log('not online');
+                return;
+            }
+            return fetch(`${API.user}${username}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            }).then(r => r.json());
+        },
+
         updateArticle: (username, article_id, payload) => {
             if (!onLine) {
                 console.log('not online');
@@ -81,7 +94,7 @@ function storage(sufix = null) {
                 body: JSON.stringify(payload),
             })
                 .then(r => r.json())
-                .then(d => console.log(d));
+                .then(d => console.log(d, username, article_id));
         },
         updateSettings: body => {
             const username = body.guid;

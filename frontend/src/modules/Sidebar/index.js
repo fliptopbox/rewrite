@@ -99,36 +99,84 @@ class Sidebar extends React.Component {
         );
     };
 
-    syncWithServer = guid => {
-        if (!guid) {
+    syncWithServer = username => {
+        if (!username) {
             console.warn('Require sync profile id');
             return;
         }
 
-        const { purge, restore } = u.backupRestore;
-        const fn = json => {
-            const { status, data } = json;
-            if (status !== 200) {
-                console.error('Nothing to restore', json);
-                return;
+        // sync with server
+        // 1. does this user exist?
+        // 2. get the remote articles
+        // 3. compare the modified timestamps
+        // 4. collect the articles that are newer thatn localStorage
+        // 5. push the new or more recent records to the server
+        //
+
+        const fs = u.storage('articles');
+        const localtimestamps = {};
+        let localarticles = fs.read();
+
+        localarticles.forEach(r => {
+            localtimestamps[r.uuid] = r.modified || r.opened;
+        });
+
+        fs.getUser(username).then(json => {
+            let meta, diff, prev, next;
+            for (let row in json) {
+                if (/settings$/.test(row)) continue;
+                meta = json[row].meta;
+                if (!localtimestamps[row]) {
+                    console.log('Create local article [%s]', row);
+                    u.storage(row).write(json[row]);
+                    localarticles.push(meta);
+                    continue;
+                }
+                // there is a local version
+                // compare timestamp and keep newset
+                prev = u.storage(row).read();
+                next = json[row];
+                diff = prev.meta.modified - next.meta.modified;
+
+                if (diff > 10 * 1000) {
+                    console.log('Replace remote data', row, username);
+                    fs.updateArticle(username, row, prev);
+                    continue;
+                }
+
+                u.storage(row).write(next);
+                localarticles = localarticles.filter(r => r.uuid !== row);
+                localarticles.push(next.meta);
             }
+            fs.write(localarticles);
+            u.storage('settings').write(json.settings);
+            this.setState({ articles: [...localarticles], guid: username });
+        });
 
-            console.warn('Restoring remote data');
+        // const { purge, restore } = u.backupRestore;
+        // const fn = json => {
+        //     const { status, data } = json;
+        //     if (status !== 200) {
+        //         console.error('Nothing to restore', json);
+        //         return;
+        //     }
 
-            purge('rewrite');
-            restore('rewrite', data);
-            let { articles, settings } = data;
-            const current = settings.current || null;
-            const { splitwidth = 50 } = settings.values || {};
+        //     console.warn('Restoring remote data');
 
-            let state = { current, splitwidth, articles, guid };
+        //     purge('rewrite');
+        //     restore('rewrite', data);
+        //     let { articles, settings } = data;
+        //     const current = settings.current || null;
+        //     const { splitwidth = 50 } = settings.values || {};
 
-            this.setState(state);
-            this.getArticleByGuid(current);
-            this.props.store.setSyncProfile(guid);
-        };
+        //     let state = { current, splitwidth, articles, guid };
 
-        return u.storage().pull(guid, fn);
+        //     this.setState(state);
+        //     this.getArticleByGuid(current);
+        //     this.props.store.setSyncProfile(guid);
+        // };
+
+        // return u.storage().pull(guid, fn);
     };
 
     getUpdatedArticles() {

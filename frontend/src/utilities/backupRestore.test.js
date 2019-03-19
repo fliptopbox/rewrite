@@ -81,3 +81,20 @@ test('restore the data to localStorage', () => {
     expect(c16992278a301002.data).toHaveLength(5);
     expect(a0123456789abcde.data).toHaveLength(9);
 });
+
+test('Ensure the deprecated values have been replaced', () => {
+    const json = require('./backupRestore.test.1.json');
+    backupRestore.context({});
+    const result = backupRestore.restore('rewrite', json);
+    const keys = Object.keys(result);
+    expect(keys).toHaveLength(4);
+
+    const articles = JSON.parse(result['rewrite-articles']);
+
+    articles.forEach(r => {
+        expect(r).toHaveProperty('uuid');
+        expect(r).toHaveProperty('name');
+        expect(r).toHaveProperty('modified');
+        expect(r).toHaveProperty('created');
+    });
+});

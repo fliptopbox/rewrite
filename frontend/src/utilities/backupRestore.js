@@ -31,7 +31,6 @@ function restore(ns = '', obj) {
         const now = new Date().valueOf();
 
         if (/[a-z0-9]{16}$/.test(k)) {
-            //console.log('add article data row [%s]', key);
             if (!('data' in row || 'meta' in row)) {
                 //console.log('old schema ....... ');
                 row = {
@@ -59,24 +58,37 @@ function restore(ns = '', obj) {
         }
     });
 
-    // lastly we need to transpose the row metadata and articles metadata
+    // we need to transpose the row metadata and articles metadata
     // and elect an article as the "current" article as a setting prop
+    const derived = [];
     rows.articles.forEach((r, i) => {
         const id = r.uuid || r.guid;
-        rows[id].meta = {
-            ...r,
+        rows[id].meta = { ...r };
+        rows[id].meta.uuid = id;
+        rows[id].meta.modified = r.opened || r.modified;
+
+        derived.push({
             uuid: id,
-            modified: r.modified || r.opened,
-        };
-        // remove deprecated keys
-        delete rows[id].meta.guid;
-        delete rows[id].meta.opened;
+            modified: r.opened || r.modified,
+            created: r.created,
+            name: r.name,
+        });
     });
+    // replace the original with the derived array.
+    rows.articles = derived;
 
     const { previous, current } = rows.settings;
     rows.settings.current = previous || current;
     delete rows.settings.previous;
     delete rows.settings.settings;
+
+    // clean up illegal keys
+    Object.keys(rows.settings).forEach(r => {
+        if (/^[0-9]+$/.test(r)) {
+            // console.log('delete invalid key [%s]', r);
+            delete rows.settings[r];
+        }
+    });
 
     // finally save the coersed schema to disk
     Object.keys(rows).forEach(
