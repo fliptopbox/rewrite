@@ -187,7 +187,8 @@ class Storage {
     initilize() {
         const settings = this.storage('settings').read();
         const { current = null } = settings || {};
-        if (!this.list()) {
+        if (!this.list().length) {
+            console.warn('create default example article');
             this.create('a0123456789abcde', 'Startup example', startup);
         }
         if (current) {
