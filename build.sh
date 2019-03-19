@@ -13,3 +13,8 @@ echo "Move build folder to backend root"
 mv build ../backend/
 
 cd ../
+
+echo "Adding to GIT repo"
+git add -A
+git commit -m "updated backend build assets"
+
