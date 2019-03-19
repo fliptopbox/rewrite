@@ -24,10 +24,10 @@ function restore(ns = '', obj) {
     };
 
     Object.keys(obj).forEach((k, i) => {
-        const key = k.replace(/(^[^\-]+-+)/, '');
+        const key = k.replace(/(^[^-]+-+)/, '');
         const value = obj[k];
 
-        let row = /^[\[{'"]/.test(value) ? JSON.parse(obj[k]) : value;
+        let row = /^[[{'"]/.test(value) ? JSON.parse(obj[k]) : value;
         const now = new Date().valueOf();
 
         if (/[a-z0-9]{16}$/.test(k)) {
