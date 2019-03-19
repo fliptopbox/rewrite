@@ -140,7 +140,7 @@ class Sidebar extends React.Component {
     registerMouseEvent() {
         const body = document.querySelector('body');
         const sidebar = document.querySelector('#sidebar');
-        const zone = [3, sidebar.offsetWidth + 50]; // mouse trigger region
+        const zone = [5, sidebar.offsetWidth + 50]; // mouse trigger region
         let showsidebar = body.classList.contains('show-sidebar');
 
         this.props.mouse(null, 'move', e => {
@@ -165,7 +165,8 @@ class Sidebar extends React.Component {
                 );
             }
 
-            if (pageX < zone[0] || (showsidebar && pageX < zone[1])) {
+            // if (pageX < zone[0] || (showsidebar && pageX < zone[1])) {
+            if (pageX < zone[0]) {
                 // refresh the articles list
                 this.setState({ articles: this.getUpdatedArticles() });
                 body.classList.add('show-sidebar');
@@ -233,7 +234,9 @@ class Sidebar extends React.Component {
         this.props.article.wordcounter();
     };
     getArticles() {
-        const { current = null, articles = [] } = this.state;
+        const articles = this.getUpdatedArticles();
+        let current = this.state.current || articles[0].uuid;
+
         const { store } = this.props;
         let callbacks = {
             getArticleByGuid: this.getArticleByGuid,
@@ -245,16 +248,20 @@ class Sidebar extends React.Component {
             downloadJson: this.download('json'),
         };
 
-        const files = articles.map(obj => {
-            const key = obj.guid || obj.uuid;
-            const selected = key === current ? 'selected' : '';
+        let files = null;
 
-            return (
-                <li key={key} className={selected}>
-                    <FileRow object={obj} callbacks={callbacks} />
-                </li>
-            );
-        });
+        if (articles && articles.length) {
+            files = articles.map((obj, n) => {
+                const key = obj.guid || obj.uuid;
+                const selected = key === current ? 'selected' : '';
+
+                return (
+                    <li key={key || n} className={selected}>
+                        <FileRow object={obj} callbacks={callbacks} />
+                    </li>
+                );
+            });
+        }
 
         return (
             <div id="files">

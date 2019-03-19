@@ -185,33 +185,40 @@ class Storage {
     // attempts to load previous article,
     // or first article or blank or welcome page
     initilize() {
-        const settings = this.storage('settings').read();
-        const { current = null } = settings || {};
-        if (!this.list().length) {
-            console.warn('create default example article');
-            this.create('a0123456789abcde', 'Startup example', startup);
+        const uuid = startup.meta.uuid;
+        const name = startup.meta.name;
+
+        const settings = this.storage('settings');
+        const { current = null } = settings.read() || {};
+
+        if (!this.list()) {
+            this.create(uuid, name, startup);
+            settings.write({ current: uuid });
+            console.warn('create default example article [%s]', uuid);
         }
+
         if (current) {
             this.read(current);
         }
+
         return this.current;
     }
 }
 
 export default Storage;
 
-function createArticle(guid, name, schema) {
+function createArticle(article_id, name, schema) {
     if (!schema) {
         console.error('Create requires article schema');
         return;
     }
 
     // generate the initial metadata
-    guid = guid || uuid();
+    article_id = article_id || uuid();
     name = name || 'Untitled';
     const created = new Date().valueOf();
-    const opened = new Date().valueOf();
-    const row = { guid, name, created, opened };
+    const modified = new Date().valueOf();
+    const row = { uuid: article_id, name, created, modified };
 
     // append to list of articles
     const articles = this.storage('articles');
@@ -220,14 +227,14 @@ function createArticle(guid, name, schema) {
     articles.write(array);
 
     // save the article data
-    const key = this.filename(guid);
+    const key = this.filename(article_id);
     this.storage(key).write(schema);
-    this.storage('previous').write(guid);
 
     this.current = {
         ...row,
         data: schema,
-        previous: guid,
+        previous: article_id,
+        current: article_id,
     };
 
     return this.current;

@@ -1,33 +1,39 @@
-[
-    { "text": "# Re:writing" },
-    { "text": "" },
-    { "text": "Writing is rewriting." },
-    { "text": "" },
-    {
-        "text": "This is a simple tool, which allows the writer, to systematically breakdown each paragraph into component sentences, iterate over them until the paragraph is complete.",
-        "versions": [
-            ">This is a crude tool",
-            ">A new way to rewrite",
-            "This is a simple tool,",
-            ">",
-            ">and it allows the student,",
-            ">that empowers the the author,",
-            "which allows the writer,",
-            ">",
-            ">to systematically breakdown each paragraph into component sentences, and iterate over new versions until the paragraph is complete.",
-            "to systematically breakdown each paragraph into component sentences, iterate over them until the paragraph is complete.",
-            ""
-        ],
-        "locked": "locked",
-        "className": "className"
+{
+    "meta": {
+        "name": "Startup example",
+        "uuid": "a0123456789abcde"
     },
-    { "text": "" },
-    {
-        "text": "The interface is split into two parts which can be resized, and there is a file and settings menu on the left, which remains hidden, to keep the work area clean."
-    },
-    { "text": "" },
-    {
-        "text": "To open the menu move your mouse to the left edge of the screen. The menu will open to reveal various self explanatory preferences.",
-        "selected": "selected"
-    }
-]
+    "data": [
+        { "text": "# Re:writing" },
+        { "text": "" },
+        { "text": "Writing is rewriting." },
+        { "text": "" },
+        {
+            "text": "This is a simple tool, which allows the writer, to systematically breakdown each paragraph into component sentences, iterate over them until the paragraph is complete.",
+            "versions": [
+                ">This is a crude tool",
+                ">A new way to rewrite",
+                "This is a simple tool,",
+                ">",
+                ">and it allows the student,",
+                ">that empowers the the author,",
+                "which allows the writer,",
+                ">",
+                ">to systematically breakdown each paragraph into component sentences, and iterate over new versions until the paragraph is complete.",
+                "to systematically breakdown each paragraph into component sentences, iterate over them until the paragraph is complete.",
+                ""
+            ],
+            "locked": "locked",
+            "className": "className"
+        },
+        { "text": "" },
+        {
+            "text": "The interface is split into two parts which can be resized, and there is a file and settings menu on the left, which remains hidden, to keep the work area clean."
+        },
+        { "text": "" },
+        {
+            "text": "To open the menu move your mouse to the left edge of the screen. The menu will open to reveal various self explanatory preferences.",
+            "selected": "selected"
+        }
+    ]
+}
