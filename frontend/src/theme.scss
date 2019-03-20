@@ -119,6 +119,11 @@
     }
 }
 .container {
+    background: radial-gradient(ellipse at center, #8c8c8c, #b3b3b3);
+    .dark & {
+        color: #bfbfbf;
+        background: radial-gradient(ellipse at center, #666666, #303030);
+    }
 }
 
 .sidebar {
