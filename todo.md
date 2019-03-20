@@ -9,8 +9,8 @@
 
 # TODO
 
+-   double shift on empty P throws error
 -   offline should load from localstorage
--   new document should highlight sidebar
 -   HUD should confirm save/sync pass/fail
 -   sync load should push before pull?
 -   sync should check diff delta or timestamp
@@ -67,3 +67,5 @@
 -   resize divider after server sync
 -   wordcount target that alerts when the target is met
 -   onLoad: selected para should populate sentence editor
+-   new document should highlight sidebar
+-   delete current resets to first article

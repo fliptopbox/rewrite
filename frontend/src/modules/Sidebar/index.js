@@ -326,17 +326,20 @@ class Sidebar extends React.Component {
     }
 
     handleDelete = ariticle_id => {
-        const { store } = this.props;
+        let next_id;
+        const { store, article } = this.props;
         const msg = 'You are about to delete this file.\nAre you sure?';
         if (!window.confirm(msg)) return false;
 
         store.delete(ariticle_id);
         const articles = store.list().filter(r => r.uuid !== ariticle_id);
         if (ariticle_id === this.state.current) {
-            console.log('Delete current. re-iniitalize editors');
             console.log(articles);
+            next_id = articles[0].uuid;
+            console.log('Delete current. re-iniitalize editors', next_id);
+            this.getArticleByGuid(next_id);
         }
-        this.setState({ articles });
+        this.setState({ articles, current: next_id });
     };
 
     makeEditable = (e, name, guid) => {
