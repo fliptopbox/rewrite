@@ -118,17 +118,22 @@ class Sidebar extends React.Component {
         let localarticles = fs.read();
 
         localarticles.forEach(r => {
+            console.log('local timestamps', r.uuid);
             localtimestamps[r.uuid] = r.modified || r.opened;
         });
 
         fs.getUser(username).then(json => {
             let meta, diff, prev, next;
+            console.log(111111, json);
             for (let row in json) {
                 if (/settings$/.test(row)) continue;
                 meta = json[row].meta;
+                meta.uuid = row;
+
                 if (!localtimestamps[row]) {
                     console.log('Create local article [%s]', row);
                     u.storage(row).write(json[row]);
+                    localarticles = localarticles.filter(r => r.uuid !== row);
                     localarticles.push(meta);
                     continue;
                 }
@@ -146,6 +151,7 @@ class Sidebar extends React.Component {
 
                 u.storage(row).write(next);
                 localarticles = localarticles.filter(r => r.uuid !== row);
+                console.log(222222, localarticles);
                 localarticles.push(next.meta);
             }
             fs.write(localarticles);
@@ -304,7 +310,7 @@ class Sidebar extends React.Component {
                 const selected = key === current ? 'selected' : '';
 
                 return (
-                    <li key={key || n} className={selected}>
+                    <li key={key} className={selected}>
                         <FileRow object={obj} callbacks={callbacks} />
                     </li>
                 );
@@ -319,15 +325,19 @@ class Sidebar extends React.Component {
         );
     }
 
-    handleDelete(guid) {
+    handleDelete = ariticle_id => {
         const { store } = this.props;
         const msg = 'You are about to delete this file.\nAre you sure?';
         if (!window.confirm(msg)) return false;
 
-        store.delete(guid);
-        const articles = store.list();
+        store.delete(ariticle_id);
+        const articles = store.list().filter(r => r.uuid !== ariticle_id);
+        if (ariticle_id === this.state.current) {
+            console.log('Delete current. re-iniitalize editors');
+            console.log(articles);
+        }
         this.setState({ articles });
-    }
+    };
 
     makeEditable = (e, name, guid) => {
         e.stopPropagation();
@@ -352,13 +362,14 @@ class Sidebar extends React.Component {
     };
 
     handleImport = e => {
+        // import the document and re-set the editor and current id
         const { store, article } = this.props;
         const that = this;
         store.open(e, function(name, text) {
             const p = new Parse(text);
             const current = store.create(null, name, p.toCollection());
-            article.init(current.data);
-            that.setState({ articles: store.list() });
+            article.reset(current.data);
+            that.setState({ articles: store.list(), current: current.current });
         });
     };
 
