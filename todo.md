@@ -9,6 +9,12 @@
 
 # TODO
 
+-   offline should load from localstorage
+-   new document should highlight sidebar
+-   HUD should confirm save/sync pass/fail
+-   sync load should push before pull?
+-   sync should check diff delta or timestamp
+-   show a version number
 -   Underline toggle (on/off)
 -   dark theme selected & locked highlighting is too subtle
 -   ESC obscured workspace
