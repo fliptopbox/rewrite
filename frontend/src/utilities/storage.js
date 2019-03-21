@@ -81,11 +81,42 @@ function storage(sufix = null) {
             }).then(r => r.json());
         },
 
+        deleteArticle: article_id => {
+            if (!onLine) {
+                console.log('not online');
+                return;
+            }
+
+            if (!article_id) {
+                console.error('property missing [%s]', article_id);
+                return;
+            }
+
+            fetch(`${API.article}${article_id}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            })
+                .then(r => r.json())
+                .then(console.log);
+        },
         updateArticle: (username, article_id, payload) => {
             if (!onLine) {
                 console.log('not online');
                 return;
             }
+
+            if (!username || !article_id || !payload) {
+                console.error(
+                    'property missing [%s] [%s]',
+                    username,
+                    article_id,
+                    payload
+                );
+                return;
+            }
+
             fetch(`${API.article}${username}/${article_id}`, {
                 method: 'POST',
                 headers: {

@@ -33,7 +33,7 @@ class Sidebar extends React.Component {
         props.article.on('after', null, this.saveToDisk.bind(this));
         props.sentences.on('after', null, this.saveToDisk.bind(this));
     }
-    saveToDisk() {
+    saveToDisk = () => {
         u.defer(
             'savearticle',
             () => {
@@ -44,23 +44,21 @@ class Sidebar extends React.Component {
                 const children = article.texteditor.children;
                 const data = new Parse(children).toCollection();
 
-                const meta = articles.find(r => r.uuid === current);
+                let meta = articles.find(r => r.uuid === current);
+
+                if (!meta) {
+                    console.log('No meta data. New article?');
+                    meta = fs.read().meta;
+                }
+
                 const payload = { data, meta };
 
-                console.log(
-                    'persit article',
-                    this.state.guid,
-                    this.state.current
-                );
-                console.log('payload', payload);
-
-                //store.write(data);
                 fs.write(payload);
                 fs.updateArticle(guid, current, payload);
             },
             1500
         );
-    }
+    };
     componentDidMount() {
         // update with persisted data
         const articles = this.getUpdatedArticles();
@@ -118,17 +116,22 @@ class Sidebar extends React.Component {
         let localarticles = fs.read();
 
         localarticles.forEach(r => {
+            console.log('local timestamps', r.uuid);
             localtimestamps[r.uuid] = r.modified || r.opened;
         });
 
         fs.getUser(username).then(json => {
             let meta, diff, prev, next;
+            console.log(111111, json);
             for (let row in json) {
                 if (/settings$/.test(row)) continue;
                 meta = json[row].meta;
+                meta.uuid = row;
+
                 if (!localtimestamps[row]) {
                     console.log('Create local article [%s]', row);
                     u.storage(row).write(json[row]);
+                    localarticles = localarticles.filter(r => r.uuid !== row);
                     localarticles.push(meta);
                     continue;
                 }
@@ -146,37 +149,13 @@ class Sidebar extends React.Component {
 
                 u.storage(row).write(next);
                 localarticles = localarticles.filter(r => r.uuid !== row);
+                console.log(222222, localarticles);
                 localarticles.push(next.meta);
             }
             fs.write(localarticles);
             u.storage('settings').write(json.settings);
             this.setState({ articles: [...localarticles], guid: username });
         });
-
-        // const { purge, restore } = u.backupRestore;
-        // const fn = json => {
-        //     const { status, data } = json;
-        //     if (status !== 200) {
-        //         console.error('Nothing to restore', json);
-        //         return;
-        //     }
-
-        //     console.warn('Restoring remote data');
-
-        //     purge('rewrite');
-        //     restore('rewrite', data);
-        //     let { articles, settings } = data;
-        //     const current = settings.current || null;
-        //     const { splitwidth = 50 } = settings.values || {};
-
-        //     let state = { current, splitwidth, articles, guid };
-
-        //     this.setState(state);
-        //     this.getArticleByGuid(current);
-        //     this.props.store.setSyncProfile(guid);
-        // };
-
-        // return u.storage().pull(guid, fn);
     };
 
     getUpdatedArticles() {
@@ -304,7 +283,7 @@ class Sidebar extends React.Component {
                 const selected = key === current ? 'selected' : '';
 
                 return (
-                    <li key={key || n} className={selected}>
+                    <li key={key} className={selected}>
                         <FileRow object={obj} callbacks={callbacks} />
                     </li>
                 );
@@ -319,15 +298,26 @@ class Sidebar extends React.Component {
         );
     }
 
-    handleDelete(guid) {
+    handleDelete = ariticle_id => {
         const { store } = this.props;
         const msg = 'You are about to delete this file.\nAre you sure?';
         if (!window.confirm(msg)) return false;
 
-        store.delete(guid);
+        store.delete(ariticle_id); // deletes and update articles list
+        u.storage().deleteArticle(ariticle_id);
         const articles = store.list();
-        this.setState({ articles });
-    }
+
+        // if the deleted article is the current one, reload with
+        // the first available article in the article list
+        if (ariticle_id === this.state.current && articles.length) {
+            ariticle_id = articles[0].uuid;
+            console.log('Delete current. re-initalize editors', ariticle_id);
+            this.getArticleByGuid(ariticle_id);
+        }
+
+        ariticle_id = articles.length ? ariticle_id : null;
+        this.setState({ articles, current: ariticle_id });
+    };
 
     makeEditable = (e, name, guid) => {
         e.stopPropagation();
@@ -352,13 +342,15 @@ class Sidebar extends React.Component {
     };
 
     handleImport = e => {
+        // import the document and re-set the editor and current id
+        // save to localStorage, update articles list and try to sync to server.
         const { store, article } = this.props;
         const that = this;
         store.open(e, function(name, text) {
             const p = new Parse(text);
             const current = store.create(null, name, p.toCollection());
-            article.init(current.data);
-            that.setState({ articles: store.list() });
+            article.reset(current.data);
+            that.setState({ articles: store.list(), current: current.current });
         });
     };
 
@@ -447,8 +439,14 @@ class Sidebar extends React.Component {
                         <div
                             className="inner"
                             onClick={() => {
-                                this.props.store.create(null, 'Untitled', [{}]);
-                                this.props.article.init([{}]);
+                                const a = this.props.store.create(
+                                    null,
+                                    'Untitled',
+                                    [{ text: 'New document ...' }]
+                                );
+
+                                this.getArticleByGuid(a.meta.uuid);
+                                this.updateCurrent(a.meta.uuid);
                                 return;
                             }}>
                             New

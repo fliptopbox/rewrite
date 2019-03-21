@@ -54,13 +54,12 @@ def get_users():
 @app.route("%s/articles/<username>" % API_URI, methods=['GET'])
 def get_all_articles(username):
     user = User.query.filter_by(username=username).first_or_404()
-    all = Article.query.filter_by(status=0, user_id=user.id)
+    all = Article.query.filter_by(user_id=user.id)
     articles = []
     for article in all:
-        u = User.query.filter_by(id=article.user_id).first()
         articles.append({
             "uuid": article.uuid,
-            "username": u.username,
+            "username": username,
             "meta": article.meta,
             "status": STATUS[article.status],
             "created": int(article.created.timestamp() * 1000),
@@ -105,14 +104,19 @@ def create_article(username, uuid = None):
     data=payload['data']
     meta=payload['meta']
 
-    print("\n\n", data, "\n\n")
-    print("\n\n", meta, "\n\n")
+    print("\n\n incoming data ------------", data, "\n\n")
+    print("\n\n incoming meta -----------", meta, "\n\n")
 
     if uuid:
         # is this an insert or update?
-        article = Article.query.filter_by(uuid=uuid)
+        article = Article.query.filter_by(uuid=uuid, user_id=user.id)
+        print("Article count", article.count())
 
-        if article.count() > 0:
+        if article.count() > 1:
+            print("Ambiguis article. Can't update with uuid %s" % uuid)
+            abort(404)
+
+        if article.count() == 1:
             print("Update existing article with uuid %s" % uuid)
             article.data = data
             article.meta = meta
@@ -144,11 +148,12 @@ def delete_article(uuid):
         abort(404)
 
     a = Article.query.filter_by(uuid=uuid).first_or_404()
+    uuid = a.uuid;
 
     db.session.delete(a)
     db.session.commit()
 
-    return jsonify({'article deleted': True}), 201
+    return jsonify({'article deleted': uuid}), 201
 
 
 @app.route("%s/article/<uuid>" % API_URI, methods=['PUT'])
