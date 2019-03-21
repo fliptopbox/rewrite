@@ -41,6 +41,7 @@ class Storage {
 
         const { storage, filename } = this;
         const articles = storage('articles');
+        const s = storage('settings');
         const file = storage(filename(guid)).read();
 
         if (!file) {
@@ -48,10 +49,20 @@ class Storage {
             return null;
         }
 
-        const meta = articles.read().find(obj => obj.guid === guid);
-        const current = { ...meta, data: file, previous: guid };
+        if (!file.meta || !file.data) {
+            console.error(
+                'This article has incorrect schema. Missing meta and data'
+            );
+            return null;
+        }
 
-        return (this.current = current);
+        //const meta = articles.read().find(obj => obj.guid === guid);
+        //const current = { ...meta, data: file, previous: guid };
+        let settings = s.read() || {};
+        settings.current = file.meta.uuid;
+        s.write(settings);
+
+        return (this.current = file);
     }
 
     // persists to localStorage
@@ -149,35 +160,34 @@ class Storage {
     // rename
     // assigns a new filename to the given guid
     rename(uuid, filename) {
-        if (!uuid) return;
+        if (!uuid || !filename) return;
 
         const list = this.list();
         let index = list.findIndex(r => r.uuid === uuid);
         let articles = this.storage('articles');
         list[index].name = filename;
         articles.write(list);
+
+        return true;
     }
 
-    // delete this is a test
+    // delete
     // deletes the associated files by guid
+    // and refreshes the articles list
     delete(guid) {
         if (!guid) return false;
 
         const { filename, storage } = this;
-        const list = this.list();
-        let index = list.findIndex(r => r.guid === guid);
-        let articles = storage('articles');
-        const previous = storage('previous');
-        const collection = articles.read();
-        collection.splice(index, 1);
-        // const pluck = collection.splice(index, 1);
+        const { meta = null } = this.current || {};
+        const list = this.list().filter(r => r.uuid !== guid);
+        storage('articles').write(list);
+        storage(guid).delete();
 
-        articles.write(collection);
-        storage(filename(guid)).delete();
-
-        if (previous.read() === guid) {
-            previous.delete();
+        if (meta && meta.uuid === guid) {
+            console.warn('Deleting current article %s', guid);
+            this.read(this.list()[0].uuid);
         }
+
         return true;
     }
 
@@ -218,24 +228,32 @@ function createArticle(article_id, name, schema) {
     name = name || 'Untitled';
     const created = new Date().valueOf();
     const modified = new Date().valueOf();
-    const row = { uuid: article_id, name, created, modified };
+    const meta = { uuid: article_id, name, created, modified };
 
     // append to list of articles
     const articles = this.storage('articles');
     const array = articles.read() || [];
-    array.push(row);
+
+    const exists = array.findIndex(a => a.uuid === article_id);
+
+    // ensure the uuid is unique
+    // existing uuid will be updated
+    if (array && array.length && exists + 1) {
+        console.warn('UUID exists. Replace %s', article_id);
+        array.splice(exists, 1);
+    }
+
+    array.push(meta);
     articles.write(array);
+
+    this.current = {
+        meta,
+        data: schema,
+    };
 
     // save the article data
     const key = this.filename(article_id);
-    this.storage(key).write(schema);
-
-    this.current = {
-        ...row,
-        data: schema,
-        previous: article_id,
-        current: article_id,
-    };
+    this.storage(key).write(this.current);
 
     return this.current;
 }

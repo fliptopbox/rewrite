@@ -326,20 +326,23 @@ class Sidebar extends React.Component {
     }
 
     handleDelete = ariticle_id => {
-        let next_id;
-        const { store, article } = this.props;
+        const { store } = this.props;
         const msg = 'You are about to delete this file.\nAre you sure?';
         if (!window.confirm(msg)) return false;
 
-        store.delete(ariticle_id);
-        const articles = store.list().filter(r => r.uuid !== ariticle_id);
-        if (ariticle_id === this.state.current) {
-            console.log(articles);
-            next_id = articles[0].uuid;
-            console.log('Delete current. re-iniitalize editors', next_id);
-            this.getArticleByGuid(next_id);
+        store.delete(ariticle_id); // deletes and update articles list
+        const articles = store.list();
+
+        // if the deleted article is the current one, reload with
+        // the first available article in the article list
+        if (ariticle_id === this.state.current && articles.length) {
+            ariticle_id = articles[0].uuid;
+            console.log('Delete current. re-initalize editors', ariticle_id);
+            this.getArticleByGuid(ariticle_id);
         }
-        this.setState({ articles, current: next_id });
+
+        ariticle_id = articles.length ? ariticle_id : null;
+        this.setState({ articles, current: ariticle_id });
     };
 
     makeEditable = (e, name, guid) => {
@@ -366,6 +369,7 @@ class Sidebar extends React.Component {
 
     handleImport = e => {
         // import the document and re-set the editor and current id
+        // save to localStorage, update articles list and try to sync to server.
         const { store, article } = this.props;
         const that = this;
         store.open(e, function(name, text) {
