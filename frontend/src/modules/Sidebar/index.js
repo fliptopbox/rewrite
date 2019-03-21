@@ -345,12 +345,18 @@ class Sidebar extends React.Component {
         // import the document and re-set the editor and current id
         // save to localStorage, update articles list and try to sync to server.
         const { store, article } = this.props;
+        const { getArticleByGuid, updateCurrent } = this;
         const that = this;
         store.open(e, function(name, text) {
             const p = new Parse(text);
-            const current = store.create(null, name, p.toCollection());
-            article.reset(current.data);
-            that.setState({ articles: store.list(), current: current.current });
+            const a = store.create(null, name, p.toCollection());
+            const { uuid } = a.meta;
+            const { guid } = that.state;
+            // article.reset(current.data);
+            // that.setState({ articles: store.list(), current: current.current });
+            getArticleByGuid(uuid);
+            updateCurrent(uuid);
+            u.storage().updateArticle(guid, uuid, a);
         });
     };
 
