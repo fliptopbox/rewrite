@@ -122,7 +122,6 @@ class Sidebar extends React.Component {
 
         fs.getUser(username).then(json => {
             let meta, diff, prev, next;
-            console.log(111111, json);
             for (let row in json) {
                 if (/settings$/.test(row)) continue;
                 meta = json[row].meta;
@@ -354,6 +353,7 @@ class Sidebar extends React.Component {
             const { guid } = that.state;
             // article.reset(current.data);
             // that.setState({ articles: store.list(), current: current.current });
+            console.log('Import user:[%s] uuid[%s]', guid, uuid, a);
             getArticleByGuid(uuid);
             updateCurrent(uuid);
             u.storage().updateArticle(guid, uuid, a);
@@ -515,7 +515,8 @@ class Sidebar extends React.Component {
                                     const guid = u.prompt(
                                         'Enter your sync id:'
                                     );
-                                    return this.syncWithServer(guid);
+                                    this.syncWithServer(guid);
+                                    this.setState({ guid });
                                 }}>
                                 <span>Sync Profile</span>
                                 <em>{this.state.guid || 'Not syncing'}</em>
