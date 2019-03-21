@@ -48,7 +48,6 @@ def get_users():
     for user in all:
         users.append(user.username)
 
-    print (users)
     return jsonify({ 'users': users }), 201
 
 @app.route("%s/articles/<username>" % API_URI, methods=['GET'])
@@ -66,16 +65,12 @@ def get_all_articles(username):
             "modified": int(article.modified.timestamp() * 1000),
         })
 
-    print (articles)
     return jsonify({ 'articles': articles }), 201
 
 @app.route("%s/article/<uuid>" % API_URI, methods=['GET'])
 def get_article(uuid):
     a = Article.query.filter_by(uuid=uuid).first_or_404()
     u = User.query.filter_by(id=a.user_id).first()
-
-    print("data --------------------------------------------\n\n", a.data)
-    print("meta --------------------------------------------\n\n", a.meta)
 
     meta = {} if not a.meta else a.meta
     article = {
@@ -96,7 +91,6 @@ def get_article(uuid):
 def create_article(username, uuid = None):
     user = User.query.filter_by(username=username).first_or_404()
     if not request.json or not 'data' in request.json:
-        print("no data or no JSON")
         abort(400)
 
     payload = request.get_json()
@@ -104,37 +98,28 @@ def create_article(username, uuid = None):
     data=payload['data']
     meta=payload['meta']
 
-    print("\n\n incoming data ------------", data, "\n\n")
-    print("\n\n incoming meta -----------", meta, "\n\n")
 
     if uuid:
         # is this an insert or update?
         article = Article.query.filter_by(uuid=uuid, user_id=user.id)
-        print("Article count", article.count())
 
         if article.count() > 1:
-            print("Ambiguis article. Can't update with uuid %s" % uuid)
             abort(404)
 
         if article.count() == 1:
-            print("Update existing article with uuid %s" % uuid)
             article.data = data
             article.meta = meta
             article.modified = datetime.utcnow()
             db.session.commit()
 
-            print("\n\n", article.data)
-            print("\n\n", article.meta)
 
             return jsonify({'article update': True}), 201
 
 
         # update (using existing UUID)
-        print("Insert NEW article with UUID %s" % uuid)
         article = Article(author=user, uuid=uuid, data=data, meta=meta)
 
     else:
-        print("Insert NEW article without UUID")
         article = Article(author=user, data=data, meta=meta)
 
     db.session.add(article)
@@ -178,7 +163,6 @@ def update_article(uuid):
 
     modified=datetime.utcnow()
 
-    print(article.uuid, user.username, data, meta)
 
     article.data = data
     article.meta = meta
@@ -191,23 +175,19 @@ def update_article(uuid):
 @app.route("%s/user/<username>" % API_URI, methods=['GET'])
 def get_user(username):
     '''get catenated assets that belong to user @username'''
-    print(username)
     user = User.query.filter_by(username=username).first_or_404()
     articles = Article.query.filter_by(user_id=user.id, status=0)
     settings = Setting.query.filter_by(user_id=user.id)
 
 
     if settings.count() == 0:
-        print("\n\nNo settings found for ...", username)
         settings = UI_SETTINGS
     else:
         settings = settings[0].data
-        print("\n\nSettings found for ...", username, settings)
 
     payload = { "settings": settings }
 
     for article in articles:
-        print ("\n\n", article.id, article.uuid, STATUS[article.status])
 
         created=int(time.mktime(article.created.timetuple()))
         modified=int(time.mktime(article.modified.timetuple()))
@@ -285,17 +265,13 @@ def update_settings(username):
 
 
     if s.count() == 0:
-        print("------------- creating settings", username)
         s = Setting(user_id=u.id, data=data, modified=modified)
         db.session.add(s)
     else:
-        print("------------- updating settings", username)
         s = s[0]
-        print(s.data)
         s.modified=modified
         s.data=data
 
-    print(data)
     db.session.commit()
 
     return jsonify({'settings update': True}), 201
@@ -311,16 +287,13 @@ def get_settings(username):
 
 
     if s.count() == 0:
-        print("------------- creating settings", username)
         data = UI_SETTINGS
         s = Setting(user_id=u.id, data=data)
         db.session.add(s)
         db.session.commit()
 
     else:
-        print("------------- retreiving settings", username)
         data = s[0].data
 
-    print(data)
 
     return jsonify(data), 201
