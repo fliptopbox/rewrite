@@ -118,7 +118,6 @@ test('create will create new articles', () => {
         const a = storage.read(uuid);
         expect(uuid).toHaveLength(16);
         expect(a).not.toBeNull();
-        console.log(123, a);
         expect(a.data).toBeDefined();
         expect(a.meta).toBeDefined();
     });

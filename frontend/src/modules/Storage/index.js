@@ -40,7 +40,6 @@ class Storage {
         }
 
         const { storage, filename } = this;
-        const articles = storage('articles');
         const s = storage('settings');
         const file = storage(filename(guid)).read();
 
@@ -177,7 +176,7 @@ class Storage {
     delete(guid) {
         if (!guid) return false;
 
-        const { filename, storage } = this;
+        const { storage } = this;
         const { meta = null } = this.current || {};
         const list = this.list().filter(r => r.uuid !== guid);
         storage('articles').write(list);
