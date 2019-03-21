@@ -148,11 +148,12 @@ def delete_article(uuid):
         abort(404)
 
     a = Article.query.filter_by(uuid=uuid).first_or_404()
+    uuid = a.uuid;
 
     db.session.delete(a)
     db.session.commit()
 
-    return jsonify({'article deleted': True}), 201
+    return jsonify({'article deleted': uuid}), 201
 
 
 @app.route("%s/article/<uuid>" % API_URI, methods=['PUT'])

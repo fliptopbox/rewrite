@@ -174,7 +174,10 @@ class Storage {
     // deletes the associated files by guid
     // and refreshes the articles list
     delete(guid) {
-        if (!guid) return false;
+        if (!guid) {
+            console.log('Cant delete [%s]', guid);
+            return false;
+        }
 
         const { storage } = this;
         const { meta = null } = this.current || {};

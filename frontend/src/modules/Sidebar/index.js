@@ -33,7 +33,7 @@ class Sidebar extends React.Component {
         props.article.on('after', null, this.saveToDisk.bind(this));
         props.sentences.on('after', null, this.saveToDisk.bind(this));
     }
-    saveToDisk() {
+    saveToDisk = () => {
         u.defer(
             'savearticle',
             () => {
@@ -44,23 +44,21 @@ class Sidebar extends React.Component {
                 const children = article.texteditor.children;
                 const data = new Parse(children).toCollection();
 
-                const meta = articles.find(r => r.uuid === current);
+                let meta = articles.find(r => r.uuid === current);
+
+                if (!meta) {
+                    console.log('No meta data. New article?');
+                    meta = fs.read().meta;
+                }
+
                 const payload = { data, meta };
 
-                console.log(
-                    'persit article',
-                    this.state.guid,
-                    this.state.current
-                );
-                console.log('payload', payload);
-
-                //store.write(data);
                 fs.write(payload);
                 fs.updateArticle(guid, current, payload);
             },
             1500
         );
-    }
+    };
     componentDidMount() {
         // update with persisted data
         const articles = this.getUpdatedArticles();
@@ -158,31 +156,6 @@ class Sidebar extends React.Component {
             u.storage('settings').write(json.settings);
             this.setState({ articles: [...localarticles], guid: username });
         });
-
-        // const { purge, restore } = u.backupRestore;
-        // const fn = json => {
-        //     const { status, data } = json;
-        //     if (status !== 200) {
-        //         console.error('Nothing to restore', json);
-        //         return;
-        //     }
-
-        //     console.warn('Restoring remote data');
-
-        //     purge('rewrite');
-        //     restore('rewrite', data);
-        //     let { articles, settings } = data;
-        //     const current = settings.current || null;
-        //     const { splitwidth = 50 } = settings.values || {};
-
-        //     let state = { current, splitwidth, articles, guid };
-
-        //     this.setState(state);
-        //     this.getArticleByGuid(current);
-        //     this.props.store.setSyncProfile(guid);
-        // };
-
-        // return u.storage().pull(guid, fn);
     };
 
     getUpdatedArticles() {
@@ -331,6 +304,7 @@ class Sidebar extends React.Component {
         if (!window.confirm(msg)) return false;
 
         store.delete(ariticle_id); // deletes and update articles list
+        u.storage().deleteArticle(ariticle_id);
         const articles = store.list();
 
         // if the deleted article is the current one, reload with
@@ -465,8 +439,14 @@ class Sidebar extends React.Component {
                         <div
                             className="inner"
                             onClick={() => {
-                                this.props.store.create(null, 'Untitled', [{}]);
-                                this.props.article.init([{}]);
+                                const a = this.props.store.create(
+                                    null,
+                                    'Untitled',
+                                    [{ text: 'New document ...' }]
+                                );
+
+                                this.getArticleByGuid(a.meta.uuid);
+                                this.updateCurrent(a.meta.uuid);
                                 return;
                             }}>
                             New
