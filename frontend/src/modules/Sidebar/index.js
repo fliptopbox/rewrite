@@ -111,6 +111,7 @@ class Sidebar extends React.Component {
         // 5. push the new or more recent records to the server
         //
 
+        console.log('Sync with server', username);
         const fs = u.storage('articles');
         const localtimestamps = {};
         let localarticles = fs.read();
@@ -516,7 +517,7 @@ class Sidebar extends React.Component {
                                         'Enter your sync id:'
                                     );
                                     this.syncWithServer(guid);
-                                    this.setState({ guid });
+                                    console.log('state', this.state);
                                 }}>
                                 <span>Sync Profile</span>
                                 <em>{this.state.guid || 'Not syncing'}</em>
