@@ -344,7 +344,7 @@ class Sidebar extends React.Component {
     handleImport = e => {
         // import the document and re-set the editor and current id
         // save to localStorage, update articles list and try to sync to server.
-        const { store, article } = this.props;
+        const { store } = this.props;
         const { getArticleByGuid, updateCurrent } = this;
         const that = this;
         store.open(e, function(name, text) {
