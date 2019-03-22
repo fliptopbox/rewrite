@@ -27,7 +27,7 @@ function handleKeyDown(e) {
         return re && re.test(keySequence) ? fn : null;
     });
 
-    console.log("ONKEYDOWN", e.key, e.code, keySequence);
+    // console.log("ONKEYDOWN", e.key, e.code, keySequence);
     return this.trigger(trigger, e);
 }
 

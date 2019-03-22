@@ -36,7 +36,6 @@ class Settings extends React.Component {
         }
         // apply the UI modifiers
         for (let key in state.modifiers) {
-            console.log(key, state.modifiers[key]);
             this.toggleClassName(key, state.modifiers[key]);
         }
 

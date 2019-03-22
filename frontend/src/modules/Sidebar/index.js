@@ -52,9 +52,13 @@ class Sidebar extends React.Component {
                 }
 
                 const payload = { data, meta };
+                payload.meta.modified = new Date().valueOf();
 
                 fs.write(payload);
                 fs.updateArticle(guid, current, payload);
+                const newarticles = fs.updateArticlesData();
+
+                this.setState({ articles: newarticles, current, guid });
             },
             1500
         );
@@ -62,11 +66,18 @@ class Sidebar extends React.Component {
     componentDidMount() {
         // update with persisted data
         const articles = this.getUpdatedArticles();
-        const { guid = null, current = null, values = null } =
-            read() || this.state;
+        const settings = { ...this.state, ...(read() || {}) };
+        const { guid = null, current = null, values = null } = settings;
         const { splitwidth = 50 } = values || {};
         const state = { articles, guid, current, splitwidth };
+
+        // set the state first, then update with remote data
         this.setState(state);
+
+        if (guid) {
+            this.props.store.setSyncProfile(guid);
+            this.syncWithServer(guid);
+        }
 
         // instanate the divider
         this.mouse = this.props.mouse;
@@ -81,7 +92,6 @@ class Sidebar extends React.Component {
         this.props.sentences.on('wordcounter', null, () =>
             this.props.article.wordcounter()
         );
-        this.props.store.setSyncProfile(guid);
 
         this.registerMouseEvent();
     }
@@ -117,7 +127,6 @@ class Sidebar extends React.Component {
         let localarticles = fs.read();
 
         localarticles.forEach(r => {
-            console.log('local timestamps', r.uuid);
             localtimestamps[r.uuid] = r.modified || r.opened;
         });
 
@@ -141,15 +150,14 @@ class Sidebar extends React.Component {
                 next = json[row];
                 diff = prev.meta.modified - next.meta.modified;
 
-                if (diff > 10 * 1000) {
-                    console.log('Replace remote data', row, username);
+                if (diff > 5 * 1000) {
+                    console.warn('Replace remote data', row, username, diff);
                     fs.updateArticle(username, row, prev);
                     continue;
                 }
 
                 u.storage(row).write(next);
                 localarticles = localarticles.filter(r => r.uuid !== row);
-                console.log(222222, localarticles);
                 localarticles.push(next.meta);
             }
             fs.write(localarticles);

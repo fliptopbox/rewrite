@@ -113,7 +113,7 @@ def create_article(username, uuid = None):
             db.session.commit()
 
 
-            return jsonify({'article update': True}), 201
+            return jsonify({'article update': uuid, "username": username, "meta": meta}), 201
 
 
         # update (using existing UUID)

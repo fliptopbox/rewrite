@@ -101,6 +101,18 @@ function storage(sufix = null) {
                 .then(r => r.json())
                 .then(console.log);
         },
+        updateArticlesData: fn => {
+            // refresn the meta collection
+            const uuid = /[a-z][a-z0-9]{15}$/i;
+            const articles = [];
+            const keys = Object.keys(localStorage).filter(k => uuid.test(k));
+            keys.forEach(key => {
+                const a = JSON.parse(localStorage[key]);
+                articles.push(a.meta);
+            });
+            localStorage['rewrite-articles'] = JSON.stringify(articles);
+            return fn && fn.construcor === Function ? fn(articles) : articles;
+        },
         updateArticle: (username, article_id, payload) => {
             if (!onLine) {
                 console.log('not online');
@@ -109,7 +121,7 @@ function storage(sufix = null) {
 
             if (!username || !article_id || !payload) {
                 console.error(
-                    'property missing [%s] [%s]',
+                    'property missing user[%s] uuid[%s]',
                     username,
                     article_id,
                     payload
