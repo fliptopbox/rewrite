@@ -22,12 +22,22 @@ window.addEventListener('keydown', e => {
 class Sidebar extends React.Component {
     constructor(props) {
         super();
-        this.state = {
-            guid: null,
-            current: null,
-            splitwidth: 50,
-            articles: [],
-        };
+
+        const settings = read() || {};
+        this.defaultData = props.store.initilize();
+
+        //this.defaultdata = props.store.initalize();
+        this.state = Object.assign(
+            {},
+            {
+                guid: null,
+                current: null,
+                splitwidth: 50,
+                articles: [],
+            },
+            settings,
+            { articles: props.store.list() }
+        );
 
         // bind the onAfter event to persit the data
         props.article.on('after', null, this.saveToDisk.bind(this));
@@ -65,18 +75,16 @@ class Sidebar extends React.Component {
     };
     componentDidMount() {
         // update with persisted data
-        const articles = this.getUpdatedArticles();
-        const settings = { ...this.state, ...(read() || {}) };
-        const { guid = null, current = null, values = null } = settings;
+        const { guid = null, values = null } = this.state;
         const { splitwidth = 50 } = values || {};
-        const state = { articles, guid, current, splitwidth };
 
-        // set the state first, then update with remote data
-        this.setState(state);
-
-        if (guid) {
+        if (guid && navigator.onLine) {
+            console.log('SYNC WITH SERVER');
             this.props.store.setSyncProfile(guid);
             this.syncWithServer(guid);
+        } else {
+            console.log('load the default data. no server sync.');
+            this.props.article.init(this.defaultData);
         }
 
         // instanate the divider
@@ -125,51 +133,73 @@ class Sidebar extends React.Component {
         const fs = u.storage('articles');
         const localtimestamps = {};
         let localarticles = fs.read();
+        let current;
 
         localarticles.forEach(r => {
             localtimestamps[r.uuid] = r.modified || r.opened;
         });
 
-        fs.getUser(username).then(json => {
-            let meta, diff, prev, next;
-            for (let row in json) {
-                if (/settings$/.test(row)) continue;
-                meta = json[row].meta;
-                meta.uuid = row;
+        return fs
+            .getUser(username)
+            .then(json => {
+                let meta, diff;
+                current = json.settings.current;
+                u.storage('settings').write(json.settings);
 
-                if (!localtimestamps[row]) {
-                    console.log('Create local article [%s]', row);
-                    u.storage(row).write(json[row]);
-                    localarticles = localarticles.filter(r => r.uuid !== row);
-                    localarticles.push(meta);
-                    continue;
+                for (let row in json) {
+                    if (/settings$/.test(row)) continue;
+                    meta = json[row].meta;
+                    meta.uuid = row;
+
+                    if (!localtimestamps[row]) {
+                        console.log('Create local article [%s]', row);
+                        u.storage(row).write(json[row]);
+                        localarticles = localarticles.filter(
+                            r => r.uuid !== row
+                        );
+                        localarticles.push(meta);
+                        continue;
+                    }
+                    // there is a local version
+                    // compare timestamp and keep newset
+                    const local = u.storage(row).read();
+                    const remote = json[row];
+
+                    if (local > remote) {
+                        console.warn(
+                            'Replace remote data',
+                            row,
+                            username,
+                            diff
+                        );
+                        fs.updateArticle(username, row, local);
+                        continue;
+                    }
+
+                    console.log('replacing local copy %s', row);
+                    u.storage(row).write(remote);
                 }
-                // there is a local version
-                // compare timestamp and keep newset
-                prev = u.storage(row).read();
-                next = json[row];
-                diff = prev.meta.modified - next.meta.modified;
+            })
+            .then(() => {
+                console.log('server sync compete', current);
+                this.getArticleByGuid(current);
+            })
 
-                if (diff > 5 * 1000) {
-                    console.warn('Replace remote data', row, username, diff);
-                    fs.updateArticle(username, row, prev);
-                    continue;
-                }
-
-                u.storage(row).write(next);
-                localarticles = localarticles.filter(r => r.uuid !== row);
-                localarticles.push(next.meta);
-            }
-            fs.write(localarticles);
-            u.storage('settings').write(json.settings);
-            this.setState({ articles: [...localarticles], guid: username });
-        });
+            .then(() => {
+                console.log('update set state', current);
+                localarticles = fs.updateArticlesData();
+                this.setState({
+                    articles: localarticles,
+                    guid: username,
+                    current: current,
+                });
+            });
     };
 
     getUpdatedArticles() {
         const { store } = this.props;
         const articles = store.list();
-        return articles;
+        return articles || null;
     }
 
     registerMouseEvent() {
@@ -270,6 +300,8 @@ class Sidebar extends React.Component {
     };
     getArticles() {
         const articles = this.getUpdatedArticles();
+
+        if (!articles || !articles.length) return;
         let current = this.state.current || articles[0].uuid;
 
         const { store } = this.props;
@@ -285,18 +317,16 @@ class Sidebar extends React.Component {
 
         let files = null;
 
-        if (articles && articles.length) {
-            files = articles.map((obj, n) => {
-                const key = obj.guid || obj.uuid;
-                const selected = key === current ? 'selected' : '';
+        files = articles.map((obj, n) => {
+            const key = obj.guid || obj.uuid;
+            const selected = key === current ? 'selected' : '';
 
-                return (
-                    <li key={key} className={selected}>
-                        <FileRow object={obj} callbacks={callbacks} />
-                    </li>
-                );
-            });
-        }
+            return (
+                <li key={key} className={selected}>
+                    <FileRow object={obj} callbacks={callbacks} />
+                </li>
+            );
+        });
 
         return (
             <div id="files">

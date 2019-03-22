@@ -24,7 +24,7 @@ window.onmousemove = e => mouse(e, 'move');
 const store = new Storage(u.storage.bind(window));
 const article = new Article('c1', { prefix: 'a', hidden: true });
 const sentences = new Sentences('c2', { prefix: 's', hidden: true });
-const articleText = store.initilize();
+//const articleText = store.initilize();
 
 article.bindTo(sentences);
 sentences.bindTo(article);
@@ -41,8 +41,8 @@ window.RE = {
         document.querySelector('.overlay').classList.add('hidden');
 
         // init delay required for scrollIntoViewIfNeeded()
-        article.init((articleText && articleText.data) || ['']);
-    }, 1950);
+        //article.init((articleText && articleText.data) || ['']);
+    }, 1000);
 })();
 
 // Sidebar is a React component

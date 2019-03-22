@@ -102,17 +102,23 @@ def create_article(username, uuid = None):
     if uuid:
         # is this an insert or update?
         article = Article.query.filter_by(uuid=uuid, user_id=user.id)
+        count = article.count();
 
-        if article.count() > 1:
+
+        if count > 1:
             abort(404)
 
-        if article.count() == 1:
+
+
+        if count == 1:
+            article = article.first()
             article.data = data
             article.meta = meta
             article.modified = datetime.utcnow()
             db.session.commit()
 
 
+            print("\n\n\narticle update", count, user.id, user.username, uuid, data, meta, "\n\n\n")
             return jsonify({'article update': uuid, "username": username, "meta": meta}), 201
 
 

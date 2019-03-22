@@ -103,6 +103,7 @@ function storage(sufix = null) {
         },
         updateArticlesData: fn => {
             // refresn the meta collection
+            // returns Array of meta data
             const uuid = /[a-z][a-z0-9]{15}$/i;
             const articles = [];
             const keys = Object.keys(localStorage).filter(k => uuid.test(k));
