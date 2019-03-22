@@ -118,7 +118,7 @@ def create_article(username, uuid = None):
             db.session.commit()
 
 
-            print("\n\n\narticle update", count, user.id, user.username, uuid, data, meta, "\n\n\n")
+            # print("\n\n\narticle update", count, user.id, user.username, uuid, data, meta, "\n\n\n")
             return jsonify({'article update': uuid, "username": username, "meta": meta}), 201
 
 
