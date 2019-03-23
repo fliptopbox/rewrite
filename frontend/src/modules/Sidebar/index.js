@@ -266,11 +266,15 @@ class Sidebar extends React.Component {
         );
     };
 
-    getArticleByGuid = guid => {
+    getArticleByGuid = article_id => {
         const { store, article } = this.props;
-        const fileObj = store.read(guid);
-        const { data } = fileObj;
-        article.setWordTarget(fileObj.wordtarget);
+        const fileObj = store.read(article_id);
+        if (!fileObj) {
+            console.warn('No article by that uuid [%s]', article_id);
+            return;
+        }
+        const { data, wordtarget = 0 } = fileObj;
+        article.setWordTarget(wordtarget);
         return article.reset(data);
     };
 
@@ -402,32 +406,58 @@ class Sidebar extends React.Component {
     handleDataRestore = e => {
         const { restore } = u.backupRestore;
         const { readTextFile } = u;
+        const { updateArticle, updateArticlesData } = u.storage();
         const ns = 'rewrite';
+        let settings;
+        let username = this.state.guid || null;
+        const domId = e.target.id;
 
-        return readTextFile(e, (name, plaintext) => {
-            const data = JSON.parse(plaintext);
-            const keys = Object.keys(data);
-            const valid = keys.filter(k =>
-                /(articles|previous|settings)$/i.test(k)
-            );
+        const promise = readTextFile(e);
+        promise
+            .then(object => {
+                const { result } = object;
+                const data = JSON.parse(result);
+                const keys = Object.keys(data);
+                const valid = keys.filter(k => /(articles|settings)$/i.test(k));
 
-            console.log(valid);
-            // restore if there is data integrity
-            if (!valid.length === 3) {
-                console.error('Restore failed integrity check', data);
-                return;
-            }
+                settings = data.settings || {};
+                username = settings.guid || username;
 
-            const contd = u.confirm(
-                'You are about to overwrite existing data.\nAre you sure?'
-            );
-            if (!contd) return;
+                // restore if there is data integrity
+                if (!valid.length === 2) {
+                    console.error('Restore failed integrity check', data);
+                    return;
+                }
 
-            Object.keys(localStorage).forEach(k =>
-                k.indexOf() + 1 ? delete localStorage[k] : null
-            );
-            return restore(ns, data);
-        });
+                const warning =
+                    'You are about to overwrite existing data.\nAre you sure?';
+                const contd = u.confirm(warning);
+                if (!contd) return;
+
+                return restore(ns, data);
+            })
+            .then(data => {
+                return updateArticlesData();
+            })
+            .then(array => {
+                this.setState({ articles: this.getUpdatedArticles() });
+                document.querySelector('#' + domId).value = '';
+                return array;
+            })
+            .then(metaArray => {
+                // if we have a syncID push to remote server
+
+                if (!username) {
+                    console.log('Cant sync. No username');
+                    return;
+                }
+
+                metaArray.forEach(obj => {
+                    const article_id = obj.uuid;
+                    const data = u.storage(article_id).read();
+                    updateArticle(username, article_id, data);
+                });
+            });
     };
 
     download = (mime = 'text') => {

@@ -126,15 +126,15 @@ class Storage {
     // open
     // presents a file picker to load an external file
     // same as import, without id or plainText string
-    open(files, fn) {
-        if (!files) {
+    open(e, fn) {
+        if (!e) {
             console.error('Cant open, require files array');
         }
 
-        // remember read file is async
-        return readTextFile(files, function(name, data) {
-            // console.log("read text file", name, data);
-            return fn(name, data);
+        const promise = readTextFile(e);
+        promise.then(object => {
+            const { name, result } = object;
+            return fn(name, result);
         });
     }
 
@@ -158,11 +158,11 @@ class Storage {
 
     // rename
     // assigns a new filename to the given guid
-    rename(uuid, filename) {
-        if (!uuid || !filename) return;
+    rename(article_id, filename) {
+        if (!article_id || !filename) return;
 
         const list = this.list();
-        let index = list.findIndex(r => r.uuid === uuid);
+        let index = list.findIndex(r => r.uuid === article_id);
         let articles = this.storage('articles');
         list[index].name = filename;
         articles.write(list);
@@ -197,16 +197,16 @@ class Storage {
     // attempts to load previous article,
     // or first article or blank or welcome page
     initilize() {
-        const uuid = startup.meta.uuid;
+        const article_id = uuid();
         const name = startup.meta.name;
 
         const settings = this.storage('settings');
         const { current = null } = settings.read() || {};
 
         if (!this.list()) {
-            this.create(uuid, name, startup);
-            settings.write({ current: uuid });
-            console.warn('create default example article [%s]', uuid);
+            this.create(article_id, name, startup);
+            settings.write({ current: article_id });
+            console.warn('create default example article [%s]', article_id);
         }
 
         if (current) {

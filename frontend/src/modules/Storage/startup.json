@@ -1,7 +1,7 @@
 {
     "meta": {
         "name": "Startup example",
-        "uuid": "a0123456789abcde"
+        "uuid": null
     },
     "data": [
         { "text": "# Re:writing" },

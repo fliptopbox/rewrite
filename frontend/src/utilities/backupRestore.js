@@ -60,29 +60,37 @@ function restore(ns = '', obj) {
 
     // we need to transpose the row metadata and articles metadata
     // and elect an article as the "current" article as a setting prop
+    // and update each rows modified date.
     const derived = [];
     rows.articles.forEach((r, i) => {
         const id = r.uuid || r.guid;
+        const now = new Date().valueOf();
+
         rows[id].meta = { ...r };
         rows[id].meta.uuid = id;
-        rows[id].meta.modified = r.opened || r.modified;
+        rows[id].meta.modified = now;
 
+        delete rows[id].meta.opened;
+
+        // append the derived meta Object
         derived.push({
             uuid: id,
-            modified: r.opened || r.modified,
-            created: r.created,
             name: r.name,
+            modified: now,
+            created: now,
         });
     });
-    // replace the original with the derived array.
+    // replace the original collection with the new derived array.
     rows.articles = derived;
 
+    // examine the settings and ensure there is a "current" value
     const { previous, current } = rows.settings;
-    rows.settings.current = previous || current;
-    delete rows.settings.previous;
-    delete rows.settings.settings;
+    rows.settings.current = previous || current || derived[0].uuid;
+    delete rows.settings.previous; // deprecated former name
+    delete rows.settings.settings; // a nesting precaution
 
-    // clean up illegal keys
+    // clean up illegal keys eg. {0: "a", 1: "b" ...}
+    // properties are expected to be alpha word strings ONLY
     Object.keys(rows.settings).forEach(r => {
         if (/^[0-9]+$/.test(r)) {
             // console.log('delete invalid key [%s]', r);
@@ -91,9 +99,12 @@ function restore(ns = '', obj) {
     });
 
     // finally save the coersed schema to disk
-    Object.keys(rows).forEach(
-        r => (localStorage[`${prefix}${r}`] = JSON.stringify(rows[r]))
-    );
+    // articles Collection, settings Object and article Object(s)
+    Object.keys(rows).forEach(r => {
+        const obj = rows[r];
+        const string = JSON.stringify(obj);
+        localStorage[`${prefix}${r}`] = string;
+    });
 
     return localStorage;
 }

@@ -114,6 +114,12 @@ function storage(sufix = null) {
             localStorage['rewrite-articles'] = JSON.stringify(articles);
             return fn && fn.construcor === Function ? fn(articles) : articles;
         },
+
+        // push artice to remote server
+        // username         String
+        // article_id       String
+        // payload          Object or String
+
         updateArticle: (username, article_id, payload) => {
             if (!onLine) {
                 console.log('not online');
@@ -130,12 +136,17 @@ function storage(sufix = null) {
                 return;
             }
 
+            const stringify =
+                payload.construcor === String
+                    ? payload
+                    : JSON.stringify(payload);
+
             fetch(`${API.article}${username}/${article_id}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(payload),
+                body: stringify,
             })
                 .then(r => r.json())
                 .then(d => console.log(d, username, article_id));
