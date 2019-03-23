@@ -130,10 +130,12 @@ class Sidebar extends React.Component {
         //
 
         console.log('Sync with server', username);
+
         const fs = u.storage('articles');
+
         const localtimestamps = {};
-        let localarticles = fs.read();
-        let current;
+        let localarticles = fs.updateArticlesData();
+        let current = localarticles[0].uuid;
 
         localarticles.forEach(r => {
             localtimestamps[r.uuid] = r.modified || r.opened;
@@ -143,8 +145,11 @@ class Sidebar extends React.Component {
             .getUser(username)
             .then(json => {
                 let meta, diff;
-                current = json.settings.current;
-                u.storage('settings').write(json.settings);
+                if (json && json.settings) {
+                    u.storage('settings').write(json.settings);
+                }
+
+                current = (json.settings && json.settings.current) || current;
 
                 for (let row in json) {
                     if (/settings$/.test(row)) continue;
