@@ -1,6 +1,7 @@
 import u from '../../utilities/';
 
 // this function needs to be bound to this context
+// Dependancies:
 // this.setState()
 // this.getArticleByGuid()
 
