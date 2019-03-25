@@ -36,6 +36,7 @@ class Sidebar extends React.Component {
                 current: null,
                 splitwidth: 50,
                 articles: [],
+                mode: 0,
             },
             settings,
             { articles: props.store.list() }
@@ -387,7 +388,10 @@ class Sidebar extends React.Component {
 
     render() {
         const articleList = this.getArticles();
-        return (
+        const classname = ['show-file-actions', 'show-settings'][
+            this.state.mode
+        ];
+        const actions = (
             <div>
                 <ul className="actions">
                     <li>
@@ -474,12 +478,47 @@ class Sidebar extends React.Component {
                     </div>
                 </ul>
                 {articleList}
+            </div>
+        );
+        const settings = (
+            <div class="sidebar-settings">
                 <Settings
                     article={this.props.article}
                     guid={this.state.guid}
                     current={this.state.current}
                     splitwidth={this.state.splitwidth}
                 />
+            </div>
+        );
+        return (
+            <div className="sidebar-content">
+                {this.state.mode ? settings : actions}
+                <div className="sidebar-mode-switch">
+                    <a
+                        href="#show-file-actions"
+                        className={
+                            'sidebar-mode-toggle' +
+                            (this.state.mode === 0 ? ' selected' : '')
+                        }
+                        onClick={e => {
+                            e.preventDefault();
+                            this.setState({ mode: 0 });
+                        }}>
+                        files
+                    </a>
+                    <a
+                        href="#show-settings"
+                        className={
+                            'sidebar-mode-toggle' +
+                            (this.state.mode === 1 ? ' selected' : '')
+                        }
+                        onClick={e => {
+                            e.preventDefault();
+                            this.setState({ mode: 1 });
+                        }}>
+                        settings
+                    </a>
+                </div>
             </div>
         );
     }
