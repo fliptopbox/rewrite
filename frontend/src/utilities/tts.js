@@ -96,6 +96,7 @@ function textToSpeech(array, period = '') {
 }
 
 const methods = {
+    initialize,
     say: saythis,
     read: textToSpeech,
     voice: setVoice,
@@ -103,6 +104,6 @@ const methods = {
     cancel: () => window.speechSynthesis.cancel(),
 };
 
-window.TTS = methods;
+//window.TTS = methods;
 
-export default initialize;
+export default methods;

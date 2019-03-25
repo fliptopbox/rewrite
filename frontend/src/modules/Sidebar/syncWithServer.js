@@ -19,7 +19,7 @@ function syncWithServer(username) {
     // 5. push the new or more recent records to the server
     //
 
-    console.log('Sync with server', username);
+    console.log('Sync with server [%s]', username);
 
     const fs = u.storage('articles');
 
@@ -64,17 +64,15 @@ function syncWithServer(username) {
                     continue;
                 }
 
-                console.log('replacing local copy %s', row);
+                //console.log('replacing local copy %s', row);
                 u.storage(row).write(remote);
             }
         })
         .then(() => {
-            console.log('server sync compete', current);
             this.getArticleByGuid(current);
         })
 
         .then(() => {
-            console.log('update set state', current);
             localarticles = fs.updateArticlesData();
             this.setState({
                 articles: localarticles,

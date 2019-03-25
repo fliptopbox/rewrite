@@ -12,7 +12,6 @@
 -   double shift on empty P throws error
 -   offline should load from localstorage
 -   HUD should confirm save/sync pass/fail
--   sync load should push before pull?
 -   sync should check diff delta or timestamp
 -   show a version number
 -   Underline toggle (on/off)
@@ -26,7 +25,6 @@
 -   files toggle that shows metadata, export etc.
 -   reset divider button
 -   show list of key trigger shortcuts
--   refactor file/settings flexbox vertical
 
 ## NEW FEATURES or MAJOR REFACTOR
 
@@ -69,3 +67,5 @@
 -   onLoad: selected para should populate sentence editor
 -   new document should highlight sidebar
 -   delete current resets to first article
+-   sync load should pull first
+-   refactor file/settings into sperate panels

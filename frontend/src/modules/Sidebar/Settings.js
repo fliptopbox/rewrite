@@ -1,12 +1,15 @@
 import React from 'react';
 import u from '../../utilities/';
 
+const TTS = u.tts;
+
 class Settings extends React.Component {
     constructor(props) {
         super();
         this.article = props.article;
         this.fs = u.storage('settings');
 
+        this.visible = props.visible;
         this.state = {
             guid: null,
             current: null,
@@ -21,7 +24,11 @@ class Settings extends React.Component {
                 fontsize: 24,
                 splitwidth: 50,
             },
+            visible: null,
         };
+
+        // register TTS key trigger
+        props.keycapture(/^space/i, 'ctrlKey', this.readSelected);
     }
 
     componentDidMount() {
@@ -61,6 +68,9 @@ class Settings extends React.Component {
                 fontsize: this.state.values.fontsize,
                 splitwidth: this.props.splitwidth,
             };
+        }
+        if (this.props.visible !== prevProps.visible) {
+            updates.visible = this.props.visible;
         }
 
         if (Object.keys(updates).length) {
@@ -113,7 +123,7 @@ class Settings extends React.Component {
             selected && selected.innerText.trim() ? selected : texteditor;
         if (!el || !el.innerText) return;
 
-        window.TTS.read(el.innerText);
+        TTS.read(el.innerText);
     };
     fontsize(value, persist = false) {
         document.querySelector('body').style.fontSize = `${value}px`;
@@ -137,6 +147,7 @@ class Settings extends React.Component {
     }
 
     render() {
+        if (!this.state.visible) return null;
         return (
             <ul className="settings">
                 <li>

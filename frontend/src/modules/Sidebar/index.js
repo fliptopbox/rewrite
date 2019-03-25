@@ -6,18 +6,45 @@ import Settings from './Settings';
 import divider from '../divider';
 import syncWithServer from '../Sidebar/syncWithServer.js';
 import registerMouseEvent from '../Sidebar/registerMouseEvent';
+import SidebarButton from '../Sidebar/SidebarButton';
 
 const { read } = u.storage('settings');
 const html = document.querySelector('html');
+const TTS = u.tts;
 
 // a keypress toggle. 1st press = on, 2nd press = off
 // different platforms have strange quirks with holding down keys + clicking
-window.addEventListener('keydown', e => {
+
+const keydown = [];
+function keycapture(key, modifier, fn) {
+    console.log('register key capture', key, modifier);
+    keydown.push([key, modifier, fn]);
+}
+
+window.onkeydown = e => {
+    keydown.some((row, i) => {
+        // row[0].test(e.code) && e[row[1]]
+        console.log('%s) [%s]', i, e.code, row[0].test(e.code), e[row[1]]);
+        return row[0].test(e.code) && e[row[1]] && row[2](e);
+    });
+};
+
+keycapture(/^alt/i, 'altKey', e => {
     let method, className;
     if (e.altKey) {
         className = 'show-alternative';
         method = html.classList.contains(className) ? 'remove' : 'add';
         html.classList[method](className);
+    }
+    if (e.crtlKey && e.code === 'Space') {
+        e.stopPropagation();
+
+        const { selected = null, texteditor = null } = this.article;
+        const el =
+            selected && selected.innerText.trim() ? selected : texteditor;
+        if (!el || !el.innerText) return;
+
+        TTS.read(el.innerText);
     }
 });
 
@@ -50,36 +77,6 @@ class Sidebar extends React.Component {
         this.syncWithServer = syncWithServer.bind(this);
         this.registerMouseEvent = registerMouseEvent.bind(this);
     }
-    saveToDisk = () => {
-        u.defer(
-            'savearticle',
-            () => {
-                const { article } = this.props;
-                const { current, guid, articles } = this.state;
-                const fs = u.storage(current);
-
-                const children = article.texteditor.children;
-                const data = new Parse(children).toCollection();
-
-                let meta = articles.find(r => r.uuid === current);
-
-                if (!meta) {
-                    console.log('No meta data. New article?');
-                    meta = fs.read().meta;
-                }
-
-                const payload = { data, meta };
-                payload.meta.modified = new Date().valueOf();
-
-                fs.write(payload);
-                fs.updateArticle(guid, current, payload);
-                const newarticles = fs.updateArticlesData();
-
-                this.setState({ articles: newarticles, current, guid });
-            },
-            1500
-        );
-    };
     componentDidMount() {
         // update with persisted data
         const { guid = null, values = null } = this.state;
@@ -110,6 +107,37 @@ class Sidebar extends React.Component {
 
         this.registerMouseEvent();
     }
+
+    saveToDisk = () => {
+        u.defer(
+            'savearticle',
+            () => {
+                const { article } = this.props;
+                const { current, guid, articles } = this.state;
+                const fs = u.storage(current);
+
+                const children = article.texteditor.children;
+                const data = new Parse(children).toCollection();
+
+                let meta = articles.find(r => r.uuid === current);
+
+                if (!meta) {
+                    console.log('No meta data. New article?');
+                    meta = fs.read().meta;
+                }
+
+                const payload = { data, meta };
+                payload.meta.modified = new Date().valueOf();
+
+                fs.write(payload);
+                fs.updateArticle(guid, current, payload);
+                const newarticles = fs.updateArticlesData();
+
+                this.setState({ articles: newarticles, current, guid });
+            },
+            1500
+        );
+    };
 
     saveDividerWidth = value => {
         u.defer(
@@ -387,137 +415,132 @@ class Sidebar extends React.Component {
     };
 
     render() {
-        const articleList = this.getArticles();
-        const classname = ['show-file-actions', 'show-settings'][
-            this.state.mode
-        ];
-        const actions = (
-            <div>
-                <ul className="actions">
-                    <li>
-                        <div
-                            className="inner"
-                            onClick={() => {
-                                const a = this.props.store.create(
-                                    null,
-                                    'Untitled',
-                                    [{ text: 'New document ...' }]
-                                );
-
-                                this.getArticleByGuid(a.meta.uuid);
-                                this.updateCurrent(a.meta.uuid);
-                                return;
-                            }}>
-                            New
-                        </div>
-                    </li>
-                    <li>
-                        <label htmlFor="uploadInput" className="inner">
-                            <span>Open</span>
-                            <input
-                                id="uploadInput"
-                                className="hidden"
-                                onChange={this.handleImport}
-                                type="file"
-                                accept="text/*"
-                            />
-                        </label>
-                    </li>
-                    <li>
-                        <div className="inner" onClick={this.download('text')}>
-                            <span>
-                                Save <i className="on-alternative-inline">As</i>
-                            </span>
-                        </div>
-                    </li>
-                    <div className="on-alternative">
+        const actions = visible => {
+            if (!visible) return null;
+            return (
+                <div>
+                    <ul className="actions">
                         <li>
                             <div
                                 className="inner"
                                 onClick={() => {
-                                    const { download, backupRestore } = u;
-                                    const { backup } = backupRestore;
+                                    const a = this.props.store.create(
+                                        null,
+                                        'Untitled',
+                                        [{ text: 'New document ...' }]
+                                    );
 
-                                    const data = backup('rewrite');
-                                    const meta = {
-                                        name: 'rewriting-backup',
-                                        id: new Date().toISOString(),
-                                        data,
-                                    };
-                                    return download(meta);
+                                    this.getArticleByGuid(a.meta.uuid);
+                                    this.updateCurrent(a.meta.uuid);
+                                    return;
                                 }}>
-                                <span>Backup</span>
+                                New
                             </div>
                         </li>
                         <li>
-                            <label htmlFor="restoreData" className="inner">
-                                <span>Restore</span>
+                            <label htmlFor="uploadInput" className="inner">
+                                <span>Open</span>
                                 <input
-                                    id="restoreData"
+                                    id="uploadInput"
                                     className="hidden"
-                                    onChange={this.handleDataRestore}
+                                    onChange={this.handleImport}
                                     type="file"
-                                    accept="text/json"
+                                    accept="text/*"
                                 />
                             </label>
                         </li>
                         <li>
                             <div
                                 className="inner"
-                                onClick={() => {
-                                    const guid = u.prompt(
-                                        'Enter your sync id:'
-                                    );
-                                    this.syncWithServer(guid);
-                                    console.log('state', this.state);
-                                }}>
-                                <span>Sync Profile</span>
-                                <em>{this.state.guid || 'Not syncing'}</em>
+                                onClick={this.download('text')}>
+                                <span>
+                                    Save{' '}
+                                    <i className="on-alternative-inline">As</i>
+                                </span>
                             </div>
                         </li>
-                    </div>
-                </ul>
-                {articleList}
-            </div>
-        );
-        const settings = (
-            <div class="sidebar-settings">
-                <Settings
-                    article={this.props.article}
-                    guid={this.state.guid}
-                    current={this.state.current}
-                    splitwidth={this.state.splitwidth}
-                />
-            </div>
-        );
+                        <div className="on-alternative">
+                            <li>
+                                <div
+                                    className="inner"
+                                    onClick={() => {
+                                        const { download, backupRestore } = u;
+                                        const { backup } = backupRestore;
+
+                                        const data = backup('rewrite');
+                                        const meta = {
+                                            name: 'rewriting-backup',
+                                            id: new Date().toISOString(),
+                                            data,
+                                        };
+                                        return download(meta);
+                                    }}>
+                                    <span>Backup</span>
+                                </div>
+                            </li>
+                            <li>
+                                <label htmlFor="restoreData" className="inner">
+                                    <span>Restore</span>
+                                    <input
+                                        id="restoreData"
+                                        className="hidden"
+                                        onChange={this.handleDataRestore}
+                                        type="file"
+                                        accept="text/json"
+                                    />
+                                </label>
+                            </li>
+                            <li>
+                                <div
+                                    className="inner"
+                                    onClick={() => {
+                                        const guid = u.prompt(
+                                            'Enter your sync id:'
+                                        );
+                                        this.syncWithServer(guid);
+                                        console.log('state', this.state);
+                                    }}>
+                                    <span>Sync Profile</span>
+                                    <em>{this.state.guid || 'Not syncing'}</em>
+                                </div>
+                            </li>
+                        </div>
+                    </ul>
+                    {this.getArticles()}
+                </div>
+            );
+        };
+        const settings = visible => {
+            return (
+                <div className="sidebar-settings">
+                    <Settings
+                        article={this.props.article}
+                        guid={this.state.guid}
+                        current={this.state.current}
+                        keycapture={keycapture}
+                        visible={visible}
+                        splitwidth={this.state.splitwidth}
+                    />
+                </div>
+            );
+        };
         return (
             <div className="sidebar-content">
-                {this.state.mode ? settings : actions}
+                {actions(this.state.mode === 0)}
+                {settings(this.state.mode === 1)}
                 <div className="sidebar-mode-switch">
-                    <a
-                        href="#show-file-actions"
-                        className={
-                            'sidebar-mode-toggle' +
-                            (this.state.mode === 0 ? ' selected' : '')
-                        }
-                        onClick={e => {
-                            e.preventDefault();
-                            this.setState({ mode: 0 });
-                        }}>
-                        files
-                    </a>
-                    <a
-                        href="#show-settings"
-                        className={
-                            'sidebar-mode-toggle' +
-                            (this.state.mode === 1 ? ' selected' : '')
-                        }
-                        onClick={e => {
-                            e.preventDefault();
-                            this.setState({ mode: 1 });
-                        }}>
-                        settings
-                    </a>
+                    <SidebarButton
+                        text="files"
+                        handler={i => this.setState({ mode: i })}
+                        mode={this.state.mode}
+                        value={0}
+                    />
+                    <SidebarButton
+                        text="settings"
+                        handler={i => this.setState({ mode: i })}
+                        mode={this.state.mode}
+                        value={1}
+                    />
                 </div>
             </div>
         );
