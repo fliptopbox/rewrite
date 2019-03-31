@@ -14,6 +14,7 @@ class Parse {
             tag: 'p',
             br: '<br/>',
             markdown: false,
+            filterInactive: false, // see toTextArray()
             ...options,
         };
 
@@ -83,7 +84,7 @@ class Parse {
     }
 
     toText() {
-        const array = toTextArray(_collection);
+        const array = toTextArray(_collection, this.options);
         let string = array.join('\n');
         string = string.replace(/(\s+)?$/g, '');
 
@@ -91,7 +92,7 @@ class Parse {
     }
 
     toArray() {
-        return toTextArray(_collection);
+        return toTextArray(_collection, this.options);
     }
 
     toCollection() {
@@ -101,8 +102,15 @@ class Parse {
 
 export default Parse;
 
-function toTextArray(collection) {
-    return [...collection].map(o => `${o.text}`);
+function toTextArray(collection, options) {
+    // retrun simple Array of paragraph Strings
+    // @collection = schema object
+
+    const { filterInactive = false } = options;
+
+    return [...collection]
+        .map(o => (filterInactive && o.inactive ? null : `${o.text}`))
+        .filter(s => s !== null);
 }
 
 function linebreaks(plaintext = '') {

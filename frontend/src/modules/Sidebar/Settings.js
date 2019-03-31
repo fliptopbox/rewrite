@@ -1,5 +1,6 @@
 import React from 'react';
 import u from '../../utilities/';
+import Parse from '../../utilities/Parse';
 
 const TTS = u.tts;
 
@@ -119,12 +120,29 @@ class Settings extends React.Component {
         e.stopPropagation();
 
         const { selected = null, texteditor = null } = this.article;
-        const el =
-            selected && selected.innerText.trim() ? selected : texteditor;
-        if (!el || !el.innerText) return;
+        const article = selected
+            ? document.createElement('article')
+            : texteditor.cloneNode(true);
 
-        TTS.read(el.innerText);
+        // if there is a selected element,
+        // create a DOM collection of all following siblings
+        if (selected) {
+            let p = document.querySelector('.selected');
+            while (p) {
+                article.appendChild(p.cloneNode(true));
+                p = p.nextElementSibling;
+            }
+        }
+
+        console.log(article.innerText);
+        const p = new Parse(article.children, { filterInactive: true });
+        const plaintext = p.toText();
+
+        if (!plaintext) return;
+
+        TTS.read(plaintext);
     };
+
     fontsize(value, persist = false) {
         document.querySelector('body').style.fontSize = `${value}px`;
 
