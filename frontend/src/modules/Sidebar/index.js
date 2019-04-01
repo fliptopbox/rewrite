@@ -526,18 +526,18 @@ class Sidebar extends React.Component {
         };
         return (
             <div className="sidebar-content">
-                {actions(this.state.mode === 0)}
-                {settings(this.state.mode === 1)}
+                {actions(Number(this.state.mode) === 0)}
+                {settings(Number(this.state.mode) === 1)}
                 <div className="sidebar-mode-switch">
                     <SidebarButton
                         text="files"
-                        handler={i => this.setState({ mode: i })}
+                        handler={i => this.setState({ mode: 0 })}
                         mode={this.state.mode}
                         value={0}
                     />
                     <SidebarButton
                         text="settings"
-                        handler={i => this.setState({ mode: i })}
+                        handler={i => this.setState({ mode: 1 })}
                         mode={this.state.mode}
                         value={1}
                     />

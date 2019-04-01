@@ -14,7 +14,7 @@ class Parse {
             tag: 'p',
             br: '<br/>',
             markdown: false,
-            filterInactive: false, // see toTextArray()
+            filterInactive: true, // see toTextArray()
             ...options,
         };
 
@@ -109,7 +109,7 @@ function toTextArray(collection, options) {
     const { filterInactive = false } = options;
 
     return [...collection]
-        .map(o => (filterInactive && o.inactive ? null : `${o.text}`))
+        .map(o => (filterInactive ? getOutputText(o) : `${o.text}`))
         .filter(s => s !== null);
 }
 
@@ -117,4 +117,15 @@ function linebreaks(plaintext = '') {
     // remove carridge returns (aka CrLf => Lf)
     if (/\r/.test(plaintext)) plaintext = plaintext.replace(/\r/gm, '');
     return plaintext;
+}
+
+function getOutputText(object) {
+    // @object = line Object
+    // returns String or null (if the ignore pattern is matched)
+    // lines with the value (empty)
+    // lines with inactive flag
+
+    if (object.inactive || object.empty) return null;
+    if (/\(empty\)/.test(object.text)) return null;
+    return `${object.text}`;
 }

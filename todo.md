@@ -6,13 +6,13 @@
 -   backspace sometimes does not trigger change
 -   the spell corrector can edit on a locked paragraph.
 -   pasting causes un formatted article. shift paste is okay
+-   TTS skips lines prefixed with #
 
 # TODO
 
--   double shift on empty P throws error
+-   on first load settings & files are visible
 -   offline should load from localstorage
 -   HUD should confirm save/sync pass/fail
--   sync should check diff delta or timestamp
 -   show a version number
 -   Underline toggle (on/off)
 -   dark theme selected & locked highlighting is too subtle
@@ -69,3 +69,5 @@
 -   delete current resets to first article
 -   sync load should pull first
 -   refactor file/settings into sperate panels
+-   double shift on empty P throws error
+-   sync should check diff delta or timestamp
