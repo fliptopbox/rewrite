@@ -19,6 +19,7 @@
         "react": "16.5.2",
         "react-dom": "16.5.2",
         "react-scripts": "^2.1.5",
+        "readability-meter": "^1.0.0",
         "sbd": "^1.0.14",
         "styled-components": "4.1.3"
     },
