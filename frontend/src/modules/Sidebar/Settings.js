@@ -25,7 +25,7 @@ class Settings extends React.Component {
                 fontsize: 24,
                 splitwidth: 50,
             },
-            visible: null,
+            visible: false,
         };
 
         // register TTS key trigger
@@ -34,6 +34,11 @@ class Settings extends React.Component {
 
     componentDidMount() {
         const settings = this.fs.read();
+
+        // visibility is a local state
+        // remove it to ensure settings visibility is not persisted
+        delete settings.visible;
+
         let state = { ...this.state };
         if (settings) {
             state = {

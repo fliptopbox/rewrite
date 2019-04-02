@@ -23,8 +23,7 @@ function keycapture(key, modifier, fn) {
 
 window.onkeydown = e => {
     keydown.some((row, i) => {
-        // row[0].test(e.code) && e[row[1]]
-        console.log('%s) [%s]', i, e.code, row[0].test(e.code), e[row[1]]);
+        // console.log('%s) [%s]', i, e.code, row[0].test(e.code), e[row[1]]);
         return row[0].test(e.code) && e[row[1]] && row[2](e);
     });
 };
@@ -524,6 +523,7 @@ class Sidebar extends React.Component {
                 </div>
             );
         };
+
         return (
             <div className="sidebar-content">
                 {actions(Number(this.state.mode) === 0)}

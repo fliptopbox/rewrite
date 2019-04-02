@@ -8,27 +8,29 @@
 -   pasting causes un formatted article. shift paste is okay
 -   TTS skips lines prefixed with #
 
-# TODO
+## TODO
 
--   on first load settings & files are visible
+-   UI: Improve readbility score
+-   Setting: Add readbility target percentage
+-   Setting: Add readbility toggle
 -   offline should load from localstorage
 -   HUD should confirm save/sync pass/fail
--   show a version number
--   Underline toggle (on/off)
--   dark theme selected & locked highlighting is too subtle
--   ESC obscured workspace
--   locked paragraph needs an icon to be more obvious
--   visual prompt to signal an edit on a locked paragraph
--   ? move DOM dataset to Javascript state tree
--   word count should ignore inactive lines
--   mouse down on help icon shows settings description
--   files toggle that shows metadata, export etc.
+-   UI: show a version number
+-   UI: Underline toggle (on/off)
+-   UI: dark theme selected & locked highlighting is too subtle
+-   UI: ESC obscured workspace
+-   UI: locked paragraph needs an icon to be more obvious
+-   UI: visual prompt to signal an edit on a locked paragraph
+-   SIDEBAR: mouse down on help icon shows settings description
+-   SIDEBAR: files toggle that shows metadata, export etc.
 -   reset divider button
--   show list of key trigger shortcuts
+-   UI: show list of key trigger shortcuts
 
 ## NEW FEATURES or MAJOR REFACTOR
 
+-   ? move DOM dataset to Javascript state tree
 -   allow for markdown and fountain inline rendering
+-   Article, Paragraph & Sentence have readbility score
 -   color comments
     -   eg //? //! //# /// red, green. blue & white
     -   these color the line in the sentence editor
@@ -71,3 +73,6 @@
 -   refactor file/settings into sperate panels
 -   double shift on empty P throws error
 -   sync should check diff delta or timestamp
+-   add readbility score to UI
+-   on first load settings & files are visible
+-   word count should ignore inactive lines

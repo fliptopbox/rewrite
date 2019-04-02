@@ -11,6 +11,7 @@ import Parse from '../../utilities/Parse';
 import wordcount from '../../utilities/wordcount';
 import arrayToCollection from '../../utilities/arrayToCollection';
 import scrollIntoViewIfNeeded from '../../utilities/scrollIntoViewIfNeeded';
+import readability from 'readability-meter';
 
 document.execCommand('defaultParagraphSeparator', false, 'p');
 
@@ -33,6 +34,7 @@ class Texteditor {
         this.scrollToSelected = true;
         this.words = 0;
         this.wordtarget = 0;
+        this.showReadability = true;
 
         this.container = container;
         this.texteditor = texteditor;
@@ -158,20 +160,28 @@ class Texteditor {
             'wordcounter',
             () => {
                 fn = fn || this.triggers.wordcounter.fn;
-                let innerHTML, diff;
+                let diff;
+                const el = document.createElement('span');
                 const { innerText } = this.texteditor;
 
+                el.classList.add('value');
                 this.words = wordcount(innerText);
-                innerHTML = `<span class="value">${this.words}</span>`;
+                el.innerHTML = this.words;
 
                 if (this.wordtarget) {
                     diff = this.wordtarget - this.words;
                     let warn = diff < 0 ? '-warn' : '';
-                    innerHTML = `<span class="value value${warn}">${
-                        this.words
-                    }/${this.wordtarget}</span>`;
+
+                    el.classList.add(`value${warn}`);
+                    el.innerHTML = `${this.words}/${this.wordtarget}`;
                 }
-                return fn(innerHTML);
+
+                if (this.showReadability) {
+                    let { score } = readability.ease(innerText);
+                    score = parseInt(score, 10);
+                    el.innerHTML = `${el.innerHTML} (${score}%)`;
+                }
+                return fn(el.outerHTML);
             },
             150
         );
