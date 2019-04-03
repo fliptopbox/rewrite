@@ -1,2 +1,6 @@
-build/
+frontend/build/
 node_modules/
+**/__pycache__/**
+tmp
+**/rewriting_sqlite.db
+**/rewriting_sqlite.db.0
