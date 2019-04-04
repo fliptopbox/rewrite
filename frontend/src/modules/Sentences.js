@@ -14,6 +14,7 @@ class Senetences extends Texteditor {
         this.on('capitalize', /^(altenter)$/i, toggleStringCase);
         this.on('newline', /^(shiftenter)$/i, carridgeReturn);
         this.on('deleteline', /^(altbackspace)$/i, deleteCurrentLine);
+        this.on('centeron', /^(controlcontrol)$/i, scrollToParagraph);
         this.on('click', null, () => {});
     }
 }
@@ -61,4 +62,10 @@ function updateSelectedParagraph() {
 
 function toggleInactiveFlag(e) {
     this.selected.classList.toggle('inactive');
+}
+
+function scrollToParagraph(e) {
+    // scroll the Paragraph selected element into view
+    const selected = this.parent.texteditor.querySelector('.selected');
+    selected.scrollIntoViewIfNeeded(true);
 }

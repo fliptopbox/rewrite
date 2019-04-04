@@ -27,7 +27,7 @@ function handleKeyDown(e) {
         return re && re.test(keySequence) ? fn : null;
     });
 
-    // console.log("ONKEYDOWN", e.key, e.code, keySequence);
+    console.log('ONKEYDOWN', e.key, e.code, keySequence);
     return this.trigger(trigger, e);
 }
 
@@ -69,7 +69,7 @@ function handleKeyUp(e) {
 
     // change the ms delay and ensure arrowkeys are processed immediately
     const ms = this.timer.after;
-    this.timer.delay = passive ? 25 : this.timer.default;
+    this.timer.delay = passive ? 75 : this.timer.default;
 
     // after all triggers always emit the change event.
     this.defer('change', () => this.triggers.change.fn.call(this, e));

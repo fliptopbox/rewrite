@@ -2,7 +2,7 @@ const re = {
     lineEnd: /(^\w|[.?!;]\s+\w)/g, // alpha. beta? charlie! delta;
     newLine: /^-{3,}/, // the magic sequence to add <br/> via editor
     commentChars: /^(\s+)?[>?!/]+(\s+)?/, // so far ... the prefix comment tokens
-    passiveKeys: /^(arrow|shift|control|alt|tab)/i, // keys that dont alter the sentence
+    passiveKeys: /^(arrow|shift|control|alt|tab|page|home|end|escape)/i, // keys that dont alter the sentence
 };
 let options = {
     flag: 'inactive',

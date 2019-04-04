@@ -144,9 +144,8 @@ class Texteditor {
 
     focus() {
         // if there is a selected element ...
-        // scroll to that element and ensure it
-        // also appears in the sentence editor
-        let el = document.querySelector('p.selected');
+        // scroll to that element
+        let el = this.selected;
         if (this.scrollToSelected && el) el.scrollIntoViewIfNeeded();
     }
 
@@ -199,13 +198,15 @@ class Texteditor {
         this.texteditor.innerHTML = p.toHTML();
 
         this.show();
-        this.focus();
         this.wordcounter();
 
         const selected = this.texteditor.querySelector('.selected');
         let sentence = null;
 
         if (!selected) return;
+
+        // give the DOM time to render, then focus on selected.
+        setTimeout(() => this.focus(), 850);
 
         // activate current element and inject sentence data
         this.setSelected(selected);
