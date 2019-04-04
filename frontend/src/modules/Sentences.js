@@ -45,7 +45,6 @@ function carridgeReturn(e) {
 function deleteCurrentLine(e) {
     e.preventDefault();
     e.stopPropagation();
-    console.log(e.target);
     this.selected.remove();
 }
 

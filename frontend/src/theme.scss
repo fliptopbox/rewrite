@@ -75,6 +75,76 @@
         background-color: rgba(0, 0, 0, 0.2);
     }
 }
+
+$dot: 5px;
+@mixin readability($selector, $color) {
+    .read-#{$selector} {
+        &:before {
+            content: '';
+            background: $color;
+            position: absolute;
+            left: -0.1em;
+            top: 0.6em;
+            width: $dot;
+            height: $dot;
+            border-radius: $dot;
+        }
+        &.selected.locked:before,
+        &.selected:before {
+            width: 1px;
+            bottom: 0;
+            border-radius: 0;
+            height: auto;
+            left: 0;
+            top: 0;
+        }
+    }
+}
+.readability {
+    &-1 {
+        @include readability('very-easy', #11aabb);
+        @include readability('easy', #22ccaa);
+        @include readability('fairly-easy', #69d025);
+        @include readability('plain-english', #d0c310);
+        @include readability('fairly-difficult', #feae2d);
+        @include readability('difficult', #ff6644);
+        @include readability('very-difficult', #f80c12);
+    }
+    &-2 {
+        @include readability('easy', #22ccaa);
+        @include readability('fairly-easy', #69d025);
+        @include readability('plain-english', #d0c310);
+        @include readability('fairly-difficult', #feae2d);
+        @include readability('difficult', #ff6644);
+        @include readability('very-difficult', #f80c12);
+    }
+    &-3 {
+        @include readability('fairly-easy', #69d025);
+        @include readability('plain-english', #d0c310);
+        @include readability('fairly-difficult', #feae2d);
+        @include readability('difficult', #ff6644);
+        @include readability('very-difficult', #f80c12);
+    }
+    &-4 {
+        @include readability('plain-english', #d0c310);
+        @include readability('fairly-difficult', #feae2d);
+        @include readability('difficult', #ff6644);
+        @include readability('very-difficult', #f80c12);
+    }
+    &-5 {
+        @include readability('fairly-difficult', #feae2d);
+        @include readability('difficult', #ff6644);
+        @include readability('very-difficult', #f80c12);
+    }
+    &-6 {
+        @include readability('difficult', #ff6644);
+        @include readability('very-difficult', #f80c12);
+    }
+    &-7 {
+        @include readability('very-difficult', #f80c12);
+    }
+}
+
 .divider {
     & {
         background: rgb(44, 44, 44);

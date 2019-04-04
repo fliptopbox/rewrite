@@ -84,7 +84,7 @@ body {
 .selected {
     &:before {
         content: ' ';
-        width: 3px;
+        //width: 3px;
         position: absolute;
         top: 0;
         bottom: 0;

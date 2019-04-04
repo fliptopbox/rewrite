@@ -24,6 +24,7 @@ class Settings extends React.Component {
             values: {
                 fontsize: 24,
                 splitwidth: 50,
+                readability: 0,
             },
             visible: false,
         };
@@ -49,6 +50,7 @@ class Settings extends React.Component {
         }
         // apply the UI modifiers
         for (let key in state.modifiers) {
+            console.log(key);
             this.toggleClassName(key, state.modifiers[key]);
         }
 
@@ -148,11 +150,43 @@ class Settings extends React.Component {
         TTS.read(plaintext);
     };
 
+    getReadabilityLevel(int) {
+        const ratings = [
+            'Off',
+            'very-easy',
+            'easy',
+            'fairly-easy',
+            'plain-english',
+            'fairly-difficult',
+            'difficult',
+            'very-difficult',
+            'unknown', // empty string
+        ];
+        return ratings[int];
+    }
+    readability(value, persist = false) {
+        value = Number(value);
+        const method = value ? 'add' : 'remove';
+
+        const body = document.querySelector('body');
+        const classnames = body.className.replace(/readability-[0-9]/, '');
+        body.className = classnames;
+        body.classList[method](`readability-${value}`);
+        body.classList[method](`readability`);
+
+        if (!persist) return;
+        const values = this.state.values;
+        values.readability = Number(value);
+        this.setState({ values });
+        u.defer('readability', () => this.save(), 500);
+    }
     fontsize(value, persist = false) {
         document.querySelector('body').style.fontSize = `${value}px`;
 
         if (!persist) return;
-        this.setState({ values: { fontsize: Number(value) } });
+        const values = this.state.values;
+        values.fontsize = Number(value);
+        this.setState({ values });
         u.defer('fontsize', () => this.save(), 500);
     }
     save() {
@@ -226,6 +260,28 @@ class Settings extends React.Component {
                         onChange={e => {
                             const { value } = e.target;
                             this.fontsize(value, true);
+                        }}
+                    />
+                </li>
+                <li className="no-underline">
+                    <div className="inner">
+                        <strong>Readability</strong>
+                        <em>
+                            {this.getReadabilityLevel(
+                                Number(this.state.values.readability)
+                            )}
+                        </em>
+                    </div>
+                    <input
+                        type="range"
+                        id="readability"
+                        name="readability"
+                        min="0"
+                        max="7"
+                        defaultValue={this.state.values.readability}
+                        onChange={e => {
+                            const { value } = e.target;
+                            this.readability(value, true);
                         }}
                     />
                 </li>
