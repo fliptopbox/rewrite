@@ -39,7 +39,7 @@ const ratings = [
 ];
 
 function rating(row = '') {
-    if (!row) return { score: null, name: 'undefined' };
+    if (!row) return { score: null, name: '' };
 
     let { score } = readability.ease(`${row}`);
     let int = parseInt(score / 10, 10); // eg. 25.34234234 = 2
