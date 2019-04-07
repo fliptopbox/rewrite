@@ -69,7 +69,6 @@ function arrayToCollection(array, re = /^>/, md = false) {
             obj.classnames = obj.classnames || [];
             obj.classnames.push(`read-${name}`);
         }
-
         return obj;
     });
 }

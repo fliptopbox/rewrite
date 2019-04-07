@@ -161,7 +161,10 @@ class Texteditor {
                 fn = fn || this.triggers.wordcounter.fn;
                 let diff;
                 const el = document.createElement('span');
-                const { innerText } = this.texteditor;
+                const p = new Parse(this.texteditor.children);
+
+                //const { innerText } = this.texteditor;
+                const innerText = p.toText();
 
                 el.classList.add('value');
                 this.words = wordcount(innerText);
