@@ -24,7 +24,7 @@ class Settings extends React.Component {
             values: {
                 fontsize: 24,
                 splitwidth: 50,
-                readability: 0,
+                readability: 5,
             },
             visible: false,
         };

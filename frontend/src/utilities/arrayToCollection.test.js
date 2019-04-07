@@ -3,56 +3,28 @@ import arrayToCollection from './arrayToCollection';
 
 test('predictable json schema', () => {
     let array = ['string of plain text.'];
-    let expected = [
-        {
-            classnames: [],
-            html: null,
-            inactive: false,
-            text: 'string of plain text.',
-        },
-    ];
-    let result = arrayToCollection(array);
-    expect(result).toEqual(expected);
+    let result = arrayToCollection(array)[0];
+    console.log(result);
+    expect(result).toHaveProperty('classnames');
+    expect(result.html).toBeNull();
+    expect(result.inactive).toBe(false);
+    expect(result.text).toBe('string of plain text.');
 });
 
 test('an inactive line', () => {
     let array = ['> string of plain text.'];
-    let expected = [
-        {
-            classnames: [],
-            html: null,
-            inactive: true,
-            text: '> string of plain text.',
-        },
-    ];
-    let result = arrayToCollection(array);
-    expect(result).toEqual(expected);
+    let result = arrayToCollection(array)[0];
+    expect(result).toHaveProperty('classnames');
+    expect(result.html).toBeNull();
+    expect(result.inactive).toBe(true);
+    expect(result.text).toBe('> string of plain text.');
 });
-
-// test('heading 1 markdown', () => {
-//     let array = ['# string of plain text.'];
-//     let expected = [
-//         {
-//             classnames: ['md-h1'],
-//             html: null,
-//             inactive: false,
-//             text: '# string of plain text.',
-//         },
-//     ];
-//     let result = arrayToCollection(array);
-//     expect(result).toEqual(expected);
-// });
 
 test('unbalanced nested tags', () => {
     let array = ['_string_ of **plain** text.'];
-    let expected = [
-        {
-            classnames: [],
-            html: null,
-            inactive: false,
-            text: '_string_ of **plain** text.',
-        },
-    ];
-    let result = arrayToCollection(array);
-    expect(result).toEqual(expected);
+    let result = arrayToCollection(array)[0];
+    expect(result).toHaveProperty('classnames');
+    expect(result.html).toBeNull();
+    expect(result.inactive).toBe(false);
+    expect(result.text).toBe('_string_ of **plain** text.');
 });

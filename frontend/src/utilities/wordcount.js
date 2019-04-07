@@ -1,21 +1,21 @@
-function wordcount(value) {
-    value = String(value || '');
+function wordcount(string) {
+    string = String(string || '');
 
-    if (!value) return 0;
+    if (!string) return 0;
 
     // collapse hyphenations into one entity
-    value = value.replace(/(\w)[-]+(\w)/g, '$1$1');
+    string = string.replace(/(\w)[-]+(\w)/g, '$1$1');
 
     // normalize non-word chars .,:; etc.
-    value = value.replace(/[\W"]+/g, ' ');
+    string = string.replace(/[\W"]+/g, ' ');
 
     // remove double spaces
-    value = value.replace(/(\s{1,})/g, ' ');
+    string = string.replace(/(\s{1,})/g, ' ');
 
     // remove trailing spaces
-    value = value.trim();
+    string = string.trim();
 
-    return value.length ? value.split(' ').length : 0;
+    return string.length ? string.split(' ').length : 0;
 }
 
 export default wordcount;

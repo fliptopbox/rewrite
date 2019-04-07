@@ -35,7 +35,6 @@ const ratings = [
     'fairly-difficult',
     'difficult',
     'very-difficult',
-    'unknown', // empty string
 ];
 
 function rating(row = '') {
@@ -65,25 +64,12 @@ function arrayToCollection(array, re = /^>/, md = false) {
                   }
                 : row;
 
-        const { score, name } = rating(obj.text);
+        const { name } = rating(obj.text);
         if (name) {
             obj.classnames = obj.classnames || [];
             obj.classnames.push(`read-${name}`);
-            //obj.classnames.push(`read-${score}`);
         }
 
-        /* //! remove markdown ... for now
-        if (false && md && obj.text) {
-            obj.html = marked(obj.text).replace(/\n+/g, '');
-            obj.html = unwrap(obj.html).trim() || null;
-
-            md = markdown(obj.text);
-            md.splice(-1, 1);
-            md.forEach(val => {
-                obj.classnames = obj.classnames || [];
-                obj.classnames.push(`md-${val}`);
-            });
-        }*/
         return obj;
     });
 }
